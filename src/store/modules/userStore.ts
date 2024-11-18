@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IUser, IUserState } from '../types/iTypes';
+import { IUser, IUserState } from '../iTypes/iTypes';
 
 
 const useUserStore = create<IUserState>((set, get) => ({

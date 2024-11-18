@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IAppState } from '../types/iTypes';
+import { IAppState } from '../iTypes/iTypes';
 
 const useAppStore = create<IAppState>((set, get) => ({
     table: undefined,
