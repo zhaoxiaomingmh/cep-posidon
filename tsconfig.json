@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+      "target": "ES6",
+      "module": "CommonJS",
+      "lib": ["DOM", "DOM.Iterable", "ES6"],
+      "skipLibCheck": true,
+      "allowSyntheticDefaultImports": true,
+      "forceConsistentCasingInFileNames": true,
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "declaration": true,
+      "declarationDir": "types",
+      "allowJs": true,
+      "jsx": "react-jsx",
+      "outDir": "js/",
+      "baseUrl": ".",
+      "paths": {
+          "*": ["./declare/*"],
+          "@/*": ["src/*"]
+      }
+  },
+  "include": ["src", "declarations.d.ts"]
+}

@@ -1,0 +1,10 @@
+.parcel-cache
+.vscode
+exec
+node_modules
+package-lock.json
+types
+lib
+jsx
+js
+dist

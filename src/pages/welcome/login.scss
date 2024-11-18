@@ -1,0 +1,22 @@
+.login-wrap {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+
+    .login-wrap-icon {
+        width: 50%;
+        height: 50%;
+        display: flex;
+    }
+
+    #login-button {
+        border-radius: 4px;
+        height: 40px;
+        width: 60%;
+        margin-top: 20px;
+    }
+}
