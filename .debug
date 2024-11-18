@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionList>
-    <Extension Id="com.demo.cepstart">
+    <Extension Id="posidon-ps">
         <HostList>
-            <Host Name="PHXS" Port="4001"/>
+            <Host Name="PHXS" Port="4002"/>
         </HostList>
     </Extension>
 </ExtensionList>

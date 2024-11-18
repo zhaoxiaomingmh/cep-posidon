@@ -31,3 +31,32 @@ export interface IProject {
     resource?: any
 }
 
+export interface IDocument {
+    id: number,
+    number: number,
+    layers?: ILayer[],
+    activeLayer?: ILayer,
+}
+
+export interface ILayer {
+    id: number,
+    name: string,
+    kind: string,
+}
+
+export interface IDocumentState {
+    activeDocument?: IDocument,
+    setActiveDocument: (document: IDocument) => void;
+    getActiveDocument: () => IDocument | undefined;
+    setActiveLayer: (layer: ILayer) => void;
+    getActiveLayer: () => ILayer | undefined;
+}
+
+export interface IEventResult {
+    appId: string,
+    data: string,
+    extensionId: string,
+    scope: string,
+    type: string,
+}
+

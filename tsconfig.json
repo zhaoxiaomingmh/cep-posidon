@@ -19,5 +19,5 @@
           "@/*": ["src/*"]
       }
   },
-  "include": ["src", "declarations.d.ts"]
+  "include": ["src", "declarations.d.ts", "photoshop", "jsx", "photoshop"]
 }

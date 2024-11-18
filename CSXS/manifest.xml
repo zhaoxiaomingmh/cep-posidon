@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<ExtensionManifest Version="7.0" ExtensionBundleId="com.demo.cepstart"
+<ExtensionManifest Version="7.0" ExtensionBundleId="posidon-ps"
     ExtensionBundleVersion="1.0.1"
     ExtensionBundleName="CEPPanelStart" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <ExtensionList>
-        <Extension Id="com.demo.cepstart" Version="1.0" />
+        <Extension Id="posidon-ps" Version="1.0" />
     </ExtensionList>
     <ExecutionEnvironment>
         <HostList>
-            <Host Name="PHXS" Version="[11.0,99.9]" />
-            <Host Name="PHSP" Version="[11.0,99.9]" />
+            <Host Name="PHXS" Version="16.0" />
+            <Host Name="PHSP" Version="16.0" />
         </HostList>
         <LocaleList>
             <Locale Code="All" />
         </LocaleList>
         <RequiredRuntimeList>
-            <RequiredRuntime Name="CSXS" Version="10.0" />
+            <RequiredRuntime Name="CSXS" Version="6.0" />
         </RequiredRuntimeList>
     </ExecutionEnvironment>
     <DispatchInfoList>
-        <Extension Id="com.demo.cepstart">
+        <Extension Id="posidon-ps">
             <DispatchInfo>
                 <Resources>
                     <MainPath>./index.html</MainPath>
+                    <ScriptPath>./photoshop/external/engine.jsx</ScriptPath>
                     <CEFCommandLine>
                         <Parameter>--enable-nodejs</Parameter>
                     </CEFCommandLine>
-                    <ScriptPath>./jsx/main.jsx</ScriptPath>
                 </Resources>
                 <Lifecycle>
                     <AutoVisible>true</AutoVisible>
                 </Lifecycle>
                 <UI>
                     <Type>Panel</Type>
-                    <Menu>CEP面板</Menu>
+                    <Menu>Posidon-PS-CEP</Menu>
                     <Geometry>
                         <Size>
                             <Height>300</Height>
