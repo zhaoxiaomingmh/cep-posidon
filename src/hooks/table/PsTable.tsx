@@ -1,13 +1,13 @@
 import useAppStore from "@/store/modules/appStore";
 import { forwardRef, useEffect } from "react"
 import { SideIcon } from "./SideIcon";
-import { FuncProps } from "../func/PsFunc";
+import { PsTableItemProps } from "./PsTableItem";
 import './PsTable.scss'
 import React from 'react';
 
 interface PsTableRef { }
 interface PsTableProps {
-    children: React.ReactElement<FuncProps>[]
+    children: React.ReactElement<PsTableItemProps>[]
 }
 
 export const PsTable = forwardRef<PsTableRef, PsTableProps>((props, ref) => {

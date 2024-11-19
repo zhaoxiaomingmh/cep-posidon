@@ -8,6 +8,7 @@ import { Button, darkTheme, defaultTheme, lightTheme, Provider } from '@adobe/re
 import { Face } from "./Face";
 
 interface AppRefType {
+    refresh: () => void;
 };
 interface AppProps { }
 export const AppRef = React.createRef<AppRefType>();
@@ -18,11 +19,13 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     const setActiveDocument = useDocumentStore(state => state.setActiveDocument);
     const handler = psHandler;
     useImperativeHandle(ref, () => {
-        return {}
+        return {
+            refresh: checkActiveDocument
+        }
     })
     useEffect(() => {
         checkActiveDocument();
-    })
+    },[])
 
     const checkActiveDocument = async () => {
         const activeDocument = await handler.getActiveDocument();

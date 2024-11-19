@@ -1,3 +1,4 @@
+import { AppRef } from "@/router/App";
 import { IDocument, IEventResult } from "@/store/iTypes/iTypes";
 import useDocumentStore from "@/store/modules/documentStore";
 
@@ -29,6 +30,8 @@ class handler {
     private init() {
         this.registerEvent('select',);
         this.registerEvent('close');
+        this.registerEvent('open');
+
 
         this.csInterface.addEventListener('com.adobe.csxs.events.ThemeColorChanged', () => {
             console.log('颜色更换')
@@ -44,15 +47,14 @@ class handler {
             let obj = JSON.parse(data);
             if (parseInt(obj.eventID) === parseInt(this.selectEventId)) {
                 //"ver1,{ "eventID": 1936483188, "eventData": {"documentID":230,"null":{"_offset":-1,"_ref":"document"}}}"
-
             }
             if (parseInt(obj.eventID) === parseInt(this.closeEventId)) {
                 //{extensionId: "", data: "ver1,{ "eventID": 1131180832, "eventData": {"documentID":243,"forceNotify":true}}", appId: "PHXS", type: "com.adobe.PhotoshopJSONCallbackposidon-ps", scope: "APPLICATION"}
 
-                this.csInterface.evalScript(`app.activeDocument.id`, (result) => {
-                    console.log(result);
-
-                });
+                AppRef.current.refresh();
+            }
+            if (parseInt(obj.eventID) === parseInt(this.openEventId)) {
+                AppRef.current.refresh();
             }
         }, undefined);
 
@@ -66,6 +68,7 @@ class handler {
         this.csInterface.evalScript(`app.stringIDToTypeID('${stringId}')`, (data) => {
             if (stringId === 'select') this.selectEventId = data;
             if (stringId === 'close') this.closeEventId = data;
+            if (stringId === 'open') this.openEventId = data;
             const csEvent: CSEvent = {
                 type: 'com.adobe.PhotoshopRegisterEvent',
                 scope: 'APPLICATION',
@@ -78,12 +81,17 @@ class handler {
 
     }
 
-    public getActiveDocument(): Promise<IDocument> {
+    public getActiveDocument(): Promise<IDocument | undefined> {
         return new Promise((resolve, reject) => {
             this.csInterface.evalScript(`getActiveDocument()`, (result: string) => {
                 try {
-                    const activeDocument = JSON.parse(result) as IDocument;
-                    resolve(activeDocument);
+                    console.log('result', result)
+                    if (result && result !== "undefined") {
+                        const activeDocument = JSON.parse(result) as IDocument;
+                        resolve(activeDocument);
+                    } else {
+                        resolve(undefined);
+                    }
                 } catch (error) {
                     reject(error);
                 }

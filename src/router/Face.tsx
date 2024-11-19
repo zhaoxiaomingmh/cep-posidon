@@ -1,14 +1,15 @@
 import { forwardRef } from "react"
 import './Face.scss'
 import { PsTable } from "@/hooks/table/PsTable";
-import { Func } from "@/hooks/func/PsFunc";
+import { PsTableItem } from "@/hooks/table/PsTableItem";
 import React from 'react';
+import { AssetSearch, AssetSearchRef } from "@/pages/search/AssetSearch";
 
 export const Face = forwardRef(() => {
     return (
         <div className="ps-face">
             <PsTable>
-                <Func
+                <PsTableItem
                     id={"asset-search"}
                     icon={
                         <svg className="icon" viewBox="0 0 1032 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4578" width="26" height="26">
@@ -16,11 +17,9 @@ export const Face = forwardRef(() => {
                             <path d="M468.41 841.112a381.135 381.135 0 1 0 0-762.27 381.135 381.135 0 0 0 0 762.27z m0 78.763a459.898 459.898 0 1 1 0-919.796 459.898 459.898 0 0 1 0 919.796z" p-id="4580" fill="#ebebeb"></path>
                         </svg>
                     }  >
-                    <div>
-                        功能测试1
-                    </div>
-                </Func>
-                <Func
+                    <AssetSearch ref={AssetSearchRef} />
+                </PsTableItem>
+                <PsTableItem
                     id={"psd-level"}
                     icon={
                         <svg className="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7159" xmlnsXlink="http://www.w3.org/1999/xlink" width="26" height="26">
@@ -30,7 +29,7 @@ export const Face = forwardRef(() => {
                     <div>
                         功能测试2
                     </div>
-                </Func>
+                </PsTableItem>
             </PsTable>
         </div >
     );
