@@ -9,7 +9,7 @@ class handler {
 
     private selectEventId: string;
     private closeEventId: string;
-    private setDoc = useDocumentStore(state => state.setActiveDocument)
+    // private setDoc = useDocumentStore(state => state.setActiveDocument)
     constructor() {
         console.log("中央处理器注册成功");
         this.csInterface = new CSInterface();
