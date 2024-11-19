@@ -33,7 +33,7 @@ export interface IProject {
 
 export interface IDocument {
     id: number,
-    number: number,
+    name: number,
     layers?: ILayer[],
     activeLayer?: ILayer,
 }
@@ -42,11 +42,12 @@ export interface ILayer {
     id: number,
     name: string,
     kind: string,
+    subLayers?: ILayer[],
 }
 
 export interface IDocumentState {
     activeDocument?: IDocument,
-    setActiveDocument: (document: IDocument) => void;
+    setActiveDocument: (document: IDocument | undefined) => void;
     getActiveDocument: () => IDocument | undefined;
     setActiveLayer: (layer: ILayer) => void;
     getActiveLayer: () => ILayer | undefined;

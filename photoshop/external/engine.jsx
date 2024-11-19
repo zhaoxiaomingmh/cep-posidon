@@ -1,4 +1,5 @@
 ﻿
+$.level=0;
 try {
     var xLib = new ExternalObject("lib:\PlugPlugExternalObject");
 } catch (e) {
@@ -379,7 +380,7 @@ if (typeof JSON !== "object") {
     }
 }());
 //#endregion
-// 获取当前选中图层的名称
+
 function getActiveLayerName() {
     var activeLayer = app.activeDocument.activeLayer;
     const layer = {
@@ -387,17 +388,29 @@ function getActiveLayerName() {
         id: activeLayer.id,
     }
     return JSON.stringify(layer);
-
 }
 
-// 事件派发函数
+function getActiveDocument() {
+    try {
+        const activeDocument = app.activeDocument;
+        const document = {
+            name: activeDocument.name,
+            id: activeDocument.id,
+        }
+        return JSON.stringify(document);
+    } catch (error) {
+        return undefined;
+    }
+}
+
+
+//#region 
 function dispatch(message) {
     var eventObj = new CSXSEvent();
     eventObj.type = "my_custom_event_type";
     eventObj.data = '[CSXSEvent] ' + message + '';
     eventObj.dispatch()
 }
-
 var psconsole = {
     log: function (message) {
         var eventObj = new CSXSEvent();
@@ -406,3 +419,4 @@ var psconsole = {
         eventObj.dispatch();
     }
 };
+//#endregion

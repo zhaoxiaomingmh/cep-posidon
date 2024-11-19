@@ -1,4 +1,4 @@
-import { IEventResult } from "@/store/iTypes/iTypes";
+import { IDocument, IEventResult } from "@/store/iTypes/iTypes";
 import useDocumentStore from "@/store/modules/documentStore";
 
 class handler {
@@ -9,7 +9,8 @@ class handler {
 
     private selectEventId: string;
     private closeEventId: string;
-    // private setDoc = useDocumentStore(state => state.setActiveDocument)
+    private openEventId: string;
+
     constructor() {
         console.log("中央处理器注册成功");
         this.csInterface = new CSInterface();
@@ -47,10 +48,10 @@ class handler {
             }
             if (parseInt(obj.eventID) === parseInt(this.closeEventId)) {
                 //{extensionId: "", data: "ver1,{ "eventID": 1131180832, "eventData": {"documentID":243,"forceNotify":true}}", appId: "PHXS", type: "com.adobe.PhotoshopJSONCallbackposidon-ps", scope: "APPLICATION"}
-                
+
                 this.csInterface.evalScript(`app.activeDocument.id`, (result) => {
                     console.log(result);
-                    
+
                 });
             }
         }, undefined);
@@ -77,9 +78,16 @@ class handler {
 
     }
 
-    public getActiveLayerName() {
-        this.csInterface.evalScript(`getActiveLayerName()`, (result) => {
-            console.log(result);
+    public getActiveDocument(): Promise<IDocument> {
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`getActiveDocument()`, (result: string) => {
+                try {
+                    const activeDocument = JSON.parse(result) as IDocument;
+                    resolve(activeDocument);
+                } catch (error) {
+                    reject(error);
+                }
+            });
         });
     }
 

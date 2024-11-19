@@ -7,7 +7,7 @@ const useDocumentStore = create<IDocumentState>((set, get) => ({
     setActiveDocument(document: IDocument | undefined) {
         set(state => ({
             ...state,
-            document: document
+            activeDocument: document
         }))
     },
     getActiveDocument() {
