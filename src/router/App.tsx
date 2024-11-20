@@ -1,14 +1,12 @@
 import { Login, LoginRef } from "@/pages/welcome/Login";
 import psHandler from "@/service/handler";
-import { IDocument, IPosidonResponse, IProject, IUser } from "@/store/iTypes/iTypes";
+import { IDocument, IEnv, IPosidonResponse, IProject, IUser } from "@/store/iTypes/iTypes";
 import useDocumentStore from "@/store/modules/documentStore";
 import useUserStore from "@/store/modules/userStore";
 import React, { forwardRef, useEffect, useImperativeHandle } from "react";
 import { Button, darkTheme, defaultTheme, lightTheme, Provider } from '@adobe/react-spectrum';
 import { Face } from "./Face";
 import { psConfig } from "@/utlis/util-env";
-import utilHttps from "@/utlis/util-https";
-import { defaultProjectHeadImage } from "@/utlis/const";
 
 interface AppRefType {
     refresh: () => void;
@@ -30,7 +28,6 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         }
     })
     useEffect(() => {
-        localStorage.removeItem('cep-user');
         checkActiveDocument();
         getUserInLocalStorage();
     }, [])

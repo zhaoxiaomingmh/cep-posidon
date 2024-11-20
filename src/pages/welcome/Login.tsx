@@ -15,7 +15,6 @@ export const LoginRef = React.createRef<LoginRefType>();
 export const Login = forwardRef<LoginRefType, LoginProps>((props, ref) => {
 
     const setUser = useUserStore(state => state.setUser);
-    const project = useUserStore(state => state.getProject());
     const setProject = useUserStore(state => state.setProject);
 
     const handleLogin = () => {

@@ -48,7 +48,7 @@ export interface IProject {
 
 export interface IDocument {
     id: number,
-    name: number,
+    name: string,
     layers?: ILayer[],
     activeLayer?: ILayer,
 }
