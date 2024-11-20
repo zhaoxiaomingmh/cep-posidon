@@ -1,7 +1,7 @@
 import { AppRef } from "@/router/App";
 import { IDocument, IEventResult } from "@/store/iTypes/iTypes";
-import useDocumentStore from "@/store/modules/documentStore";
 
+//用来与Photoshop交互
 class handler {
     private static instance: handler;
     private csInterface: CSInterface;

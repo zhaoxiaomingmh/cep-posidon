@@ -4,6 +4,7 @@ import { IUser, IUserState } from '../iTypes/iTypes';
 
 const useUserStore = create<IUserState>((set, get) => ({
     user: undefined,
+    project: undefined,
     setUser(user: IUser) {
         set(state => ({
             ...state,
@@ -12,6 +13,15 @@ const useUserStore = create<IUserState>((set, get) => ({
     },
     getUser() {
         return get().user
+    },
+    setProject(project) {
+        set(state => ({
+            ...state,
+            project: project
+        }))
+    },
+    getProject() {
+        return get().project
     }
 }));
 export default useUserStore; 

@@ -14,20 +14,35 @@ export interface IAppState {
 }
 export interface IUserState {
     user: IUser,
+    project: IProject,
     setUser: (user: IUser) => void;
     getUser: () => IUser | undefined;
+    setProject: (project: IProject) => void;
+    getProject: () => IProject | undefined;
 }
 
 export interface IUser {
     id: number,
+    env: IEnv,
+    loginType: 'External' | 'OpenID',
     email?: string,
+    head?: string,
     name: string,
-    projectjects?: IProject[]
+    projectjects?: IProject[],
+    expired: Date
+    last: number,
+}
+
+export enum IEnv {
+    dev = 'dev',
+    test = 'test',
+    prod = 'prod',
 }
 
 export interface IProject {
     id: number,
-    name: string,
+    head?: string,
+    name?: string,
     resource?: any
 }
 
@@ -61,3 +76,10 @@ export interface IEventResult {
     type: string,
 }
 
+export type IPosidonResponse = {
+    code?: number,
+    message?: string,
+    data?: any,
+    state?: boolean,
+    error?: string
+}

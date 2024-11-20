@@ -2,6 +2,10 @@ import React from "react";
 import { forwardRef } from "react";
 import './login.scss'
 import useUserStore from "@/store/modules/userStore";
+import { IUser } from "@/store/iTypes/iTypes";
+import * as signalR from "@microsoft/signalr";
+import { psConfig } from "@/utlis/util-env";
+import { util } from "@/utlis/util";
 
 interface LoginRefType { };
 interface LoginProps { }
@@ -11,9 +15,40 @@ export const Login = forwardRef<LoginRefType, LoginProps>((props, ref) => {
     const setUser = useUserStore(state => state.setUser);
 
     const handleLogin = () => {
-        setUser({
-            id: 0,
-            name: "明辉"
+        let currentStateId = util.uuid();
+        let connection = new signalR.HubConnectionBuilder().withUrl(psConfig.host + psConfig.hubservice, {
+            skipNegotiation: true,
+            transport: signalR.HttpTransportType.WebSockets
+        })
+            .configureLogging(signalR.LogLevel.Information)
+            .withAutomaticReconnect()
+            .build();
+        console.log('signalr start');
+        connection.start().catch(err => console.error(err.toString()));
+        console.log('signalr connected');
+        connection.on("ReturnConnectionId", (connectionID) => {
+            const link = `${psConfig.host}?type=FigmaPlugin&state=${currentStateId}&connectionid=${connectionID}`;
+            const cs = new CSInterface();
+            cs.openURLInDefaultBrowser(link);
+        });
+
+        connection.on("FigmaPluginLoginSuccessCallback", (state, userInfo, isExternal) => {
+            console.log("登录信息", state, userInfo, isExternal);
+            if (state && state == currentStateId) {
+                let user: IUser = {
+                    id: userInfo.id,
+                    env: psConfig.env,
+                    loginType: isExternal ? "External" : "OpenID",
+                    name: userInfo.name,
+                    email: userInfo.netaseEmail,
+                    head: userInfo.headImageUrl,
+                    expired: new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000),
+                    last: -1,
+                }
+                setUser(user);
+                localStorage.setItem('cep-user', JSON.stringify(user));
+
+            }
         });
     };
 

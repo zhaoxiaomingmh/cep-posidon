@@ -1,0 +1,1 @@
+export const defaultProjectHeadImage = "../images/img_team.png";
