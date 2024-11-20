@@ -14,7 +14,7 @@ export const psConfig = {
     rsa: function () {
         const jsencrypt = new JSEncrypt();
         jsencrypt.setPublicKey(this.publicKey);
-        let data = (this.clientId + '-' + this.clientSecret + '-' + this.timeStamp);
+        let data = (this.clientId + '-' + this.clientSecret + '-' + this.timeStamp());
         return jsencrypt.encrypt(data);
     },
     hubservice: config[env].posidon.path.hubservice,

@@ -17,10 +17,10 @@ const instance = axios.create({
 
 // 添加请求拦截器
 instance.interceptors.request.use(function (config) {
-    config.headers[API_KEY] = psConfig.rsa;
+    config.headers[API_KEY] = psConfig.rsa();
     config.headers[API_CLIENTID] = psConfig.clientId
-    config.headers[API_TIMESTAMP] = psConfig.timeStamp;
-    config.headers[API_EMAILE] = AppRef.current.user.email;
+    config.headers[API_TIMESTAMP] = psConfig.timeStamp();
+    if (AppRef.current.user) config.headers[API_EMAILE] = AppRef.current.user?.email;
     config.headers["Content-Type"] = 'application/json'
     // 在发送请求之前做些什么   
     config.url = psConfig.host + config.url;
@@ -68,11 +68,11 @@ function httpGet(api, params, name: String = '') {
                         console.log('api重试后依然请求错误:', error);
                         reject(error);
                     });
-                } 
-                    else {
-                        reject(err);
-                    }
-                
+                }
+                else {
+                    reject(err);
+                }
+
             }
         })
     })

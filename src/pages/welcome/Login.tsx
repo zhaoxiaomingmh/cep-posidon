@@ -2,10 +2,12 @@ import React from "react";
 import { forwardRef } from "react";
 import './login.scss'
 import useUserStore from "@/store/modules/userStore";
-import { IUser } from "@/store/iTypes/iTypes";
+import { IPosidonResponse, IProject, IUser } from "@/store/iTypes/iTypes";
 import * as signalR from "@microsoft/signalr";
 import { psConfig } from "@/utlis/util-env";
 import { util } from "@/utlis/util";
+import utilHttps from "@/utlis/util-https";
+import { defaultProjectHeadImage } from "@/utlis/const";
 
 interface LoginRefType { };
 interface LoginProps { }
@@ -13,6 +15,8 @@ export const LoginRef = React.createRef<LoginRefType>();
 export const Login = forwardRef<LoginRefType, LoginProps>((props, ref) => {
 
     const setUser = useUserStore(state => state.setUser);
+    const project = useUserStore(state => state.getProject());
+    const setProject = useUserStore(state => state.setProject);
 
     const handleLogin = () => {
         let currentStateId = util.uuid();
@@ -35,21 +39,47 @@ export const Login = forwardRef<LoginRefType, LoginProps>((props, ref) => {
         connection.on("FigmaPluginLoginSuccessCallback", (state, userInfo, isExternal) => {
             console.log("登录信息", state, userInfo, isExternal);
             if (state && state == currentStateId) {
-                let user: IUser = {
-                    id: userInfo.id,
-                    env: psConfig.env,
-                    loginType: isExternal ? "External" : "OpenID",
-                    name: userInfo.name,
-                    email: userInfo.netaseEmail,
-                    head: userInfo.headImageUrl,
-                    expired: new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000),
-                    last: -1,
-                }
-                setUser(user);
-                localStorage.setItem('cep-user', JSON.stringify(user));
-
+                updateUser(userInfo, isExternal);
             }
         });
+    };
+
+    const updateUser = async (userInfo, isExternal: boolean) => {
+        let user: IUser = {
+            id: userInfo.id,
+            env: psConfig.env,
+            loginType: isExternal ? "External" : "OpenID",
+            name: userInfo.name,
+            email: userInfo.netaseEmail,
+            head: userInfo.headImageUrl,
+            expired: new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000),
+            last: -1,
+        }
+
+        const posidonResole: any = await utilHttps.httpGet(psConfig.getProject, { userId: user.id });
+        if (posidonResole.status != 200) {
+            //todo:报错
+            return;
+        }
+        const data = posidonResole.data;
+        let projects: IProject[] = [];
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            let projectInfo: IProject = {
+                name: item.name,
+                id: item.id,
+                head: item.headImageUrl ? item.headImageUrl : defaultProjectHeadImage,
+            }
+            projects.push(projectInfo);
+        }
+        user.projectjects = projects;
+        if (projects.length > 0) {
+            let project = projects[0];
+            user.last = project.id;
+            setProject(project);
+        }
+        setUser(user);
+        localStorage.setItem('cep-user', JSON.stringify(user));
     };
 
     return (
