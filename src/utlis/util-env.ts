@@ -17,7 +17,10 @@ export const psConfig = {
         let data = (this.clientId + '-' + this.clientSecret + '-' + this.timeStamp());
         return jsencrypt.encrypt(data);
     },
-    hubservice: config[env].posidon.path.hubservice,
-    getProject: config[env].posidon.path["get-project"],
+    hubservice: config.path.hubservice,
+    getProject: config.path["get-project"],
+    getStorehouse: config.path["get-storehouse"],
+    generateURL: config.path["generate-url"],
+    searchImage: config.path["seach-image"],
 }
 

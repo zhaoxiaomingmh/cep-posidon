@@ -1,0 +1,30 @@
+.formats-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    .format-checkbox-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+
+        .format-check-box {
+            width: 12px;
+            height: 12px;
+            margin-left: 5px;
+            border: 1px solid #1f88ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        >span {
+            flex: 1;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+    }
+
+}

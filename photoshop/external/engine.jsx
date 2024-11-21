@@ -403,7 +403,6 @@ function getActiveDocument() {
     }
 }
 
-
 //#region 
 function dispatch(message) {
     var eventObj = new CSXSEvent();

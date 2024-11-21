@@ -5,6 +5,9 @@ import { PsFuncItem } from "@/hooks/func/PsFuncItem";
 import { PsFunc } from "@/hooks/func/PsFunc";
 import { Button, defaultTheme, Heading, Provider, } from "@adobe/react-spectrum";
 import { psConfig } from "@/utlis/util-env";
+import utilHttps from "@/utlis/util-https";
+import { IPosidonResponse, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
+import { defaultProjectHeadImage } from "@/utlis/const";
 interface SettingsRefType { };
 interface SettingsProps { }
 export const SettingsRef = React.createRef<SettingsRefType>();
@@ -15,12 +18,37 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
     const project = useUserStore(state => state.getProject());
     const setProject = useUserStore(state => state.setProject);
 
-    const handleChange = (event) => {
+    const handleChange = async (event) => {
         const target = event.target.value;
-        const p = user.projectjects.find(x => x.id === parseInt(target));
+        const p = user.projects.find(x => x.id === parseInt(target));
+        if (!p.storehouses) {
+            const posidonResole: any = await utilHttps.httpGet(psConfig.getStorehouse, { projectId: project.id });
+            if (posidonResole.status == 200) {
+                const response = posidonResole.data as IPosidonResponse;
+                if (response.code == 0) {
+                    const data: IProjectStorehouse = response.data;
+                    p.storehouses = data.storehouses;
+                    const updatedProjects = user.projects?.map(project => {
+                        if (project.id === project.id) {
+                            return {
+                                ...project,
+                                storehouses: data.storehouses
+                            };
+                        }
+                    });
+
+                    const u: IUser = {
+                        ...user,
+                        last: p.id,
+                        projects: updatedProjects
+                    }
+                    setUser(u);
+                    localStorage.setItem('cep-user', JSON.stringify(u));
+                }
+            }
+        }
         setProject(p);
     }
-
 
     return (
         <PsFunc>
@@ -46,17 +74,17 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                 <div className="settings__content__team">
                     <div className="settings__content__team__title">
                         <span id="currunt-team">当前项目</span>
-                        <select onChange={handleChange}>
-                            {user.projectjects?.map((p, index) => {
+                        <select onChange={handleChange} defaultValue={project.id}>
+                            {user.projects?.map((p, index) => {
                                 return <option key={index} value={p.id}>{p.name}</option>
                             })}
                         </select>
                     </div>
                     <div className="settings__content__team__preview">
-                        <img id='project-head' src={psConfig.host + project.head.replace('..', '')} />
+                        <img id='project-head' src={project?.head ? psConfig.host + project.head.replace('..', '') : psConfig.host + defaultProjectHeadImage.replace('..', '')} />
                         <div className="settings__content__team__preview__project-name">
-                            <span>{project.name}</span>
-                            <span>{project.projectEditorType}</span>
+                            <span>{project?.name}</span>
+                            <span>{project?.projectEditorType}</span>
                         </div>
                     </div>
                 </div>

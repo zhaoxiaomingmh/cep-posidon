@@ -45,9 +45,11 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         } else {
             let timer = new Date(user.expired)
             if (timer > new Date()) {
+                console.log(`user`, user);
                 setUser(user);
-                if (user.last != -1 && user.projectjects) {
-                    const project = user.projectjects.find(p => p.id === user.last);
+                if (user.last != -1 && user.projects) {
+                    console.log(`${user.last} 上次的id是这个`);
+                    const project = user.projects.find(p => p.id === user.last);
                     setProject(project)
                 }
             } else {

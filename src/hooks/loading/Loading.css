@@ -1,0 +1,11 @@
+.loading {
+    display: flex;
+    justify-content: space-between;
+    width: 34px;
+    position: relative;
+}
+
+.loading-bar {
+    width: 6px;
+    background-color: #000;
+}

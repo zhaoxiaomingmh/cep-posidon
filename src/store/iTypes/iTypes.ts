@@ -28,7 +28,7 @@ export interface IUser {
     email?: string,
     head?: string,
     name: string,
-    projectjects?: IProject[],
+    projects?: IProject[],
     expired: Date
     last: number,
 }
@@ -43,7 +43,7 @@ export interface IProject {
     id: number,
     head?: string,
     name?: string,
-    resource?: any,
+    storehouses?: IStorehouse[],
     projectEditorType: string
 }
 
@@ -77,10 +77,79 @@ export interface IEventResult {
     type: string,
 }
 
-export type IPosidonResponse = {
+export interface IPosidonResponse {
     code?: number,
     message?: string,
     data?: any,
     state?: boolean,
     error?: string
+}
+
+
+export interface IGalleryItem {
+    id: string | number,
+    isFile: boolean,
+    name: string,
+    svnPsdLevelId?: number,
+    fileUrl?: string,
+    thumb?: string,
+
+    files?: IGalleryItem[],
+    dis?: number,
+    format?: ImageFormat
+    projectName?: string
+}
+
+export type IDownloader = {
+    progress: number,
+    id: number | string,
+    complete: boolean,
+}
+
+export type ImageFormat = 'png' | 'jpg' | 'psd' | 'comp';
+
+export interface IProjectStorehouse {
+    id: number,
+    name: string,
+    storehouses: IStorehouse[]
+}
+
+export type IStorehouse = {
+    type: IStorehouseType,
+    projectName: string,
+}
+
+export type IStorehouseType = 'components' | 'interfaces' | 'ENGINEERING' | 'DESIGN' | 'All'
+
+
+export interface IFile {
+    name: string,
+    ext: string,
+    path: string,
+    url?: string
+}
+
+export interface ISearchItem {
+    projectName: string,
+    type: IStorehouseType,
+    page: number,
+    size: number,
+    canSearch: boolean
+}
+
+export interface ISearchResult  {
+    projectName: string,
+    page: number,
+    data: ISearchImageResponseItem[],
+    dis: number,
+    isTotal: boolean
+}
+
+export interface ISearchImageResponseItem  {
+    id: string
+    path: string
+    dis: number
+    thumbnail: string
+    name: string,
+    ext: string
 }
