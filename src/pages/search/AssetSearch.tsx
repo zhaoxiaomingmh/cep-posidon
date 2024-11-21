@@ -11,7 +11,7 @@ export const AssetSearchRef = React.createRef<AssetSearchRefType>();
 export const AssetSearch = forwardRef<AssetSearchRefType, AssetSearchProps>((props, ref) => {
 
     return (
-        <PsFunc table={"aaa"} >
+        <PsFunc>
             <PsFuncItem id={"func1"} title="func1">
                 <div>这是测试1的页面 </div>
             </PsFuncItem>

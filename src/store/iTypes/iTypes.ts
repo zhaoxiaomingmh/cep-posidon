@@ -43,7 +43,8 @@ export interface IProject {
     id: number,
     head?: string,
     name?: string,
-    resource?: any
+    resource?: any,
+    projectEditorType: string
 }
 
 export interface IDocument {

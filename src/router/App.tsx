@@ -1,6 +1,6 @@
 import { Login, LoginRef } from "@/pages/welcome/Login";
 import psHandler from "@/service/handler";
-import { IDocument, IEnv, IPosidonResponse, IProject, IUser } from "@/store/iTypes/iTypes";
+import { IUser } from "@/store/iTypes/iTypes";
 import useDocumentStore from "@/store/modules/documentStore";
 import useUserStore from "@/store/modules/userStore";
 import React, { forwardRef, useEffect, useImperativeHandle } from "react";
@@ -18,6 +18,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
 
     const user = useUserStore(state => state.getUser());
     const setUser = useUserStore(state => state.setUser);
+    const setProject = useUserStore(state => state.setProject);
     const activeDocument = useDocumentStore(state => state.getActiveDocument());
     const setActiveDocument = useDocumentStore(state => state.setActiveDocument);
     const handler = psHandler;
@@ -37,14 +38,18 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     }
     const getUserInLocalStorage = () => {
         const userStr = localStorage.getItem('cep-user');
-        console.log(userStr);
         if (!userStr) return;
         const user = JSON.parse(userStr) as IUser;
         if (user.env !== psConfig.env) {
             localStorage.removeItem('cep-user');
         } else {
-            if (user.expired > new Date()) {
+            let timer = new Date(user.expired)
+            if (timer > new Date()) {
                 setUser(user);
+                if (user.last != -1 && user.projectjects) {
+                    const project = user.projectjects.find(p => p.id === user.last);
+                    setProject(project)
+                }
             } else {
                 localStorage.removeItem('cep-user');
             }

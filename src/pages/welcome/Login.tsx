@@ -68,6 +68,7 @@ export const Login = forwardRef<LoginRefType, LoginProps>((props, ref) => {
                 name: item.name,
                 id: item.id,
                 head: item.headImageUrl ? item.headImageUrl : defaultProjectHeadImage,
+                projectEditorType: item.projectEditorType,
             }
             projects.push(projectInfo);
         }

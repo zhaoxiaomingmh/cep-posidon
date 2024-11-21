@@ -8,7 +8,7 @@ export interface PsFuncItemProps {
 
 export const PsFuncItem = forwardRef<PsFuncItemRef, PsFuncItemProps>((props, ref) => {
     return (
-        <div>
+        <div className="ps-func__item">
             {props.children}
         </div>
     );
