@@ -8,7 +8,8 @@ import path from 'path'
 import './index.scss'
 import iService from "@/service/service";
 import { Gallery } from "@/hooks/gallery/Gallery";
-import { FormatCheckboxs } from "./formatCheckboxs";
+import { FormatCheckboxs } from "./FormatCheckboxs";
+import reService from "@/service/resourceService";
 
 interface ImageSearchImageProps {
 
@@ -21,6 +22,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
 
     //全局状态
     const project = useUserStore(state => state.project);
+    const myService = reService;
     //局部状态
     const size = 10;
     const [formats, setFormats] = useState<ImageFormat[]>(['psd', 'png', 'jpg', 'comp']);
@@ -202,6 +204,14 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         setIsSearch(true);
         toSearchImage(false);
     }
+    const downloadFile = (img: IGalleryItem) => {
+        if (!downloader.complete) {
+            // ExDialogRef.current.showMessage("注意", "有任务正在下载中，请稍后...", 'info');
+            return;
+        }
+        setDownloader({ id: img.id, progress: 0, complete: false });
+        myService.downloadFile(img, 'imgRef', project);
+    }
     return (
         <div className="image-search-image-container">
             {
@@ -275,7 +285,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
             {
                 storehouseState
                 &&
-                <Gallery files={imgs} isSearch={isSearch} canScroll={canScroll} scrollBottom={scrollBottom} downloader={downloader} toDownload={undefined}  >
+                <Gallery files={imgs} isSearch={isSearch} canScroll={canScroll} scrollBottom={scrollBottom} downloader={downloader} toDownload={downloadFile}  >
                     <FormatCheckboxs key={"FormatCheckboxs"} formats={formats} changeFormats={changeFormats} />
                 </Gallery>
             }

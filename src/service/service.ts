@@ -1,5 +1,5 @@
 import { ImageSearchImageRef } from '@/pages/search/component/ImageSearchImage';
-import { IPosidonResponse, ISearchItem, ISearchResult } from '@/store/iTypes/iTypes';
+import { IAccountResponse, IGalleryItem, IPosidonResponse, IProject, ISearchItem, ISearchResult } from '@/store/iTypes/iTypes';
 import { psConfig } from '@/utlis/util-env';
 import utilHttps from '@/utlis/util-https';
 import axios from 'axios';
@@ -14,7 +14,6 @@ class psSerive {
         }
         return psSerive.instance;
     }
-
     public async generateImageUrl(path: string): Promise<string | undefined> {
         const imageData = window.cep.fs.readFile(path, "Base64")
         const binary = window.cep.encoding.convertion.b64_to_binary(imageData.data)
@@ -40,7 +39,6 @@ class psSerive {
         }
         return undefined;
     }
-
     public async searchImage(projectId: number, pa: string, searchs: ISearchItem[], formats: string[], type: number) {
         const projectNames = searchs.map(item => { return item.projectName });
         let data = {
@@ -58,8 +56,8 @@ class psSerive {
             if (result.data?.code === 0) {
                 const imgData = result.data?.data as ISearchResult[];
                 console.log(imgData, "搜索结果");
-                const res : ISearchResult = {
-                    projectName: 'Testing_49_a6146334c28',
+                const res: ISearchResult = {
+                    projectName: 'Testing_16_A25ae69055e',
                     page: 1,
                     data: [
                         {
@@ -73,10 +71,10 @@ class psSerive {
                     ],
                     dis: 0,
                     isTotal: true
-                } 
+                }
                 imgData.push(res);
-                const res1 : ISearchResult = {
-                    projectName: 'Testing_49_e24a22012d9',
+                const res1: ISearchResult = {
+                    projectName: 'Testing_16_A8a4d5d1e8e',
                     page: 1,
                     data: [
                         {
@@ -90,9 +88,9 @@ class psSerive {
                     ],
                     dis: 0.1,
                     isTotal: true
-                } 
+                }
                 imgData.push(res1);
-                const res2 : ISearchResult = {
+                const res2: ISearchResult = {
                     projectName: 'inte670f3f58b1bb458b',
                     page: 1,
                     data: [
@@ -107,7 +105,7 @@ class psSerive {
                     ],
                     dis: 0.1,
                     isTotal: true
-                } 
+                }
                 imgData.push(res2);
                 this.notifySearchResult(type, imgData);
                 return;
@@ -118,8 +116,20 @@ class psSerive {
         this.notifySearchResult(type, undefined);
         return;
     }
+    public async GetSVNAccountByProjectName(projectName: string): Promise<IAccountResponse> {
+        const response: any = await utilHttps.httpGet(psConfig.getSvnAccountByProjectName, { projectName: projectName })
+        if (response.status != 200) {
+            // ExDialogRef.current.showMessage("请求失败", `原因为:${response1.message}`, 'error')
+            return;
+        }
+        const result = response.data as IPosidonResponse;
+        if (result.code != 0) {
+            return
+        }
+        const data = result.data as IAccountResponse;
+        return data;
 
-
+    }
     public notifySearchResult(type: number, data: ISearchResult[]) {
         if (type === 0) {
             ImageSearchImageRef.current?.setSearchResult(data);

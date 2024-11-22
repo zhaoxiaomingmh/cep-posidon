@@ -22,5 +22,6 @@ export const psConfig = {
     getStorehouse: config.path["get-storehouse"],
     generateURL: config.path["generate-url"],
     searchImage: config.path["seach-image"],
+    getSvnAccountByProjectName: config.path["get-svn-account-by-projectname"],
 }
 

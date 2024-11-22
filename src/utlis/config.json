@@ -28,6 +28,7 @@
         "get-project": "/ProjectInfo/GetProjectDataByUserId",
         "get-storehouse": "/ImageSeach/GetStorehouseByProjectId",
         "generate-url": "/ImageSeach/UploadImageToGenerateURL",
-        "seach-image": "/ImageSeach/SeachImage"
+        "seach-image": "/ImageSeach/SeachImage",
+        "get-svn-account-by-projectname": "/ImageSeach/GetSVNAccountByProjectName"
     }
 }

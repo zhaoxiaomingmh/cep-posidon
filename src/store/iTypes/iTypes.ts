@@ -153,3 +153,12 @@ export interface ISearchImageResponseItem  {
     name: string,
     ext: string
 }
+
+export interface IAccountResponse  {
+    id: number,
+    baseUrl: string,
+    accountType: number,
+    username: string,
+    password: string,
+    data: string
+}
