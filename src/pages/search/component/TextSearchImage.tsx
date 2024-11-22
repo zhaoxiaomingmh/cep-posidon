@@ -1,26 +1,24 @@
-import { NoSVNLibrary } from "@/hooks/gallery/NoSVNLibrary";
-import { IDownloader, IFile, IGalleryItem, ImageFormat, ISearchItem, ISearchResult, IStorehouseType } from "@/store/iTypes/iTypes";
-import useUserStore from "@/store/modules/userStore";
-import { psConfig } from "@/utlis/util-env";
-import React, { useEffect, useImperativeHandle, useState } from "react";
-import { forwardRef } from "react";
-import path from 'path'
+import { IDownloader, IGalleryItem, ImageFormat, ISearchItem, ISearchResult, IStorehouseType } from "@/store/iTypes/iTypes";
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import './index.scss'
-import iService from "@/service/service";
-import { Gallery } from "@/hooks/gallery/Gallery";
-import { FormatCheckboxs } from "./FormatCheckboxs";
+import { NoSVNLibrary } from "@/hooks/gallery/NoSVNLibrary";
 import reService from "@/service/resourceService";
+import useUserStore from "@/store/modules/userStore";
+import iService from "@/service/service";
 import { useTranslation } from "react-i18next";
+import { Gallery } from "@/hooks/gallery/Gallery";
+import { psConfig } from "@/utlis/util-env";
+import { FormatCheckboxs } from "./FormatCheckboxs";
 
-interface ImageSearchImageProps {
+interface TextSearchImageProps {
 
 };
-interface ImageSearchImageRefType {
+interface TextSearchImageRefType {
     setSearchResult: (result: ISearchResult[] | undefined) => void,
     setProgress: (progress: number | undefined) => void,
 };
-export const ImageSearchImageRef = React.createRef<ImageSearchImageRefType>();
-export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchImageProps>((props, ref) => {
+export const TextSearchImageRef = React.createRef<TextSearchImageRefType>();
+export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImageProps>((props, ref) => {
 
     //全局状态
     const project = useUserStore(state => state.project);
@@ -30,7 +28,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
     const size = 10;
     const [formats, setFormats] = useState<ImageFormat[]>(['psd', 'png', 'jpg', 'comp']);
     const [assetType, setAssetType] = useState<IStorehouseType>('All');
-    const [searchFile, setSearchFile] = useState<IFile>(undefined);
+    const [searchPa, setSearchPa] = useState<string>(undefined);
     const [storehouseState, setStorehouseState] = useState<boolean>(false);
     const [searchItems, setSearchItems] = useState<ISearchItem[]>([]);
     const [isSearch, setIsSearch] = useState<boolean>(false);
@@ -69,7 +67,6 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         setDownloader({ id: 0, progress: 0, complete: true });
         updateState();
     }, [assetType, formats])
-
     const updateState = () => {
         let svnState = false;
         let scroollState = false;
@@ -89,38 +86,10 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         setStorehouseState(svnState);
         setCanScroll(scroollState);
     }
-    const loadImage = () => {
-        const images = window.cep.fs.showOpenDialog(false, false, "选择你要上传的图片", null, ["gif", "jpg", "jpeg", "png", "bmp", "webp", "svg"]);
-        console.log('images', images);
-        if (images.data.length > 0) {
-            const filePath = images.data[0];
-            const fileName = path.basename(filePath);
-            const fileExtension = path.extname(filePath);
-            const f: IFile = {
-                name: fileName,
-                ext: fileExtension,
-                path: filePath
-            }
-            setSearchFile(f);
-        }
-    }
     const toSearchImage = async (clear: boolean) => {
         if (isSearch) return;
         if (!storehouseState) return;
-        if (!searchFile) return;
-        let imageUrl: string = undefined;
-        if (!searchFile.url) {
-            imageUrl = await iService.generateImageUrl(searchFile.path);
-            if (!imageUrl) {
-                // ExDialogRef.current.showMessage('失败', '生成ImageUrl失败，请联系管理员', 'error')
-                alert('犯病了')
-                return;
-            }
-            setSearchFile({
-                ...searchFile,
-                url: imageUrl,
-            });
-        }
+        if (!searchPa) return;
         setIsSearch(true);
         if (clear) {
             const newItems: ISearchItem[] = searchItems
@@ -136,7 +105,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 });
             setCanScroll(true);
             setImages([])
-            iService.searchImage(project.id, imageUrl ? imageUrl : searchFile.url, newItems, formats, 0)
+            iService.searchImage(project.id, searchPa, newItems, formats, 1)
         } else {
             const newItems: ISearchItem[] = searchItems
                 .filter(item => item.canSearch === true && (item.type === assetType || assetType === 'All'))
@@ -149,7 +118,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                         canSearch: item.canSearch
                     };
                 });
-            iService.searchImage(project.id, searchFile.url, newItems, formats, 0)
+            iService.searchImage(project.id, searchPa, newItems, formats, 1)
             setIsSearch(true);
         }
     }
@@ -213,10 +182,11 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
             return;
         }
         setDownloader({ id: img.id, progress: 0, complete: false });
-        myService.downloadFile(img, 'imgRef', project);
+        myService.downloadFile(img, 'textRef', project);
     }
     const setProgress = (progress: number | undefined) => {
         if (downloader.complete) return;
+        console.log('progress', progress);
         if (!progress) {
             setDownloader({
                 ...downloader,
@@ -230,6 +200,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
             })
         }
     }
+
     return (
         <div className="image-search-image-container">
             {
@@ -255,37 +226,13 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                             <option value="interfaces">界面库</option>
                         </select>
                     </div>
-                    <div className="image-search-image-input"
-                        onClick={async () => {
-                            loadImage();
-                        }}>
-                        {
-                            !searchFile
-                            &&
-                            <span style={{
-                                fontStyle: 'italic',
-                                fontSize: "14px",
-                                marginLeft: "5px",
-                            }}>
-                                {"请选择文件进行上传"}
-                            </span>
-                        }
-                        {
-                            searchFile
-                            &&
-                            <div className="image-search-image-file">
-                                <img style={{ width: "40px", height: "40px", objectFit: "contain", margin: "auto 10px" }}
-                                    src={searchFile.path} />
-                                <span style={{
-                                    margin: "auto",
-                                    whiteSpace: "nowrap",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis"
-                                }}>
-                                    {searchFile.name}
-                                </span>
-                            </div>
-                        }
+                    <div className="image-search-image-input" >
+                        <input type="text"
+                            className="searchInput"
+                            placeholder="支持中英文，英文适配度更高"
+                            onChange={(event) => {
+                                setSearchPa(event.target.value);
+                            }} />
                     </div>
                     <div className="image-search-image-button">
                         <div className="image-search-image-button-desc" onClick={() => { toSearchImage(true) }} >

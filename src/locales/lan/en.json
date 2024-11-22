@@ -1,3 +1,6 @@
 {
-
+    "asset_search": {
+        "lable1": "Image Search",
+        "lable2": "search"
+    }
 }

@@ -5,8 +5,8 @@ import { IDocument, IEventResult } from "@/store/iTypes/iTypes";
 class handler {
     private static instance: handler;
     private csInterface: CSInterface;
-    private extId: string;
-    private appId: string;
+    public extId: string;
+    public appId: string;
 
     private selectEventId: string;
     private closeEventId: string;

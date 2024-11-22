@@ -137,7 +137,7 @@ export interface ISearchItem {
     canSearch: boolean
 }
 
-export interface ISearchResult  {
+export interface ISearchResult {
     projectName: string,
     page: number,
     data: ISearchImageResponseItem[],
@@ -145,7 +145,7 @@ export interface ISearchResult  {
     isTotal: boolean
 }
 
-export interface ISearchImageResponseItem  {
+export interface ISearchImageResponseItem {
     id: string
     path: string
     dis: number
@@ -154,7 +154,7 @@ export interface ISearchImageResponseItem  {
     ext: string
 }
 
-export interface IAccountResponse  {
+export interface IAccountResponse {
     id: number,
     baseUrl: string,
     accountType: number,

@@ -29,6 +29,9 @@
         "get-storehouse": "/ImageSeach/GetStorehouseByProjectId",
         "generate-url": "/ImageSeach/UploadImageToGenerateURL",
         "seach-image": "/ImageSeach/SeachImage",
-        "get-svn-account-by-projectname": "/ImageSeach/GetSVNAccountByProjectName"
+        "get-svn-account-by-projectname": "/ImageSeach/GetSVNAccountByProjectName",
+        "get-figma-msg": "/ImageSeach/GetFigmaMessage",
+        "download-psd4-plugin": "/Psd/DownloadPsd4Plugin",
+        "get-figma-psd-result": "/ImageSeach/GetFigma2PsdResult"
     }
 }

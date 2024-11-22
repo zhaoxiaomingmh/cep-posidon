@@ -1,6 +1,11 @@
 import { IAccountResponse, IGalleryItem, IProject } from "@/store/iTypes/iTypes";
 import iService from "./service";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+import { psConfig } from "@/utlis/util-env";
+import path from "path";
+import { ImageSearchImageRef } from "@/pages/search/component/ImageSearchImage";
+import { TextSearchImageRef } from "@/pages/search/component/TextSearchImage";
+import { AppRef } from "@/router/App";
 
 class resourceService {
     private static instance: resourceService;
@@ -15,129 +20,141 @@ class resourceService {
     }
 
     public async downloadFile(img: IGalleryItem, type: string, projectInfo: IProject) {
-        // if (img.format === 'comp') {
-        //     const figmaAccountResult: any = await Https.httpGet(this.GetFigmaMessage, { compKey: img.fileUrl, userId: AppRef.current.loginUser?.user?.userID })
-        //     console.log('figmaAccountResult', figmaAccountResult)
-        //     if (figmaAccountResult.status != 200) {
-        //         this.rollback(type, true, 100);
-        //         ExDialogRef.current.showMessage("请求失败", `原因为:${figmaAccountResult.message}`, 'error')
-        //         return;
-        //     }
-        //     const figmaAccountResp = figmaAccountResult.data as PosidonResponse;
-        //     console.log('figmaAccount', figmaAccountResp)
-        //     // if (figmaAccountResp.code != 0) {
-        //     // this.rollback(type, true, 100);
-        //     //     ExDialogRef.current.showMessage("请求失败", `原因为:${figmaAccountResult.message}`, 'error')
-        //     //     return;
-        //     // }
-        //     const account = figmaAccountResp.data as AccountResponse;
-        //     const downloadResp: any = await Https.httpGet(this.DownloadPsd4Plugin, { fileKey: account.username, userId: AppRef.current.loginUser?.user?.userID, seletedNode: account.password, projectId: projectInfo.id })
-        //     if (downloadResp.status != 200) {
-        //         this.rollback(type, true, 100);
-        //         ExDialogRef.current.showMessage("请求失败", `原因为:${figmaAccountResult.message}`, 'error')
-        //         return;
-        //     }
-        //     const downResult = downloadResp.data as PosidonResponse;
-        //     if (downResult.code != 0) {
-        //         this.rollback(type, true, 100);
-        //         ExDialogRef.current.showMessage("请求失败", `原因为:${figmaAccountResult.message}`, 'error')
-        //         return;
-        //     }
-
-        //     const taskId = downResult.data as number;
-        //     let status: number = 1;
-        //     let url: string = '';
-        //     while (status != 5 && status != 6 && status != 7) {
-        //         const getFigma2PsdResult: any = await Https.httpGet(this.GetFigma2PsdResult, { wId: taskId })
-        //         if (getFigma2PsdResult.status != 200) {
-        //             this.rollback(type, true, 100);
-        //             ExDialogRef.current.showMessage("请求失败", `原因为:${getFigma2PsdResult.message}`, 'error')
-        //             return;
-        //         }
-        //         const getFigma2PsdResp = getFigma2PsdResult.data as PosidonResponse;
-        //         console.log('getFigma2PsdResp', getFigma2PsdResp)
-        //         if (getFigma2PsdResp.code != 0) {
-        //             this.rollback(type, true, 100);
-        //             ExDialogRef.current.showMessage("请求失败", `原因为:${getFigma2PsdResp.message}`, 'error')
-        //             return;
-        //         }
-        //         status = getFigma2PsdResp.data.status as number;
-        //         if (status == 5) {
-        //             url = getFigma2PsdResp.data.taskResult;
-        //             this.rollback(type, false, 50);
-        //         } else if (status == 6) {
-        //             this.rollback(type, true, 100);
-        //             ExDialogRef.current.showMessage("请求失败", `原因为:任务已取消`, 'error')
-        //             return;
-        //         } else if (status == 7) {
-        //             ExDialogRef.current.showMessage("请求失败", `原因为:${getFigma2PsdResp.data.taskResult}`, 'error')
-        //             this.rollback(type, true, 100);
-        //             return;
-        //         } else if (status == 8 || status == 2) {
-        //             this.rollback(type, false, 20);
-        //         } else if (status == 3) {
-        //             this.rollback(type, false, 30);
-        //         } else if (status == 4) {
-        //             this.rollback(type, false, 40);
-        //         }
-        //         await new Promise(resolve => setTimeout(resolve, 5000));
-        //     }
-        //     const filename = img.name + '.psd';
-        //     const fullUrl = new URL(url, this.baseUrl);
-        //     const options = {
-        //         method: 'GET',
-        //     };
-        //     await this.downloadSvnFile(filename, fullUrl, options, type, 'psd', projectInfo, true);
-        //     return;
-        // }
-        console.log('img', img);
+        if (img.format === 'comp') {
+            this.downloadFromFigma(img, projectInfo, type);
+            return;
+        }
         const account = await iService.GetSVNAccountByProjectName(img.projectName);
         if (!account) {
             //todo 回滚
+            alert('账号信息不存在')
+            this.notifyProgerss(type, 0);
             return;
         }
-        this.downloadfromSvn(account, img, projectInfo);
+        try {
+            if (account.accountType === 1) {
+                this.downloadFromSmb(account, img, projectInfo, type);
+            } else {
+                this.downloadfromUrl(account, img, type);
+            }
+        } catch (e) {
+            console.log('e', e);
+            alert('下载失败');
+            this.notifyProgerss(type, 0);
+        }
     }
 
-    private async downloadfromSvn(account: IAccountResponse, img: IGalleryItem, projectInfo: IProject) {
+    private async downloadfromUrl(account: IAccountResponse, img: IGalleryItem, type: string) {
         const options = {
             method: 'GET',
-            headers: {
+            headers: account.data ? {
                 'Authorization': `Basic ${account.data}`
-            }
+            } : undefined,
         };
-        const lengthRe = await axios.head(img.fileUrl, {
+        const length = await axios.head(img.fileUrl, {
             headers: options.headers,
+        }).then(resp => {
+            return parseInt(resp.headers['content-length'], 10);;
+        }).catch(err => {
+            console.log('err', err);
+            this.notifyProgerss(type, 0);
+            throw err;
         });
-        const length = parseInt(lengthRe.headers['content-length'], 10);
-        let p = 0;
-        const response = await axios.get(img.fileUrl, {
+        console.log('开始下载，下载内容大小为：', length);
+        await axios.get(img.fileUrl, {
             headers: options.headers,
             responseType: 'arraybuffer',
             onDownloadProgress: (progressEvent) => {
                 let progress = (progressEvent.loaded / length) * 100;
                 console.log('progress', progress);
+                this.notifyProgerss(type, parseFloat(progress.toFixed(2)));
             },
+        }).then((response) => {
+            const binary = new Uint8Array(response.data);
+            const binaryString = Array.from(binary).map(byte => String.fromCharCode(byte)).join('');
+            const base64Data = window.btoa(binaryString);
+            const userDir = psConfig.userDir();
+            let filePath = path.join(userDir, img.name.replace(/#/g, ""));
+            window.cep.fs.writeFile(filePath, base64Data, "Base64");
+            const cs = new CSInterface();
+            const req = {
+                path: filePath,
+                isImport: img.format === 'psd' ? true : false,
+            }
+            cs.evalScript(`openImage(${JSON.stringify(req)})`, (data) => {
+                window.cep.fs.deleteFile(filePath);
+                this.notifyProgerss(type, 0);
+            })
+        }).catch(err => {
+            console.log('err', err);
+            this.notifyProgerss(type, 0);
         });
-        console.log('下载成');
-        //下载成功和写入
-        const binary = new Uint8Array(response.data);
-        const binaryString = Array.from(binary).map(byte => String.fromCharCode(byte)).join('');
-        const base64Data = window.btoa(binaryString);
-        let filePath = "D:\\file\\Temp\\Resource\\素材\\" + img.name;
-        window.cep.fs.writeFile(filePath, base64Data, "Base64");
-        const cs = new CSInterface();
-        filePath = "D:\\file\\Temp\\psd\\resource\\zpsd5558.psd"
-        var req = {
-            path : filePath,
-            isImport: true
-        }
-        cs.evalScript(`openImage(${JSON.stringify(req)})`, function (data) {
+    }
+    private async downloadFromSmb(account: IAccountResponse, img: IGalleryItem, projectInfo: IProject, type: string) {
+        const address = account.baseUrl;
+        const username = account.username;
+        const password = account.password;
+        // downSmbFileCMD(address)
 
-            console.log('打开成', data)
-        })
+    }
+    private async downloadFromFigma(img: IGalleryItem, projectInfo: IProject, type: string) {
+        const taskId = await iService.GetFigmaMsg(img.fileUrl, AppRef.current.user.id, projectInfo.id);
+        if (!taskId) {
+            alert('figma组件下载任务创建失败');
+            this.notifyProgerss(type);
+            return;
+        }
+        let status: number = 1;
+        let url: string = '';
+        while (status != 5 && status != 6 && status != 7) {
+            const data = await iService.GetFigma2PsdResult(taskId);
+            status = data.status
+            if (status == 5) {
+                url = data.url;
+                this.notifyProgerss(type, 100);
+            } else if (status == 6) {
+                this.notifyProgerss(type);
+                return;
+            } else if (status == 7) {
+                this.notifyProgerss(type);
+                return;
+            } else if (status == 8 || status == 2) {
+                this.notifyProgerss(type, 40);
+            } else if (status == 3) {
+                this.notifyProgerss(type, 60);
+            } else if (status == 4) {
+                this.notifyProgerss(type, 80);
+            }
+            await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+        //开始下载
+        const filename = img.name.replace(/#/g, "") + '.psd';
+        const fullUrl = new URL(url, psConfig.host).toString();
+        const account: IAccountResponse = {
+            id: 0,
+            baseUrl: fullUrl,
+            accountType: 0,
+            username: "",
+            password: "",
+            data: ""
+        }
+        const newImg: IGalleryItem = {
+            id: 1,
+            isFile: true,
+            name: filename,
+            fileUrl: fullUrl,
+            format: 'psd',
+        }
+        this.downloadfromUrl(account, newImg, type);
     }
 
+    private notifyProgerss(type: string, progress?: number) {
+        if (type == 'imgRef') {
+            ImageSearchImageRef.current?.setProgress(progress);
+        } else {
+            TextSearchImageRef.current?.setProgress(progress);
+        }
+    }
 }
 
 const reService = resourceService.getInstance();

@@ -1,3 +1,6 @@
 {
-      
+    "asset_search": {
+        "lable1": "图片搜索",
+        "lable2": "搜索"
+    }
 }

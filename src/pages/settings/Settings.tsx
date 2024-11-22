@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useTransition } from "react";
 import './Settings.scss'
 import useUserStore from "@/store/modules/userStore";
 import { PsFuncItem } from "@/hooks/func/PsFuncItem";
@@ -8,6 +8,7 @@ import { psConfig } from "@/utlis/util-env";
 import utilHttps from "@/utlis/util-https";
 import { IPosidonResponse, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
 import { defaultProjectHeadImage } from "@/utlis/const";
+import { useTranslation } from "react-i18next";
 interface SettingsRefType { };
 interface SettingsProps { }
 export const SettingsRef = React.createRef<SettingsRefType>();
@@ -17,6 +18,7 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
     const setUser = useUserStore(state => state.setUser);
     const project = useUserStore(state => state.getProject());
     const setProject = useUserStore(state => state.setProject);
+    const { t, i18n } = useTranslation();
 
     const handleChange = async (event) => {
         const target = event.target.value;
@@ -68,8 +70,16 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                         </div>
                     </div>
                 </div>
-
                 <div className="settings__content__lan">
+                    <span>语言</span>
+                    < select onChange={(event) => {
+                        let target = event.target.value;
+                        i18n.changeLanguage(target)
+                    }} defaultValue={'cn'}>
+                        <option key='cn' value='cn'>简体中文</option>
+                        <option key='en' value='en'>English</option>
+                        <option key='jp' value='jp'>日本語</option>
+                    </select>
                 </div>
                 <div className="settings__content__team">
                     <div className="settings__content__team__title">
@@ -88,21 +98,20 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                         </div>
                     </div>
                 </div>
-
                 <div className="settings__footer">
-                    {/* <Button variant={"primary"} onPress={() => {
+                    <Button variant={"primary"} onPress={() => {
                         window.localStorage.removeItem('cep-user');
                         setUser(undefined);
                     }}>
                         注销
-                    </Button> */}
-
+                    </Button>
+                    {/* 
                     <button onClick={() => {
                         window.localStorage.removeItem('cep-user');
                         setUser(undefined);
                     }}>
                         注销
-                    </button>
+                    </button> */}
                 </div>
             </PsFuncItem>
         </PsFunc>
