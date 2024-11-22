@@ -1,6 +1,6 @@
 import { ImageSearchImageRef } from '@/pages/search/component/ImageSearchImage';
 import { TextSearchImageRef } from '@/pages/search/component/TextSearchImage';
-import { IAccountResponse, IPosidonResponse, ISearchItem, ISearchResult } from '@/store/iTypes/iTypes';
+import { IAccountResponse, IPosidonPageResponse, IPosidonResponse, ISearchItem, ISearchResult, ISvnPsdDirTreeNode, ISvnPsdGroup } from '@/store/iTypes/iTypes';
 import { psConfig } from '@/utlis/util-env';
 import utilHttps from '@/utlis/util-https';
 import axios from 'axios';
@@ -66,7 +66,7 @@ class psSerive {
         this.notifySearchResult(type, undefined);
         return;
     }
-    public async GetSVNAccountByProjectName(projectName: string): Promise<IAccountResponse> {
+    public async getSVNAccountByProjectName(projectName: string): Promise<IAccountResponse> {
         const response: any = await utilHttps.httpGet(psConfig.getSvnAccountByProjectName, { projectName: projectName })
         if (response.status != 200) {
             // ExDialogRef.current.showMessage("请求失败", `原因为:${response1.message}`, 'error')
@@ -87,7 +87,7 @@ class psSerive {
             TextSearchImageRef.current?.setSearchResult(data);
         }
     }
-    public async GetFigmaMsg(compKey: string, userId: number, projectId: number): Promise<number | undefined> {
+    public async getFigmaMsg(compKey: string, userId: number, projectId: number): Promise<number | undefined> {
         const figmaAccountResult: any = await utilHttps.httpGet(psConfig.getFigmaMsg, { compKey: compKey, userId: userId })
         if (figmaAccountResult.status != 200) {
             return undefined;
@@ -106,7 +106,7 @@ class psSerive {
         const taskId = downResult.data as number;
         return taskId;
     }
-    public async GetFigma2PsdResult(taskId: number): Promise<{ status: number, url?: string } | undefined> {
+    public async getFigma2PsdResult(taskId: number): Promise<{ status: number, url?: string } | undefined> {
         const getFigma2PsdResult: any = await utilHttps.httpGet(psConfig.getFigma2PsdResult, { wId: taskId })
         if (getFigma2PsdResult.status != 200) {
             return undefined;
@@ -120,6 +120,34 @@ class psSerive {
             status: status,
             url: getFigma2PsdResp.data.taskResult
         };
+    }
+    public async querySvnPsdDir(projectId: number): Promise<ISvnPsdGroup[] | undefined> {
+        const response: any = await utilHttps.httpGet(psConfig.querySvnPsdDir, { projectId: projectId })
+        var queryResponse = response.data;
+        if (queryResponse.code != 0) {
+            return undefined;
+        }
+        return queryResponse.data as ISvnPsdGroup[];
+    }
+    public async getDirTree(did: number, page: number, size: number): Promise<ISvnPsdDirTreeNode | undefined> {
+        const response: any = await utilHttps.httpGet(psConfig.getDirTree, { dirId: did, page: page, size: size })
+        const posidonResponse: IPosidonPageResponse = response.data;
+        if (posidonResponse.code != 0) {
+            return undefined;
+        }
+        return posidonResponse.data;
+    }
+    public async getSVNAccountById(id: number): Promise<IAccountResponse | undefined> {
+        const accountResponse: any = await utilHttps.httpGet(psConfig.getSVNAccountById, { dirId: id })
+        if (accountResponse.status != 200) {
+            return undefined;
+        }
+        let accountDataResp = accountResponse.data as IPosidonResponse;
+        if (accountDataResp.code != 0) {
+            return undefined;
+        }
+        const account = accountDataResp.data as IAccountResponse;
+        return account;
     }
 }
 

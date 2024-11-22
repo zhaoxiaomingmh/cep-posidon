@@ -5,6 +5,7 @@ import { PsTableItem } from "@/hooks/table/PsTableItem";
 import React from 'react';
 import { AssetSearch, AssetSearchRef } from "@/pages/search/AssetSearch";
 import { Settings, SettingsRef } from "@/pages/settings/Settings";
+import { PsdLevel, PsdLevelRef } from "@/pages/level/PsdLevel";
 
 export const Face = forwardRef(() => {
     return (
@@ -27,9 +28,7 @@ export const Face = forwardRef(() => {
                             <path d="M767 640h96c17.673 0 32 14.327 32 32v192c0 17.673-14.327 32-32 32H607c-17.673 0-32-14.327-32-32V672c0-17.673 14.327-32 32-32h96v-96H319v96h96c17.673 0 32 14.327 32 32v192c0 17.673-14.327 32-32 32H159c-17.673 0-32-14.327-32-32V672c0-17.673 14.327-32 32-32h96V512c0-17.673 14.327-32 32-32h192v-96h-96c-17.673 0-32-14.327-32-32V160c0-17.673 14.327-32 32-32h256c17.673 0 32 14.327 32 32v192c0 17.673-14.327 32-32 32h-96v96h192c17.673 0 32 14.327 32 32v128z m-128 64v128h192V704H639z m-448 0v128h192V704H191z m224-512v128h192V192H415z" fill="#000000" p-id="7160"></path>
                         </svg>
                     }  >
-                    <div>
-                        功能测试2
-                    </div>
+                    <PsdLevel ref={PsdLevelRef} />
                 </PsTableItem>
                 <PsTableItem
                     id="settings"

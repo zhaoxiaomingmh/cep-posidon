@@ -32,6 +32,9 @@
         "get-svn-account-by-projectname": "/ImageSeach/GetSVNAccountByProjectName",
         "get-figma-msg": "/ImageSeach/GetFigmaMessage",
         "download-psd4-plugin": "/Psd/DownloadPsd4Plugin",
-        "get-figma-psd-result": "/ImageSeach/GetFigma2PsdResult"
+        "get-figma-psd-result": "/ImageSeach/GetFigma2PsdResult",
+        "query-svn-psd-dir": "/ImageSeach/QuerySvnPsdDirs",
+        "get-dir-tree": "/ImageSeach/GetDirTree",
+        "get-svn-account-by-id": "/ImageSeach/GetSVNAccountById"
     }
 }

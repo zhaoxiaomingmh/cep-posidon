@@ -48,8 +48,11 @@ export const psConfig = {
     generateURL: config.path["generate-url"],
     searchImage: config.path["seach-image"],
     getSvnAccountByProjectName: config.path["get-svn-account-by-projectname"],
-    getFigmaMsg : config.path["get-figma-msg"],
+    getFigmaMsg: config.path["get-figma-msg"],
     downloadPsd4Plugin: config.path["download-psd4-plugin"],
-    getFigma2PsdResult: config.path["get-figma-psd-result"]
+    getFigma2PsdResult: config.path["get-figma-psd-result"],
+    querySvnPsdDir: config.path["query-svn-psd-dir"],
+    getDirTree: config.path["get-dir-tree"],
+    getSVNAccountById: config.path["get-svn-account-by-id"],
 }
 

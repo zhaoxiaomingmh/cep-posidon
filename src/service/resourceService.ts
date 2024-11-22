@@ -6,6 +6,7 @@ import path from "path";
 import { ImageSearchImageRef } from "@/pages/search/component/ImageSearchImage";
 import { TextSearchImageRef } from "@/pages/search/component/TextSearchImage";
 import { AppRef } from "@/router/App";
+import { PsdLevel, PsdLevelRef } from "@/pages/level/PsdLevel";
 
 class resourceService {
     private static instance: resourceService;
@@ -24,7 +25,7 @@ class resourceService {
             this.downloadFromFigma(img, projectInfo, type);
             return;
         }
-        const account = await iService.GetSVNAccountByProjectName(img.projectName);
+        const account = await iService.getSVNAccountByProjectName(img.projectName);
         if (!account) {
             //todo 回滚
             alert('账号信息不存在')
@@ -44,7 +45,7 @@ class resourceService {
         }
     }
 
-    private async downloadfromUrl(account: IAccountResponse, img: IGalleryItem, type: string) {
+    public async downloadfromUrl(account: IAccountResponse, img: IGalleryItem, type: string) {
         const options = {
             method: 'GET',
             headers: account.data ? {
@@ -66,7 +67,6 @@ class resourceService {
             responseType: 'arraybuffer',
             onDownloadProgress: (progressEvent) => {
                 let progress = (progressEvent.loaded / length) * 100;
-                console.log('progress', progress);
                 this.notifyProgerss(type, parseFloat(progress.toFixed(2)));
             },
         }).then((response) => {
@@ -98,7 +98,7 @@ class resourceService {
 
     }
     private async downloadFromFigma(img: IGalleryItem, projectInfo: IProject, type: string) {
-        const taskId = await iService.GetFigmaMsg(img.fileUrl, AppRef.current.user.id, projectInfo.id);
+        const taskId = await iService.getFigmaMsg(img.fileUrl, AppRef.current.user.id, projectInfo.id);
         if (!taskId) {
             alert('figma组件下载任务创建失败');
             this.notifyProgerss(type);
@@ -107,7 +107,7 @@ class resourceService {
         let status: number = 1;
         let url: string = '';
         while (status != 5 && status != 6 && status != 7) {
-            const data = await iService.GetFigma2PsdResult(taskId);
+            const data = await iService.getFigma2PsdResult(taskId);
             status = data.status
             if (status == 5) {
                 url = data.url;
@@ -151,8 +151,10 @@ class resourceService {
     private notifyProgerss(type: string, progress?: number) {
         if (type == 'imgRef') {
             ImageSearchImageRef.current?.setProgress(progress);
-        } else {
+        } else if(type === 'textRef') {
             TextSearchImageRef.current?.setProgress(progress);
+        } else {
+            PsdLevelRef.current.setProgress(progress);
         }
     }
 }

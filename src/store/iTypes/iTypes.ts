@@ -162,3 +162,43 @@ export interface IAccountResponse {
     password: string,
     data: string
 }
+
+export interface ISvnPsdGroup {
+    parentDir: string
+    parentId: number
+    dirs: ISvnPsdGroupItem[]
+}
+
+export interface ISvnPsdGroupItem {
+    id: number
+    levelType: number,
+    name: string
+    projectId: number
+    userId: number
+}
+
+export interface IPath {
+    id: number,
+    path: string,
+    parent: number[],
+    level?: number,
+}
+
+export interface ISvnPsdDirTreeNode {
+    name: string,
+    id: number,
+    parent: number,
+    level: number,
+    projectId: number,
+    children: ISvnPsdDirTreeNode[],
+    levelType: number,
+    isFile: boolean,
+    thumb?: string,
+    fileUrl?: string,
+    svnPsdLevelId?: number,
+    fileId?: number,
+}
+
+export interface IPosidonPageResponse extends IPosidonResponse {
+    total: number
+}
