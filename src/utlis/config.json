@@ -4,11 +4,7 @@
             "publicKey": "MIIBCgKCAQEA4MlnHpeSYIsasAhEQKvZL8vHI5/YJmDf8GfBV26gae9J1Aw8VJPFVtgSMgU4nsLpWQTUchnOZ8V1Zr5vzGuTU0vjsVVW4LTXUCHz6Hsu9SDwydVMDrj9VMimjEnGLqywN5i8mK2X42dUC+CzbLAAtRF1kpdkKOtcHpDVSEUz6sqdR8kRQCDsD8eXDWPJbLN9jpSp/Ce0xICo+Ar5jUfoof10PgqDjKbg9fxrEAedEiZ5LvjUW7RvmjcN1kwHQDOLwfF8ZwumPONcJNnEa4lJ1apCXruNmQeItCB0GvF72yvhcUemZKI2ycNHfIDLmPUpM0/4e4rFwHLW+oP2quV4nQIDAQAB",
             "clientId": "ed62aa4a997648bf88731e72531941bc",
             "clientSecret": "3797540112c345279474423714fcebfad8c0d219a33c443b95613f6ea5882803",
-            "host": "https://localhost:53518",
-            "path": {
-                "hubservice": "/hubservice",
-                "get-project": "/ProjectInfo/GetProjectDataByUserId"
-            }
+            "host": "https://localhost:53518"
         }
     },
     "test": {
@@ -16,11 +12,7 @@
             "publicKey": "MIIBCgKCAQEAyGrUBKh+wGNRF0E3EI65COYBMclEVRzupryyxHSVjx7aeS91EDnyvrHcn6F7U2ZUz5rPbQktqoySOm7dbB1UsECpUaKlKbNUkFeKaPXrF9S9UqI1ZuxhL0qrlld2LjEKnKkU7xOfadWTg83L6403jZ+PhJ4vbdaOi+NrB2sZNdA0b35Z7b2IroY1lx7zz/iF/UVyxDPHJfbxpKQ2Zytecvb8YXorYgLQPZkVgFUbF8cdg6uXi8iHRXTOFJD6dc8Hp6uA9X3pBQfZcBmWJRjItnl/UDgC15P5gyQgKBjZuvSHvbcynj947ukEyttGFvUZ+SYdTSulLgttZPEPZryWmQIDAQAB",
             "clientId": "05f2a2f23c73466ab7897014b54a4f2e",
             "clientSecret": "2d101f6eba324134b248d0dcd75fe6f6502c498276c446069f8aa06f70d32309",
-            "host": "https://posidon.netease.com:6003",
-            "path": {
-                "hubservice": "/hubservice",
-                "get-project": "/ProjectInfo/GetProjectDataByUserId"
-            }
+            "host": "https://posidon.netease.com:6003"
         }
     },
     "prod": {
@@ -28,11 +20,21 @@
             "publicKey": "MIIBCgKCAQEA4MlnHpeSYIsasAhEQKvZL8vHI5/YJmDf8GfBV26gae9J1Aw8VJPFVtgSMgU4nsLpWQTUchnOZ8V1Zr5vzGuTU0vjsVVW4LTXUCHz6Hsu9SDwydVMDrj9VMimjEnGLqywN5i8mK2X42dUC+CzbLAAtRF1kpdkKOtcHpDVSEUz6sqdR8kRQCDsD8eXDWPJbLN9jpSp/Ce0xICo+Ar5jUfoof10PgqDjKbg9fxrEAedEiZ5LvjUW7RvmjcN1kwHQDOLwfF8ZwumPONcJNnEa4lJ1apCXruNmQeItCB0GvF72yvhcUemZKI2ycNHfIDLmPUpM0/4e4rFwHLW+oP2quV4nQIDAQAB",
             "clientId": "ed62aa4a997648bf88731e72531941bc",
             "clientSecret": "3797540112c345279474423714fcebfad8c0d219a33c443b95613f6ea5882803",
-            "host": "https://localhost:53518",
-            "path": {
-                "hubservice": "/hubservice",
-                "get-project": "/ProjectInfo/GetProjectDataByUserId"
-            }
+            "host": "https://localhost:53518"
         }
+    },
+    "path": {
+        "hubservice": "/hubservice",
+        "get-project": "/ProjectInfo/GetProjectDataByUserId",
+        "get-storehouse": "/ImageSeach/GetStorehouseByProjectId",
+        "generate-url": "/ImageSeach/UploadImageToGenerateURL",
+        "seach-image": "/ImageSeach/SeachImage",
+        "get-svn-account-by-projectname": "/ImageSeach/GetSVNAccountByProjectName",
+        "get-figma-msg": "/ImageSeach/GetFigmaMessage",
+        "download-psd4-plugin": "/Psd/DownloadPsd4Plugin",
+        "get-figma-psd-result": "/ImageSeach/GetFigma2PsdResult",
+        "query-svn-psd-dir": "/ImageSeach/QuerySvnPsdDirs",
+        "get-dir-tree": "/ImageSeach/GetDirTree",
+        "get-svn-account-by-id": "/ImageSeach/GetSVNAccountById"
     }
 }

@@ -6,7 +6,6 @@ import { ActionButton } from "@adobe/react-spectrum";
 
 interface PsFuncRef { }
 interface PsFuncProps {
-    table: string;
     children: React.ReactElement<PsFuncItemProps> | React.ReactElement<PsFuncItemProps>[];
 }
 export const PsFunc = forwardRef<PsFuncRef, PsFuncProps>((props, ref) => {

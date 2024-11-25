@@ -36,16 +36,16 @@
                     <Menu>Posidon-PS-CEP</Menu>
                     <Geometry>
                         <Size>
-                            <Height>300</Height>
-                            <Width>245</Width>
+                            <Height>350</Height>
+                            <Width>450</Width>
                         </Size>
                         <MinSize>
-                            <Height>165</Height>
-                            <Width>245</Width>
+                            <Height>350</Height>
+                            <Width>450</Width>
                         </MinSize>
                         <MaxSize>
-                            <Height>7680</Height>
-                            <Width>7680</Width>
+                            <Height>1200</Height>
+                            <Width>1000</Width>
                         </MaxSize>
                     </Geometry>
                     <Icons>

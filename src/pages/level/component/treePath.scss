@@ -1,0 +1,52 @@
+.tree-path-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: flex-start;
+    width: 100%;
+    gap: 4px;
+
+    .root-dir {
+        width: 36px;
+        height: 15px;
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 15px;
+        display: flex;
+        align-items: center;
+        color: #999999;
+        cursor: pointer;
+    }
+
+    .sub-dir {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        margin-left: 2px;
+
+        >span {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            font-size: 12px;
+            line-height: 15px;
+            display: flex;
+            align-items: center;
+            color: #999999;
+            margin-left: 2px;
+            cursor: pointer;
+            padding: 1px 3px;
+        }
+
+      
+    }
+    :last-child span {
+        background-color: #1C61E7;
+        border-radius: 2px;
+        color: #FFFFFF;
+    }
+}

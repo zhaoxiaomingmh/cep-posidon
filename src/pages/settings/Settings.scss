@@ -1,0 +1,77 @@
+.settings__header {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    border-bottom: 2px solid gray;
+    border-radius: 1px;
+
+    .settings__header__avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background-color: #005cc8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+    .settings__header__user {
+        display: flex;
+        flex-direction: column;
+
+        .settings__header__user__email {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+}
+
+
+.settings__content__lan {
+    height: 100px;
+    border-bottom: 2px solid gray;
+    border-radius: 1px;
+}
+
+.settings__content__team {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    border-bottom: 2px solid gray;
+    border-radius: 1px;
+
+    .settings__content__team__title {
+        display: flex;
+        flex: 1;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .settings__content__team__preview {
+        display: flex;
+        flex-direction: row;
+
+        justify-content: center;
+        align-items: center;
+
+        #project-head{
+            width: 30%;
+            height: 30%;
+            object-fit: cover;
+        }
+
+        .settings__content__team__preview__project-name {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+}
+
+.settings__footer {
+    margin-top: 10px ;
+}

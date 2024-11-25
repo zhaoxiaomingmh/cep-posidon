@@ -2,7 +2,7 @@ import React from "react";
 import { forwardRef } from "react";
 import './login.scss'
 import useUserStore from "@/store/modules/userStore";
-import { IPosidonResponse, IProject, IUser } from "@/store/iTypes/iTypes";
+import { IPosidonResponse, IProject, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
 import * as signalR from "@microsoft/signalr";
 import { psConfig } from "@/utlis/util-env";
 import { util } from "@/utlis/util";
@@ -68,13 +68,23 @@ export const Login = forwardRef<LoginRefType, LoginProps>((props, ref) => {
                 name: item.name,
                 id: item.id,
                 head: item.headImageUrl ? item.headImageUrl : defaultProjectHeadImage,
+                projectEditorType: item.projectEditorType,
             }
             projects.push(projectInfo);
         }
-        user.projectjects = projects;
+        user.projects = projects;
         if (projects.length > 0) {
             let project = projects[0];
             user.last = project.id;
+            const posidonResole: any = await utilHttps.httpGet(psConfig.getStorehouse, { projectId: project.id });
+            if (posidonResole.status == 200) {
+                const response = posidonResole.data as IPosidonResponse;
+                if(response.code == 0) {
+                    const data: IProjectStorehouse = response.data;
+                    project.storehouses = data.storehouses;
+                    user.projects.find(x => x.id === project.id).storehouses = data.storehouses;
+                }
+            }
             setProject(project);
         }
         setUser(user);
