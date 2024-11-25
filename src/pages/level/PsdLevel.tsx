@@ -8,7 +8,7 @@ import React, { forwardRef, useEffect, useImperativeHandle, useState } from "rea
 import { useTranslation } from "react-i18next";
 import { PsdLevelBar, PsdLevelBarRef } from "./component/PsdLevelBar";
 import { Gallery } from "@/hooks/gallery/Gallery";
-import { TreePath } from "./component/treePath";
+import { TreePath } from "./component/TreePath";
 
 type PsdLevelProps = {
 }
