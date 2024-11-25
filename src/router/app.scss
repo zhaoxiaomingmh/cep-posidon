@@ -1,0 +1,20 @@
+:root {
+    --font-color: #fff
+}
+
+@media (prefers-color-scheme:light) {
+    :root {
+        --font-color: #000
+    }
+}
+@media (prefers-color-scheme:dark) {
+    :root {
+        --font-color: #ccc
+    }
+}
+
+.ps-app{
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}

@@ -9,14 +9,18 @@
 
     .login-wrap-icon {
         width: 50%;
-        height: 50%;
         display: flex;
+        justify-content: center;
+        margin-bottom: 50px;
     }
 
     #login-button {
         border-radius: 4px;
         height: 40px;
         width: 60%;
-        margin-top: 20px;
+        background: #1c61e7;
+        border: none;
+        outline: none;
+        color: #fff;
     }
 }

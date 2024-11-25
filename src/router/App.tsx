@@ -7,6 +7,7 @@ import React, { forwardRef, useEffect, useImperativeHandle } from "react";
 import { Button, darkTheme, defaultTheme, lightTheme, Provider } from '@adobe/react-spectrum';
 import { Face } from "./Face";
 import { psConfig } from "@/utlis/util-env";
+import './app.scss'
 
 interface AppRefType {
     refresh: () => void;
@@ -53,8 +54,9 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
 
 
     return (
-        <Provider theme={darkTheme}>
+        <Provider theme={lightTheme}>
             <div className="ps-app">
+                <span className="test">posidon</span>
                 {
                     user ?
                         (
