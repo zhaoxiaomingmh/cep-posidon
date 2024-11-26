@@ -40,6 +40,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         const userStr = localStorage.getItem('cep-user');
         if (!userStr) return;
         const user = JSON.parse(userStr) as IUser;
+        console.log('userLocal', user)
         if (user.env !== psConfig.env) {
             localStorage.removeItem('cep-user');
         } else {

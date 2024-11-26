@@ -22,35 +22,38 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
 
     const handleChange = async (event) => {
         const target = event.target.value;
-        const p = user.projects.find(x => x.id === parseInt(target));
+        const pid = parseInt(target);
+        const p = user.projects.find(x => x.id === pid);
         if (!p.storehouses) {
-            const posidonResole: any = await utilHttps.httpGet(psConfig.getStorehouse, { projectId: project.id });
-            if (posidonResole.status == 200) {
+            const posidonResole: any = await utilHttps.httpGet(psConfig.getStorehouse, { projectId: pid });
+            if (posidonResole.status === 200) {
                 const response = posidonResole.data as IPosidonResponse;
-                if (response.code == 0) {
+                if (response.code === 0) {
                     const data: IProjectStorehouse = response.data;
                     p.storehouses = data.storehouses;
-                    const updatedProjects = user.projects?.map(project => {
-                        if (project.id === project.id) {
+                    const updatedProjects = user.projects.map(project => {
+                        if (project.id === pid) {
                             return {
                                 ...project,
                                 storehouses: data.storehouses
                             };
                         }
+                        return project;
                     });
 
                     const u: IUser = {
                         ...user,
                         last: p.id,
                         projects: updatedProjects
-                    }
+                    };
+                    console.log('u', u);
                     setUser(u);
                     localStorage.setItem('cep-user', JSON.stringify(u));
                 }
             }
         }
         setProject(p);
-    }
+    };
 
     return (
         <PsFunc>

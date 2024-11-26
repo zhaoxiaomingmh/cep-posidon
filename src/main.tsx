@@ -18,6 +18,5 @@ if (!Object.fromEntries) {
 }
 
 const domNode = document.getElementById('root');
-console.log(domNode);
 const root = ReactDOM.createRoot(domNode);
 root.render(<App ref={AppRef} />);

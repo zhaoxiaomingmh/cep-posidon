@@ -1,6 +1,6 @@
 import React from "react";
 import { forwardRef } from "react";
-import './PreviewBox.scss';
+import './previewBox.scss';
 import { IGalleryItem } from "@/store/iTypes/iTypes";
 import { transparent } from "@/utlis/const";
 
