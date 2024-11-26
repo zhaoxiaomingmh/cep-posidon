@@ -30,6 +30,7 @@ export const Face = forwardRef(() => {
                     }  >
                     <PsdLevel ref={PsdLevelRef} />
                 </PsTableItem>
+                <PsTableItem id="gap" isGap></PsTableItem>
                 <PsTableItem
                     id="settings"
                     icon={

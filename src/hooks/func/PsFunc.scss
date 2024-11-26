@@ -7,5 +7,26 @@
         height: 40px;
         display: flex;
         flex-direction: row;
+        .ps-func__toolbar__title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 2px;
+            margin-right: 10px;
+            cursor: pointer;
+            color: var(--second-font-color);
+            :hover {
+                background-color: var(--block-wrap-color);
+            }
+            &.active {
+                font-size: large;
+                color: var(--primary-font-color);
+            }
+        }
+    }
+    .ps-func__item {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
     }
 }

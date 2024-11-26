@@ -12,6 +12,7 @@ import { FormatCheckboxs } from "./FormatCheckboxs";
 import reService from "@/service/resourceService";
 import { useTranslation } from "react-i18next";
 
+
 interface ImageSearchImageProps {
 
 };
@@ -19,6 +20,11 @@ interface ImageSearchImageRefType {
     setSearchResult: (result: ISearchResult[] | undefined) => void,
     setProgress: (progress: number | undefined) => void,
 };
+
+interface DropSelectProps {
+    options: {value: IStorehouseType, name: string}[],
+    onChange:(value:IStorehouseType)=>void
+}
 export const ImageSearchImageRef = React.createRef<ImageSearchImageRefType>();
 export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchImageProps>((props, ref) => {
 
@@ -215,6 +221,44 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         setDownloader({ id: img.id, progress: 0, complete: false });
         myService.downloadFile(img, 'imgRef', project);
     }
+
+    const options = [{
+        value: 'All' as IStorehouseType,
+        name: '全局'
+    },{
+        value: 'ENGINEERING' as IStorehouseType,
+        name: '资源库'
+    },{
+        value: 'DESIGN' as IStorehouseType,
+        name: '资产库'
+    },{
+        value: 'components' as IStorehouseType,
+        name: '组件库'
+    },{
+        value: 'interfaces' as IStorehouseType,
+        name: '界面库'
+    }]
+
+    const DropSelect = (props:DropSelectProps) => {
+        const [showSelect, setShowSelect] = useState(false)
+        const onSelect = () => {
+            setShowSelect(true)
+        }
+        const onBlur = () => {
+            setShowSelect(false)
+            
+        }
+        return <div className="select-wrap">
+            <div className="select-content">
+                <div className="select-trigger" onClick={onSelect}>{props.options[0].name}</div>
+                <ul className="select-options" style={{display: showSelect?"block":''}}>
+                    {props.options.map((option) =><li key={option.value}>{option.name}</li>)}
+                </ul>
+            </div>
+            <div className="outSelect" style={{display: showSelect?"block":''}} onClick={onBlur}></div>
+        </div>
+    }
+
     const setProgress = (progress: number | undefined) => {
         if (downloader.complete) return;
         if (!progress) {
@@ -241,7 +285,12 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 project
                 &&
                 <div className="image-search-image-search-box">
-                    <div className="image-search-image-option">
+                    <DropSelect options={options} onChange={(val) => {
+                            const value = val as IStorehouseType;
+                            setAssetType(value)
+                        }}></DropSelect>
+                    {/* <div className="image-search-image-option">
+
                         <select
                             defaultValue={assetType}
                             onChange={(event) => {
@@ -254,7 +303,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                             <option value="components">组件库</option>
                             <option value="interfaces">界面库</option>
                         </select>
-                    </div>
+                    </div> */}
                     <div className="image-search-image-input"
                         onClick={async () => {
                             loadImage();

@@ -8,11 +8,14 @@
 
     .ps-table__main {
         flex: 1;
+        padding: 10px;
+        display: flex;
     }
 
     .ps-table__side {
         flex: 0 0 auto;
         display: flex;
         flex-direction: column;
+        background-color: var(--block-wrap-color);
     }
 }

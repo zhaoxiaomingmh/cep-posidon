@@ -1,45 +1,32 @@
-:root {
-    --primary-color: #E8E8E8; /* default colors are for dark themes */
-    --primary-background: #424242;
-    --primary-border: #707070;
-    --input-bg-color: #424242;
-    --block-bg-color: #323232;
-    --block-wrap-color: #262626;
-    --block-icon-color: #fff;
-}
-@media (prefers-color-scheme:darkest) {
-    :root {
-        --block-bg-color: #323232
+.select-wrap {
+    .select-content {
+        padding: 0 10px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+        z-index: 10;
+        .select-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            display: none;
+        }
     }
-}
-@media (prefers-color-scheme:dark) {
-    :root {
-        --block-bg-color: #535353;
-        --block-wrap-color: #424242;
+    .outSelect {
+        display: none;
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
     }
+    
 }
-@media (prefers-color-scheme:light) {
-    :root {
-        --input-bg-color: #a9a9a9;
-        --primary-color: #181818; /* override for light themes */
-        --primary-background: #a9a9a9;
-        --primary-border: #848484;
-        --block-bg-color: #b8b8b8;
-        --block-wrap-color: #a3a3a3;
-        --block-icon-color: #181818;
-    }
-}
-@media (prefers-color-scheme: lightest) {
-    :root {
-        --input-bg-color: #cecece;
-        --primary-color: #181818; /* override for light themes */
-        --primary-background: #cecece;
-        --primary-border: #ffffff;
-        --block-bg-color: #f0f0f0;
-        --block-wrap-color: #dbdbdb;
-        --block-icon-color: #181818;
-    }
-}
+
 .image-search-image-container {
     display: flex;
     flex-direction: column;
@@ -60,6 +47,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            select {
+                background: transparent;
+                border: none;
+                color: var(--primary-font-color);
+            }
+
+            
         }
 
         .image-search-image-input {
