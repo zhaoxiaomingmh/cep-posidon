@@ -51,12 +51,12 @@ class psSerive {
             SearchType: type,
             filterExt: formats
         }
-        console.log(data);
+        console.log('搜索参数', data);
         let result = await utilHttps.httpPost(psConfig.searchImage, data);
         if (result.status == 200) {
             if (result.data?.code === 0) {
                 const imgData = result.data?.data as ISearchResult[];
-                console.log(imgData, "搜索结果");
+                console.log("搜索结果", imgData);
                 this.notifySearchResult(type, imgData);
                 return;
             }

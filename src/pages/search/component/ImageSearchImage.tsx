@@ -142,7 +142,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 });
             setCanScroll(true);
             setImages([])
-            iService.searchImage(project.id, imageUrl ? imageUrl : searchFile.url, newItems, formats, 0)
+            iService.searchImage(project.id, imageUrl ? psConfig.host + imageUrl : psConfig.host + searchFile.url, newItems, formats, 0)
         } else {
             const newItems: ISearchItem[] = searchItems
                 .filter(item => item.canSearch === true && (item.type === assetType || assetType === 'All'))
@@ -182,7 +182,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                     name: i.name,
                     format: i.ext as ImageFormat,
                     fileUrl: i.path,
-                    thumb: `data:image/png;base64,` + i.thumbnail,
+                    thumb: i.thumbnail.startsWith('http://') ? i.thumbnail : `data:image/png;base64,` + i.thumbnail,
                     projectName: item.projectName
                 };
                 addImgs.push(son);
