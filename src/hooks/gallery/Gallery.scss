@@ -2,12 +2,13 @@
     display: flex;
     flex: 1;
     flex-direction: column;
+    overflow: hidden;
     // flex-grow: 1;
     .gallery-header {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        border-bottom: 1px solid #878787;
+        border-bottom: 1px solid var(--primary-border);
         padding: 6px 0px;
 
 
@@ -19,7 +20,7 @@
             .background-checkbox {
                 width: 14px;
                 height: 14px;
-                border: 1px solid #363636;
+                border: 1px solid var(--primary-border);
                 margin-left: 3px;
             }
         }
@@ -37,9 +38,9 @@
         margin-top: 5px;
 
         .image-gallery-hint {
-            width: 100%;
+            width: calc(100% - 5px);
             height: 50px;
-            border-top: 1px solid #474747;
+            border-top: 1px solid var(--primary-border);
             display: flex;
             align-items: center;
             justify-content: center;

@@ -197,7 +197,7 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
         }
     }
     return (
-        <div className="psd-level">
+        <div className="psd-level" style={{width: "100%",display: "flex", flexDirection: "column", overflow:"hidden"}}>
             {!project
                 &&
                 <NoSVNLibrary desc={t("common-label1")} />

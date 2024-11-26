@@ -46,7 +46,7 @@ export const Gallery = forwardRef<GalleryRefType, GalleryProps>((props, ref) => 
                         className="background-checkbox"
                         style={{
                             background: "#ffffff",
-                            borderColor: background === 1 ? "#1f88ea" : "#363636",
+                            borderColor: background === 1 ? "#1f88ea" : "",
                         }}
                         onClick={() => { setBackground(1); }}
                     />
@@ -55,7 +55,7 @@ export const Gallery = forwardRef<GalleryRefType, GalleryProps>((props, ref) => 
                         className="background-checkbox"
                         style={{
                             background: "#787878",
-                            borderColor: background === 2 ? "#1f88ea" : "#363636",
+                            borderColor: background === 2 ? "#1f88ea" : "",
                         }}
                         onClick={() => { setBackground(2) }}
                     />
@@ -64,7 +64,7 @@ export const Gallery = forwardRef<GalleryRefType, GalleryProps>((props, ref) => 
                         className="background-checkbox"
                         style={{
                             background: "#000000",
-                            borderColor: background === 3 ? "#1f88ea" : "#363636",
+                            borderColor: background === 3 ? "#1f88ea" : "",
                         }}
                         onClick={() => {
                             setBackground(3);
@@ -78,7 +78,7 @@ export const Gallery = forwardRef<GalleryRefType, GalleryProps>((props, ref) => 
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
                             backgroundRepeat: 'no-repeat',
-                            borderColor: background === 0 ? "#1f88ea" : "#363636",
+                            borderColor: background === 0 ? "#1f88ea" : "",
                         }}
                         onClick={() => { setBackground(0); }}
                     />

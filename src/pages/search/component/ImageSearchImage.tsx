@@ -24,7 +24,41 @@ interface ImageSearchImageRefType {
 interface DropSelectProps {
     options: {value: IStorehouseType, name: string}[],
     onChange:(value:IStorehouseType)=>void
+    value?: IStorehouseType,
 }
+export const DropSelect = (props:DropSelectProps) => {
+    const [showSelect, setShowSelect] = useState(false)
+    const [currentName, setCurrentName] = useState('全局')
+    const onSelect = () => {
+        setShowSelect(true)
+    }
+    const onBlur = () => {
+        setShowSelect(false)
+        
+    }
+
+    const handleSelect = (option:{value:IStorehouseType,name:string}) => {
+        props.onChange(option.value);
+        setCurrentName(option.name);
+        setShowSelect(false);
+    }
+
+    return <div className="select-wrap">
+        <div className="select-content">
+            <div className="select-trigger" onClick={onSelect}>
+                <span>{currentName}</span>
+                <svg width="9" height="6" viewBox="0 0 9 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0.5 0.5L4.5 4.5L8.5 0.5" stroke="white"/>
+                </svg>
+            </div>
+            <ul className="select-options" style={{display: showSelect?"block":''}}>
+                {props.options.map((option) =><li key={option.value} onClick={()=>handleSelect(option)}>{option.name}</li>)}
+            </ul>
+        </div>
+        <div className="outSelect" style={{display: showSelect?"block":''}} onClick={onBlur}></div>
+    </div>
+}
+
 export const ImageSearchImageRef = React.createRef<ImageSearchImageRefType>();
 export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchImageProps>((props, ref) => {
 
@@ -239,26 +273,6 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         name: '界面库'
     }]
 
-    const DropSelect = (props:DropSelectProps) => {
-        const [showSelect, setShowSelect] = useState(false)
-        const onSelect = () => {
-            setShowSelect(true)
-        }
-        const onBlur = () => {
-            setShowSelect(false)
-            
-        }
-        return <div className="select-wrap">
-            <div className="select-content">
-                <div className="select-trigger" onClick={onSelect}>{props.options[0].name}</div>
-                <ul className="select-options" style={{display: showSelect?"block":''}}>
-                    {props.options.map((option) =><li key={option.value}>{option.name}</li>)}
-                </ul>
-            </div>
-            <div className="outSelect" style={{display: showSelect?"block":''}} onClick={onBlur}></div>
-        </div>
-    }
-
     const setProgress = (progress: number | undefined) => {
         if (downloader.complete) return;
         if (!progress) {
@@ -289,21 +303,6 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                             const value = val as IStorehouseType;
                             setAssetType(value)
                         }}></DropSelect>
-                    {/* <div className="image-search-image-option">
-
-                        <select
-                            defaultValue={assetType}
-                            onChange={(event) => {
-                                const value = event.target.value as IStorehouseType;
-                                setAssetType(value)
-                            }}>
-                            <option value="All">全局</option>
-                            <option value="ENGINEERING">资源库</option>
-                            <option value="DESIGN">资产库</option>
-                            <option value="components">组件库</option>
-                            <option value="interfaces">界面库</option>
-                        </select>
-                    </div> */}
                     <div className="image-search-image-input"
                         onClick={async () => {
                             loadImage();
@@ -313,7 +312,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                             &&
                             <span style={{
                                 fontStyle: 'italic',
-                                fontSize: "14px",
+                                fontSize: "12px",
                                 marginLeft: "5px",
                             }}>
                                 {"请选择文件进行上传"}
@@ -323,16 +322,9 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                             searchFile
                             &&
                             <div className="image-search-image-file">
-                                <img style={{ width: "40px", height: "40px", objectFit: "contain", margin: "auto 10px" }}
+                                <img style={{ width: "36px", height: "36px", objectFit: "contain"}}
                                     src={searchFile.path} />
-                                <span style={{
-                                    margin: "auto",
-                                    whiteSpace: "nowrap",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis"
-                                }}>
-                                    {searchFile.name}
-                                </span>
+                                <span>{searchFile.name}</span>
                             </div>
                         }
                     </div>

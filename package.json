@@ -5,7 +5,7 @@
   "scripts": {
     "watch": "parcel watch --no-content-hash ./index.html",
     "dev": "webpack --mode=development --watch",
-    "build": "webpack --mode development"
+    "build": "webpack --mode=production"
   },
   "keywords": [],
   "author": "",

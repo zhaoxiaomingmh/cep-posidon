@@ -2,14 +2,12 @@
     flex-grow: 1;
     flex-shrink: 2;
     flex-basis: 120px;
-    height: 143px;
     margin: 0 5px 5px 0px;
-    border: 1px solid #878787;
-    background-color: #999999 50%;
+    border: 1px solid var(--primary-border);
     padding: 4px;
     display: flex;
     flex-direction: column;
-
+    overflow: hidden;
     height: 143px;
     width: 100%;
 
@@ -22,14 +20,20 @@
         position: relative;
         display: flex;
         flex-direction: row;
+        overflow: hidden;
 
         .preview-box {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid #AFAFAF;
+            border: 1px solid var(--primary-border);
+            background-image: url(../../asset/img/transBg.png);
+            background-repeat: repeat;
             margin: 0 2px 2px 0px;
+            &:last-child{
+                margin-right: 0;
+            }
 
             img {
                 width: 100%;

@@ -9,6 +9,8 @@
     --block-icon-color: #fff;
     --primary-font-color: #fff;
     --second-font-color: #999;
+    --level-bg-color: #000;
+    --dir-item-bg: #b4b4b4;
     font-family: 'SimHei', "MS Gothic";
     ul{
         padding: 0;
@@ -60,6 +62,8 @@
 //     }
 // }
 .ps-app{
+    width: 100vw;
+    overflow: hidden;
     margin: 0;
     padding: 0;
     height: 100vh;
@@ -70,28 +74,42 @@
         --panel-bg-color: #f0f0f0;
         --input-bg-color: #a9a9a9;
         --primary-color: #181818; /* override for light themes */
-        --primary-background: #a9a9a9;
-        --primary-border: #848484;
+        --primary-background: #dbdbdb;
+        --primary-border: #ccc;
         --block-bg-color: #b8b8b8;
-        --block-wrap-color: #a3a3a3;
+        --block-wrap-color: #dbdbdb;
         --block-icon-color: #181818;
         --primary-font-color: #333;
         --second-font-color: #999;
+        --level-bg-color: #dcdcdc;
+        --dir-item-bg: #f9f9f9;
     }
 
     &.theme-default {
         --panel-bg-color: #b0b0b0;
         --primary-font-color: #333;
         --second-font-color: #999;
+        --primary-background: #a3a3a3;
+        --primary-border: #8a8a8a;
+        --block-wrap-color: #a3a3a3;
+        --primary-font-color: #000;
+        --second-font-color: #666;
+        --input-bg-color: #a3a3a3;
+        --level-bg-color: #cfcfcf;
     }
-
+    
     &.theme-dark {
         --panel-bg-color: #535353;
         --block-bg-color: #535353;
         --block-wrap-color: #424242;
+        --level-bg-color: #424242;
+        --dir-item-bg: #6f6f6f;
     }
     &.theme-darkest {
+        --primary-border: #505050;
         --panel-bg-color: #323232;
+        --level-bg-color: #292929;
+        --dir-item-bg: #565656;
     }
 
 }

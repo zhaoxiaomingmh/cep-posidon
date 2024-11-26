@@ -7,5 +7,5 @@
 
 .loading-bar {
     width: 6px;
-    background-color: #000;
+    background-color: var(--second-font-color);
 }

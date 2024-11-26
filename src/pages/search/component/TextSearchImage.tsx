@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { Gallery } from "@/hooks/gallery/Gallery";
 import { psConfig } from "@/utlis/util-env";
 import { FormatCheckboxs } from "./FormatCheckboxs";
+import { DropSelect } from "./ImageSearchImage";
 
 interface TextSearchImageProps {
 
@@ -201,6 +202,23 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
         }
     }
 
+    const options = [{
+        value: 'All' as IStorehouseType,
+        name: '全局'
+    },{
+        value: 'ENGINEERING' as IStorehouseType,
+        name: '资源库'
+    },{
+        value: 'DESIGN' as IStorehouseType,
+        name: '资产库'
+    },{
+        value: 'components' as IStorehouseType,
+        name: '组件库'
+    },{
+        value: 'interfaces' as IStorehouseType,
+        name: '界面库'
+    }]
+
     return (
         <div className="image-search-image-container">
             {
@@ -212,20 +230,10 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
                 project
                 &&
                 <div className="image-search-image-search-box">
-                    <div className="image-search-image-option">
-                        <select
-                            defaultValue={assetType}
-                            onChange={(event) => {
-                                const value = event.target.value as IStorehouseType;
+                    <DropSelect options={options} onChange={(val) => {
+                                const value = val;
                                 setAssetType(value)
-                            }}>
-                            <option value="All">全局</option>
-                            <option value="ENGINEERING">资源库</option>
-                            <option value="DESIGN">资产库</option>
-                            <option value="components">组件库</option>
-                            <option value="interfaces">界面库</option>
-                        </select>
-                    </div>
+                            }}></DropSelect>
                     <div className="image-search-image-input" >
                         <input type="text"
                             className="searchInput"
