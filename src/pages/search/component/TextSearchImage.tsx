@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import { Gallery } from "@/hooks/gallery/Gallery";
 import { psConfig } from "@/utlis/util-env";
 import { FormatCheckboxs } from "./FormatCheckboxs";
-import { DropSelect } from "./ImageSearchImage";
+import { DropSelect, selectOption } from "./ImageSearchImage";
 
 interface TextSearchImageProps {
 
@@ -18,6 +18,24 @@ interface TextSearchImageRefType {
     setSearchResult: (result: ISearchResult[] | undefined) => void,
     setProgress: (progress: number | undefined) => void,
 };
+
+
+const options:selectOption[] = [{
+    value: 'All',
+    name: '全局'
+},{
+    value: 'ENGINEERING',
+    name: '资源库'
+},{
+    value: 'DESIGN',
+    name: '资产库'
+},{
+    value: 'components',
+    name: '组件库'
+},{
+    value: 'interfaces',
+    name: '界面库'
+}]
 export const TextSearchImageRef = React.createRef<TextSearchImageRefType>();
 export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImageProps>((props, ref) => {
 
@@ -36,6 +54,8 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
     const [imgs, setImages] = useState<IGalleryItem[]>();
     const [canScroll, setCanScroll] = useState<boolean>(false);
     const [downloader, setDownloader] = useState<IDownloader>({ id: 0, progress: 0, complete: true });
+    const [filterOptions, setFilterOptions] = useState<selectOption[]>(options)
+    const [disableSearch, setDisableSearch] = useState<boolean>(false)
     useImperativeHandle(ref, () => {
         return {
             setSearchResult: setSearchResult,
@@ -43,8 +63,12 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
         }
     })
     useEffect(() => {
-        if (!project.storehouses || project.storehouses.length === 0) return;
+        if (!project.storehouses || project.storehouses.length === 0) {
+            setDisableSearch(true)
+            return
+        };
         let searchs: ISearchItem[] = [];
+        let filterList: selectOption[] = []
         project.storehouses.forEach(element => {
             let item: ISearchItem = {
                 projectName: element.projectName,
@@ -54,7 +78,10 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
                 canSearch: true
             }
             searchs.push(item);
+            const option = options.find(el => el.value == element.type)
+            filterList.push(option)
         });
+        setFilterOptions(filterList)
         setSearchItems(searchs);
     }, [project.storehouses])
     useEffect(() => {
@@ -202,23 +229,6 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
         }
     }
 
-    const options = [{
-        value: 'All' as IStorehouseType,
-        name: '全局'
-    },{
-        value: 'ENGINEERING' as IStorehouseType,
-        name: '资源库'
-    },{
-        value: 'DESIGN' as IStorehouseType,
-        name: '资产库'
-    },{
-        value: 'components' as IStorehouseType,
-        name: '组件库'
-    },{
-        value: 'interfaces' as IStorehouseType,
-        name: '界面库'
-    }]
-
     return (
         <div className="image-search-image-container">
             {
@@ -229,8 +239,8 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
             {
                 project
                 &&
-                <div className="image-search-image-search-box">
-                    <DropSelect options={options} onChange={(val) => {
+                <div className={`image-search-image-search-box ${disableSearch?'disabled':''}`}>
+                    <DropSelect isDisabled={disableSearch} options={options} onChange={(val) => {
                                 const value = val;
                                 setAssetType(value)
                             }}></DropSelect>
@@ -238,6 +248,7 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
                         <input type="text"
                             className="searchInput"
                             placeholder="支持中英文，英文适配度更高"
+                            disabled={disableSearch}
                             onChange={(event) => {
                                 setSearchPa(event.target.value);
                             }} />

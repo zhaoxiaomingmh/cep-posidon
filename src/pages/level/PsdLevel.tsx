@@ -200,16 +200,12 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
         <div className="psd-level" style={{width: "100%",display: "flex", flexDirection: "column", overflow:"hidden"}}>
             {!project
                 &&
-                <NoSVNLibrary desc={t("common-label1")} />
+                <NoSVNLibrary desc={"请先选择一个可用的项目"} />
             }
             {
                 (project && !isCreate)
                 &&
-                <NoSVNLibrary desc={t("common-label2")}
-                    url={`${psConfig.host}/project/${project.id}/TeamDetail`}
-                    clickDesc={t("common-label3")}
-                    gotoSet={t("common-label4")}
-                />
+                <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
             }
             {
                 (levelGroup && isCreate)

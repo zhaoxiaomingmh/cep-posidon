@@ -12,6 +12,10 @@ import { FormatCheckboxs } from "./FormatCheckboxs";
 import reService from "@/service/resourceService";
 import { useTranslation } from "react-i18next";
 
+export interface selectOption {
+    value: IStorehouseType,
+    name: string
+}
 
 interface ImageSearchImageProps {
 
@@ -22,15 +26,16 @@ interface ImageSearchImageRefType {
 };
 
 interface DropSelectProps {
-    options: {value: IStorehouseType, name: string}[],
+    options: selectOption[],
     onChange:(value:IStorehouseType)=>void
     value?: IStorehouseType,
+    isDisabled?: boolean,
 }
 export const DropSelect = (props:DropSelectProps) => {
     const [showSelect, setShowSelect] = useState(false)
     const [currentName, setCurrentName] = useState('全局')
     const onSelect = () => {
-        setShowSelect(true)
+        if(!props.isDisabled) setShowSelect(true)
     }
     const onBlur = () => {
         setShowSelect(false)
@@ -43,7 +48,7 @@ export const DropSelect = (props:DropSelectProps) => {
         setShowSelect(false);
     }
 
-    return <div className="select-wrap">
+    return <div className={`select-wrap ${props.isDisabled?'disabled':''}`}>
         <div className="select-content">
             <div className="select-trigger" onClick={onSelect}>
                 <span>{currentName}</span>
@@ -58,6 +63,23 @@ export const DropSelect = (props:DropSelectProps) => {
         <div className="outSelect" style={{display: showSelect?"block":''}} onClick={onBlur}></div>
     </div>
 }
+
+const options:selectOption[] = [{
+    value: 'All',
+    name: '全局'
+},{
+    value: 'ENGINEERING',
+    name: '资源库'
+},{
+    value: 'DESIGN',
+    name: '资产库'
+},{
+    value: 'components',
+    name: '组件库'
+},{
+    value: 'interfaces',
+    name: '界面库'
+}]
 
 export const ImageSearchImageRef = React.createRef<ImageSearchImageRefType>();
 export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchImageProps>((props, ref) => {
@@ -77,6 +99,8 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
     const [imgs, setImages] = useState<IGalleryItem[]>();
     const [canScroll, setCanScroll] = useState<boolean>(false);
     const [downloader, setDownloader] = useState<IDownloader>({ id: 0, progress: 0, complete: true });
+    const [filterOptions, setFilterOptions] = useState<selectOption[]>(options)
+    const [disableSearch, setDisableSearch] = useState<boolean>(false)
     useImperativeHandle(ref, () => {
         return {
             setSearchResult: setSearchResult,
@@ -84,8 +108,15 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         }
     })
     useEffect(() => {
-        if (!project.storehouses || project.storehouses.length === 0) return;
+        console.log('project.storehouses', project.storehouses); 
+        if (!project.storehouses || project.storehouses.length === 0) {
+            setDisableSearch(true)
+            return
+        }
+        setDisableSearch(false)
         let searchs: ISearchItem[] = [];
+        let filterList: selectOption[] = []
+        
         project.storehouses.forEach(element => {
             let item: ISearchItem = {
                 projectName: element.projectName,
@@ -95,7 +126,12 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 canSearch: true
             }
             searchs.push(item);
+
+            const option = options.find(el => el.value == element.type)
+            filterList.push(option)
         });
+
+        setFilterOptions(filterList)
         setSearchItems(searchs);
     }, [project.storehouses])
     useEffect(() => {
@@ -256,22 +292,6 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         myService.downloadFile(img, 'imgRef', project);
     }
 
-    const options = [{
-        value: 'All' as IStorehouseType,
-        name: '全局'
-    },{
-        value: 'ENGINEERING' as IStorehouseType,
-        name: '资源库'
-    },{
-        value: 'DESIGN' as IStorehouseType,
-        name: '资产库'
-    },{
-        value: 'components' as IStorehouseType,
-        name: '组件库'
-    },{
-        value: 'interfaces' as IStorehouseType,
-        name: '界面库'
-    }]
 
     const setProgress = (progress: number | undefined) => {
         if (downloader.complete) return;
@@ -298,14 +318,14 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
             {
                 project
                 &&
-                <div className="image-search-image-search-box">
-                    <DropSelect options={options} onChange={(val) => {
+                <div className={`image-search-image-search-box ${disableSearch?'disabled':''}`}>
+                    <DropSelect isDisabled={disableSearch} options={filterOptions} onChange={(val) => {
                             const value = val as IStorehouseType;
                             setAssetType(value)
                         }}></DropSelect>
                     <div className="image-search-image-input"
                         onClick={async () => {
-                            loadImage();
+                            if(!disableSearch) loadImage();
                         }}>
                         {
                             !searchFile
@@ -336,17 +356,17 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                     </div>
                 </div>
             }
-            {
+            {/* {
                 (project && !project.storehouses)
                 &&
                 <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
-            }
+            } */}
             {
-                storehouseState
-                &&
+                storehouseState?
                 <Gallery files={imgs} isSearch={isSearch} canScroll={canScroll} scrollBottom={scrollBottom} downloader={downloader} toDownload={downloadFile}  >
                     <FormatCheckboxs key={"FormatCheckboxs"} formats={formats} changeFormats={changeFormats} />
-                </Gallery>
+                </Gallery>:
+                <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
             }
         </div>
     );

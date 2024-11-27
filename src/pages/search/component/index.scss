@@ -148,5 +148,15 @@
                 }
             }
         }
+
+        &.disabled {
+            .image-search-image-button {
+                cursor: not-allowed;
+                .image-search-image-button-desc {
+                    cursor: not-allowed;
+                    background-color: #888888;
+                }
+            }
+        }
     }
 }
