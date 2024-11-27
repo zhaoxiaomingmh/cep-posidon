@@ -34,8 +34,35 @@ class psSerive {
         if (result.status === 200) {
             const data = result.data as IPosidonResponse;
             if (data.code === 0) {
-                console.log("进来了");
                 return data.data.replace('..', '') as string;
+            }
+        }
+        return undefined;
+    }
+    public async generateImageElement(path: string): Promise<string[] | undefined> {
+        const imageData = window.cep.fs.readFile(path, "Base64")
+        const binary = window.cep.encoding.convertion.b64_to_binary(imageData.data)
+        const binaryLength = binary.length;
+        const binaryArray = new Uint8Array(binaryLength);
+        for (let i = 0; i < binaryLength; i++) {
+            binaryArray[i] = binary.charCodeAt(i);
+        }
+        const blob = new Blob([binaryArray], { type: 'application/octet-stream' });
+        const formData = new FormData();
+        formData.append('file', blob, path.split('/').pop());
+        const result = await axios.post(psConfig.host + psConfig.generateURL, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+        if (result.status === 200) {
+            const data = result.data as IPosidonResponse;
+            if (data.code === 0) {
+                const imgEles = data.data as string[];
+                const eles = imgEles.map(ele => {
+                    return 'data:image/png;base64,' + ele
+                })
+                return eles;
             }
         }
         return undefined;

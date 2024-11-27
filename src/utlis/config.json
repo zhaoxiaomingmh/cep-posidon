@@ -35,6 +35,7 @@
         "get-figma-psd-result": "/ImageSeach/GetFigma2PsdResult",
         "query-svn-psd-dir": "/ImageSeach/QuerySvnPsdDirs",
         "get-dir-tree": "/ImageSeach/GetDirTree",
-        "get-svn-account-by-id": "/ImageSeach/GetSVNAccountById"
+        "get-svn-account-by-id": "/ImageSeach/GetSVNAccountById",
+        "generate-element": "/ImageSeach/UploadImageToAnalyze"
     }
 }

@@ -53,7 +53,6 @@ module.exports = {
     //插件
     plugins: [
         //plugin插件
-
     ],
     //模式
     mode: "development",
@@ -66,4 +65,5 @@ module.exports = {
         ],
         extensions: [".js", ".jsx", ".ts", ".tsx"],
     },
+
 }

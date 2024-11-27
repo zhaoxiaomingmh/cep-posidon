@@ -79,7 +79,7 @@ class resourceService {
             const cs = new CSInterface();
             const req = {
                 path: filePath,
-                isImport: img.format === 'psd' ? true : false,
+                isImport: img.format === 'psd' ? false : true,
             }
             cs.evalScript(`openImage(${JSON.stringify(req)})`, (data) => {
                 window.cep.fs.deleteFile(filePath);

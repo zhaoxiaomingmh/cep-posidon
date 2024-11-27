@@ -46,6 +46,7 @@ export const psConfig = {
     getProject: config.path["get-project"],
     getStorehouse: config.path["get-storehouse"],
     generateURL: config.path["generate-url"],
+    generateElement: config.path["generate-element"],
     searchImage: config.path["seach-image"],
     getSvnAccountByProjectName: config.path["get-svn-account-by-projectname"],
     getFigmaMsg: config.path["get-figma-msg"],

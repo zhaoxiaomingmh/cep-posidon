@@ -87,7 +87,6 @@ export const Login = forwardRef<LoginRefType, LoginProps>((props, ref) => {
             }
             setProject(project);
         }
-        console.log('user', user);
         setUser(user);
         localStorage.setItem('cep-user', JSON.stringify(user));
     };
