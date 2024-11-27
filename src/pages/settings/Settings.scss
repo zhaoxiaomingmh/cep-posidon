@@ -1,24 +1,32 @@
 .settings__header {
     display: flex;
-    flex: 1;
+    padding-bottom: 20px;
     flex-direction: row;
     border-bottom: 2px solid gray;
     border-radius: 1px;
+    overflow: hidden;
 
     .settings__header__avatar {
-        width: 64px;
-        height: 64px;
+        width: 52px;
+        height: 52px;
         border-radius: 50%;
+        flex-shrink: 0;
         background-color: #005cc8;
         display: flex;
         justify-content: center;
         align-items: center;
+        margin-right: 10px;
 
     }
 
     .settings__header__user {
         display: flex;
         flex-direction: column;
+        overflow: hidden;
+        flex-grow: 1;
+        h3 {
+            margin: 0;
+        }
 
         .settings__header__user__email {
             flex: 1;
@@ -31,9 +39,17 @@
 
 
 .settings__content__lan {
-    height: 100px;
+    height: 60px;
     border-bottom: 2px solid gray;
     border-radius: 1px;
+    display: flex;
+    align-items: center;
+    span {
+        width: 50%;
+    }
+    select {
+        flex: 1;
+    }
 }
 
 .settings__content__team {
@@ -42,25 +58,27 @@
     flex-direction: column;
     border-bottom: 2px solid gray;
     border-radius: 1px;
+    padding-bottom: 10px;
 
     .settings__content__team__title {
         display: flex;
         flex: 1;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        span {
+            margin-bottom: 10px;
+        }
     }
 
     .settings__content__team__preview {
         display: flex;
         flex-direction: row;
 
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
 
         #project-head{
-            width: 30%;
-            height: 30%;
+            width: 50%;
             object-fit: cover;
         }
 

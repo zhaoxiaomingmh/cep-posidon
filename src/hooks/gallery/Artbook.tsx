@@ -82,7 +82,6 @@ export const Artbook = forwardRef<ArtbookRefType, ArtbookProps>((props, ref) => 
                 <span
                     style={{
                         fontSize: "12px",
-                        color: "#ffffff",
                         width: "100%",
                         overflow: "hidden",
                         whiteSpace: "nowrap",

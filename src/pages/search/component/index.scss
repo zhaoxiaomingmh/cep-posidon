@@ -14,6 +14,9 @@
                 white-space: nowrap;
                 font-size: 12px;
             }
+            svg {
+                stroke: var(--primary-font-color);
+            }
         }
         .select-options {
             position: absolute;
