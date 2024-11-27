@@ -49,10 +49,10 @@
                         </MaxSize>
                     </Geometry>
                     <Icons>
-                        <Icon Type="Normal">./images/IconLight.png</Icon>
-                        <Icon Type="RollOver">./images/IconLight.png</Icon>
-                        <Icon Type="DarkNormal">./images/IconDark.png</Icon>
-                        <Icon Type="DarkRollOver">./images/IconDark.png</Icon>
+                        <Icon Type="Normal">./dist/static/images/logo-dark.png</Icon>
+                        <Icon Type="RollOver">./dist/static/images/logo-dark.png</Icon>
+                        <Icon Type="DarkNormal">./dist/static/images/logo.png</Icon>
+                        <Icon Type="DarkRollOver">./dist/static/images/logo.png</Icon>
                     </Icons>
                 </UI>
             </DispatchInfo>
