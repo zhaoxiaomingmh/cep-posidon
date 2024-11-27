@@ -1,6 +1,7 @@
 import { AppRef } from "@/router/App";
 import { IDocument, IEventResult } from "@/store/iTypes/iTypes";
-
+import { darkTheme, defaultTheme, lightTheme } from '@adobe/react-spectrum';
+import { Theme } from "@react-types/provider";
 //用来与Photoshop交互
 class handler {
     private static instance: handler;
@@ -21,20 +22,53 @@ class handler {
     }
 
     public static getInstance(): handler {
+        handler.instance = new handler();
         if (!handler.instance) {
-            handler.instance = new handler();
         }
         return handler.instance;
+    }
+
+    public getCurrentTheme(): {theme:Theme, currentInterface: string} {
+        const bgColor =  this.csInterface.getHostEnvironment().appSkinInfo.appBarBackgroundColor;
+        const red = Math.round(bgColor.color.red)
+        let theme:Theme = defaultTheme
+        let colorScheme = 'dark'
+        let currentInterface = 'dark'
+        if(red < 60){
+            theme = darkTheme
+            currentInterface = 'darkest'
+            colorScheme = 'dark'
+            console.log('darkest');
+        } else if(60 <= red && red < 127) {
+            theme = darkTheme
+            currentInterface = 'dark'
+            colorScheme = 'dark'
+            console.log('dark');
+        } else if(127 <= red && red < 200) {
+            theme = defaultTheme
+            currentInterface = 'default'
+            colorScheme = 'light'
+            console.log('default');
+        } else {
+            theme = lightTheme
+            currentInterface = 'light'
+            colorScheme = 'light'
+            console.log('light');
+        }
+        
+        return {theme, currentInterface}
     }
 
     private init() {
         this.registerEvent('select',);
         this.registerEvent('close');
         this.registerEvent('open');
-
-
+        this.getCurrentTheme();
+        
+        
         this.csInterface.addEventListener('com.adobe.csxs.events.ThemeColorChanged', () => {
-            console.log('颜色更换')
+            this.getCurrentTheme();
+            // console.log('颜色更换')
         }, undefined);
 
         this.csInterface.addEventListener('my_custom_event_type', (result) => {

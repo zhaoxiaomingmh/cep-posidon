@@ -35,10 +35,7 @@ export const PsdLevelBar = forwardRef<PsdLevelToolBarRefType, PsdLevelToolBarPro
             <div className="design-asset-classification">
                 {
                     props.categories?.map((dir, index) => {
-                        return <div className="dir-item" key={index}
-                            style={{
-                                backgroundColor: dir.id === props.category ? "#1c61e7" : "rgba(153, 153, 153, 0.5)"
-                            }}
+                        return <div className={`dir-item ${dir.id === props.category?'active':''}`} key={index}
                             onClick={() => { 
                                 props.changeCategory(dir.id) }}
                         >

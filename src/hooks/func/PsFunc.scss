@@ -1,4 +1,5 @@
 .ps-func {
+    width: 100%;
     display: flex;
     flex-grow: 1;
     flex-direction: column;
@@ -7,5 +8,31 @@
         height: 40px;
         display: flex;
         flex-direction: row;
+        .ps-func__toolbar__title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 0;
+            margin-right: 10px;
+            cursor: pointer;
+            color: var(--second-font-color);
+            span {
+                padding: 2px 4px;
+                &:hover {
+                    background-color: var(--block-wrap-color);
+                }
+            }
+            &.active {
+                font-size: large;
+                color: var(--primary-font-color);
+            }
+        }
+    }
+    .ps-func__item {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        width: 100%;
+        overflow: hidden;
     }
 }

@@ -1,20 +1,21 @@
 .image-preview-item-container {
     flex-grow: 1;
     flex-shrink: 2;
-    flex-basis: 120px;
+    flex-basis: 106px;
     height: 143px;
     margin: 0 5px 5px 0px;
-    border: 1px solid #878787;
-    background-color: #999999 50%;
+    border: 1px solid var(--primary-border);
     padding: 4px;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 
     .image-preview-item-name {
         display: flex;
         margin-top: 4px;
         width: 100%;
         align-items: center;
+        overflow: hidden;
         .image-name {
             font-size: 12px;
             flex-grow: 1;
@@ -23,9 +24,15 @@
             text-overflow: ellipsis;
         }
         .image-info{
-            display: inline-block;
-            width: 10px;
+            display: inline-flex;
+            width: 16px;
+            height: 16px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 100px;
+            border: 1px solid var(--primary-border);
             position: relative;
+            cursor: pointer;
         }
     }
 
@@ -33,6 +40,8 @@
         width: 100%;
         flex: 1;
         position: relative;
+        background-image: url(../../asset/img/transBg.png);
+        background-repeat: repeat;
     }
 
     .image-preview-item-bg svg {

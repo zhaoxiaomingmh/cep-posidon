@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "watch": "parcel watch --no-content-hash ./index.html",
-    "build": "webpack --mode development"
+    "dev": "webpack --mode=development --watch",
+    "build": "webpack --mode=production"
   },
   "keywords": [],
   "author": "",
@@ -39,6 +40,7 @@
     "intl-pluralrules": "^2.0.1",
     "jsencrypt": "^3.3.2",
     "path": "^0.12.7",
+    "polyfill": "^0.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^11.2.1"

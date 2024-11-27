@@ -1,4 +1,5 @@
 import React, { forwardRef } from "react";
+import './PsFunc.scss'
 interface PsFuncItemRef { }
 export interface PsFuncItemProps {
     id: string;

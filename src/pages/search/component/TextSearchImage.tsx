@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { Gallery } from "@/hooks/gallery/Gallery";
 import { psConfig } from "@/utlis/util-env";
 import { FormatCheckboxs } from "./FormatCheckboxs";
+import { DropSelect, selectOption } from "./ImageSearchImage";
 
 interface TextSearchImageProps {
 
@@ -17,6 +18,24 @@ interface TextSearchImageRefType {
     setSearchResult: (result: ISearchResult[] | undefined) => void,
     setProgress: (progress: number | undefined) => void,
 };
+
+
+const options:selectOption[] = [{
+    value: 'All',
+    name: '全局'
+},{
+    value: 'ENGINEERING',
+    name: '资源库'
+},{
+    value: 'DESIGN',
+    name: '资产库'
+},{
+    value: 'components',
+    name: '组件库'
+},{
+    value: 'interfaces',
+    name: '界面库'
+}]
 export const TextSearchImageRef = React.createRef<TextSearchImageRefType>();
 export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImageProps>((props, ref) => {
 
@@ -35,6 +54,8 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
     const [imgs, setImages] = useState<IGalleryItem[]>();
     const [canScroll, setCanScroll] = useState<boolean>(false);
     const [downloader, setDownloader] = useState<IDownloader>({ id: 0, progress: 0, complete: true });
+    const [filterOptions, setFilterOptions] = useState<selectOption[]>(options)
+    const [disableSearch, setDisableSearch] = useState<boolean>(false)
     useImperativeHandle(ref, () => {
         return {
             setSearchResult: setSearchResult,
@@ -42,8 +63,12 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
         }
     })
     useEffect(() => {
-        if (!project.storehouses || project.storehouses.length === 0) return;
+        if (!project.storehouses || project.storehouses.length === 0) {
+            setDisableSearch(true)
+            return
+        };
         let searchs: ISearchItem[] = [];
+        let filterList: selectOption[] = []
         project.storehouses.forEach(element => {
             let item: ISearchItem = {
                 projectName: element.projectName,
@@ -53,7 +78,10 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
                 canSearch: true
             }
             searchs.push(item);
+            const option = options.find(el => el.value == element.type)
+            filterList.push(option)
         });
+        setFilterOptions(filterList)
         setSearchItems(searchs);
     }, [project.storehouses])
     useEffect(() => {
@@ -211,25 +239,16 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
             {
                 project
                 &&
-                <div className="image-search-image-search-box">
-                    <div className="image-search-image-option">
-                        <select
-                            defaultValue={assetType}
-                            onChange={(event) => {
-                                const value = event.target.value as IStorehouseType;
+                <div className={`image-search-image-search-box ${disableSearch?'disabled':''}`}>
+                    <DropSelect isDisabled={disableSearch} options={options} onChange={(val) => {
+                                const value = val;
                                 setAssetType(value)
-                            }}>
-                            <option value="All">全局</option>
-                            <option value="ENGINEERING">资源库</option>
-                            <option value="DESIGN">资产库</option>
-                            <option value="components">组件库</option>
-                            <option value="interfaces">界面库</option>
-                        </select>
-                    </div>
+                            }}></DropSelect>
                     <div className="image-search-image-input" >
                         <input type="text"
                             className="searchInput"
                             placeholder="支持中英文，英文适配度更高"
+                            disabled={disableSearch}
                             onChange={(event) => {
                                 setSearchPa(event.target.value);
                             }} />
@@ -242,17 +261,17 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
                     </div>
                 </div>
             }
-            {
+            {/* {
                 (project && !project.storehouses)
                 &&
                 <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
-            }
+            } */}
             {
-                storehouseState
-                &&
+                storehouseState?
                 <Gallery files={imgs} isSearch={isSearch} canScroll={canScroll} scrollBottom={scrollBottom} downloader={downloader} toDownload={downloadFile}  >
                     <FormatCheckboxs key={"FormatCheckboxs"} formats={formats} changeFormats={changeFormats} />
-                </Gallery>
+                </Gallery>:
+                <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
             }
         </div>
     );

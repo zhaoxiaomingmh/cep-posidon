@@ -4,8 +4,9 @@ import React from 'react';
 
 export interface PsTableItemProps {
     id: string
-    icon: React.ReactNode
-    children: React.ReactNode
+    icon?: React.ReactNode
+    children?: React.ReactNode
+    isGap?:boolean
 }
 interface PsTableItemRef { }
 export const PsTableItem = forwardRef<PsTableItemRef, PsTableItemProps>((props, ref) => {

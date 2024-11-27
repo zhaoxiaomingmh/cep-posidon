@@ -17,6 +17,7 @@
             justify-content: center;
             align-items: center;
             margin-right: 2px;
+            cursor: pointer;
 
             >span {
                 font-size: 16px;
@@ -37,20 +38,28 @@
         flex-wrap: wrap;
         padding: 3px 2px;
         padding-top: 5px;
-        background-color: rgba(0, 0, 0, 0.2);
+        background-color: var(--level-bg-color);
 
         .dir-item {
-            background-color: rgba(161, 161, 161, 0.103);
+            background-color: var(--dir-item-bg);
             margin: 2px;
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 0;
+            cursor: pointer;
 
+            
             // height: 29px;
             >span {
                 line-height: 12px;
                 font-size: 12px;
-                color: var(--primary-color);
+                color: var(--primary-font-color);
+            }
+            &.active {
+                background-color: #1c61e7;
+                >span{
+                    color: #fff;
+                }
             }
         }
     }

@@ -47,7 +47,7 @@ export const PsTable = forwardRef<PsTableRef, PsTableProps>((props, ref) => {
                 {
                     props.children.map((child, i) => {
                         return (
-                            <SideIcon key={i} active={child.props.id == table} id={child.props.id}>
+                            <SideIcon key={i} active={child.props.id == table} id={child.props.id} isGap={child.props.isGap}>
                                 {child.props.icon}
                             </SideIcon>
                         );
