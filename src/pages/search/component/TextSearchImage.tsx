@@ -261,17 +261,17 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
                     </div>
                 </div>
             }
-            {
+            {/* {
                 (project && !project.storehouses)
                 &&
                 <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
-            }
+            } */}
             {
-                storehouseState
-                &&
+                storehouseState?
                 <Gallery files={imgs} isSearch={isSearch} canScroll={canScroll} scrollBottom={scrollBottom} downloader={downloader} toDownload={downloadFile}  >
                     <FormatCheckboxs key={"FormatCheckboxs"} formats={formats} changeFormats={changeFormats} />
-                </Gallery>
+                </Gallery>:
+                <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
             }
         </div>
     );
