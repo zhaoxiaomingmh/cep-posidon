@@ -19,7 +19,8 @@ export type GalleryProps = {
     scrollBottom: Function,
     downloader: IDownloader,
     toDownload: (img: IGalleryItem) => void,
-    enterTheFolder?: (item: IGalleryItem) => void
+    enterTheFolder?: (item: IGalleryItem) => void,
+    onChangeBg?: (bgType: number) => void,
 };
 type GalleryRefType = {};
 export const GalleryRef = React.createRef<GalleryRefType>();
@@ -36,6 +37,11 @@ export const Gallery = forwardRef<GalleryRefType, GalleryProps>((props, ref) => 
         }
     };
 
+    const changeBg = (type:number) => {
+        setBackground(type)
+        props.onChangeBg(type)
+    }
+
     return (
         <div className="gallery-container" >
             <div className="gallery-header">
@@ -48,7 +54,7 @@ export const Gallery = forwardRef<GalleryRefType, GalleryProps>((props, ref) => 
                             background: "#ffffff",
                             borderColor: background === 1 ? "#1f88ea" : "",
                         }}
-                        onClick={() => { setBackground(1); }}
+                        onClick={() => { changeBg(1); }}
                     />
                     <div
                         key={"background-checkbox-2"}
@@ -57,7 +63,7 @@ export const Gallery = forwardRef<GalleryRefType, GalleryProps>((props, ref) => 
                             background: "#787878",
                             borderColor: background === 2 ? "#1f88ea" : "",
                         }}
-                        onClick={() => { setBackground(2) }}
+                        onClick={() => { changeBg(2) }}
                     />
                     <div
                         key={"background-checkbox-3"}
@@ -67,7 +73,7 @@ export const Gallery = forwardRef<GalleryRefType, GalleryProps>((props, ref) => 
                             borderColor: background === 3 ? "#1f88ea" : "",
                         }}
                         onClick={() => {
-                            setBackground(3);
+                            changeBg(3);
                         }}
                     />
                     <div
@@ -80,7 +86,7 @@ export const Gallery = forwardRef<GalleryRefType, GalleryProps>((props, ref) => 
                             backgroundRepeat: 'no-repeat',
                             borderColor: background === 0 ? "#1f88ea" : "",
                         }}
-                        onClick={() => { setBackground(0); }}
+                        onClick={() => { changeBg(0); }}
                     />
 
                 </div>

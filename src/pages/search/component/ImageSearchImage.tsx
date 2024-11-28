@@ -64,6 +64,20 @@ export const DropSelect = (props:DropSelectProps) => {
     </div>
 }
 
+interface segmentProps {
+    images: string[];
+    bgType: number;
+    onSearch: (base64:string) => void;
+}
+
+const SegmentList = (props:segmentProps) => {
+    return <div className="segment-wrap">
+        {props.images.map(image => {
+            return <div className={`segment-item backgroundType_${props.bgType}`}><img src={image} /></div>
+        })}
+    </div>
+}
+ 
 const options:selectOption[] = [{
     value: 'All',
     name: '全局'
@@ -101,6 +115,8 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
     const [downloader, setDownloader] = useState<IDownloader>({ id: 0, progress: 0, complete: true });
     const [filterOptions, setFilterOptions] = useState<selectOption[]>(options)
     const [disableSearch, setDisableSearch] = useState<boolean>(false)
+    const [bgType, setBgType] = useState<number>(0)
+    const [segmentImages, setSegmentImages] = useState<string[]>([])
     useImperativeHandle(ref, () => {
         return {
             setSearchResult: setSearchResult,
@@ -145,6 +161,11 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         setDownloader({ id: 0, progress: 0, complete: true });
         updateState();
     }, [assetType, formats])
+
+    useEffect(() => {
+        console.log(searchFile);
+        if(searchFile.path.length>0) toSearchImage(true)
+    }, [searchFile])
 
     const updateState = () => {
         let svnState = false;
@@ -356,6 +377,9 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                     </div>
                 </div>
             }
+            {
+                <SegmentList images={segmentImages} bgType={bgType} onSearch={img => {}}></SegmentList>
+            }
             {/* {
                 (project && !project.storehouses)
                 &&
@@ -363,7 +387,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
             } */}
             {
                 storehouseState?
-                <Gallery files={imgs} isSearch={isSearch} canScroll={canScroll} scrollBottom={scrollBottom} downloader={downloader} toDownload={downloadFile}  >
+                <Gallery files={imgs} isSearch={isSearch} canScroll={canScroll} scrollBottom={scrollBottom} downloader={downloader} toDownload={downloadFile}  onChangeBg={bgType => setBgType(bgType)}>
                     <FormatCheckboxs key={"FormatCheckboxs"} formats={formats} changeFormats={changeFormats} />
                 </Gallery>:
                 <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
