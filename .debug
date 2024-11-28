@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionList>
-    <Extension Id="posidon-ps">
+    <Extension Id="posidon-ps-cep-main_dev">
         <HostList>
             <Host Name="PHXS" Port="4002"/>
+        </HostList>
+    </Extension>
+    <Extension Id="posidon-ps-cep-invisible">
+        <HostList>
+            <Host Name="PHXS" Port="8004"/>
         </HostList>
     </Extension>
 </ExtensionList>

@@ -27,56 +27,56 @@ interface ImageSearchImageRefType {
 
 interface DropSelectProps {
     options: selectOption[],
-    onChange:(value:IStorehouseType)=>void
+    onChange: (value: IStorehouseType) => void
     value?: IStorehouseType,
     isDisabled?: boolean,
 }
-export const DropSelect = (props:DropSelectProps) => {
+export const DropSelect = (props: DropSelectProps) => {
     const [showSelect, setShowSelect] = useState(false)
     const [currentName, setCurrentName] = useState('全局')
     const onSelect = () => {
-        if(!props.isDisabled) setShowSelect(true)
+        if (!props.isDisabled) setShowSelect(true)
     }
     const onBlur = () => {
         setShowSelect(false)
-        
+
     }
 
-    const handleSelect = (option:{value:IStorehouseType,name:string}) => {
+    const handleSelect = (option: { value: IStorehouseType, name: string }) => {
         props.onChange(option.value);
         setCurrentName(option.name);
         setShowSelect(false);
     }
 
-    return <div className={`select-wrap ${props.isDisabled?'disabled':''}`}>
+    return <div className={`select-wrap ${props.isDisabled ? 'disabled' : ''}`}>
         <div className="select-content">
             <div className="select-trigger" onClick={onSelect}>
                 <span>{currentName}</span>
                 <svg width="9" height="6" viewBox="0 0 9 6" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0.5 0.5L4.5 4.5L8.5 0.5"/>
+                    <path d="M0.5 0.5L4.5 4.5L8.5 0.5" />
                 </svg>
             </div>
-            <ul className="select-options" style={{display: showSelect?"block":''}}>
-                {props.options.map((option) =><li key={option.value} onClick={()=>handleSelect(option)}>{option.name}</li>)}
+            <ul className="select-options" style={{ display: showSelect ? "block" : '' }}>
+                {props.options.map((option) => <li key={option.value} onClick={() => handleSelect(option)}>{option.name}</li>)}
             </ul>
         </div>
-        <div className="outSelect" style={{display: showSelect?"block":''}} onClick={onBlur}></div>
+        <div className="outSelect" style={{ display: showSelect ? "block" : '' }} onClick={onBlur}></div>
     </div>
 }
 
-const options:selectOption[] = [{
+const options: selectOption[] = [{
     value: 'All',
     name: '全局'
-},{
+}, {
     value: 'ENGINEERING',
     name: '资源库'
-},{
+}, {
     value: 'DESIGN',
     name: '资产库'
-},{
+}, {
     value: 'components',
     name: '组件库'
-},{
+}, {
     value: 'interfaces',
     name: '界面库'
 }]
@@ -108,7 +108,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         }
     })
     useEffect(() => {
-        console.log('project.storehouses', project.storehouses); 
+        console.log('project.storehouses', project.storehouses);
         if (!project.storehouses || project.storehouses.length === 0) {
             setDisableSearch(true)
             return
@@ -116,7 +116,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         setDisableSearch(false)
         let searchs: ISearchItem[] = [];
         let filterList: selectOption[] = []
-        
+
         project.storehouses.forEach(element => {
             let item: ISearchItem = {
                 projectName: element.projectName,
@@ -225,7 +225,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                         canSearch: item.canSearch
                     };
                 });
-            iService.searchImage(project.id, searchFile.url, newItems, formats, 0)
+            iService.searchImage(project.id, psConfig.host + searchFile.url, newItems, formats, 0)
             setIsSearch(true);
         }
     }
@@ -318,14 +318,25 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
             {
                 project
                 &&
-                <div className={`image-search-image-search-box ${disableSearch?'disabled':''}`}>
+                <div className={`image-search-image-search-box ${disableSearch ? 'disabled' : ''}`}>
                     <DropSelect isDisabled={disableSearch} options={filterOptions} onChange={(val) => {
-                            const value = val as IStorehouseType;
-                            setAssetType(value)
-                        }}></DropSelect>
+                        const value = val as IStorehouseType;
+                        setAssetType(value)
+                    }}></DropSelect>
                     <div className="image-search-image-input"
                         onClick={async () => {
-                            if(!disableSearch) loadImage();
+                            if (navigator.clipboard) {
+                                navigator.clipboard.read()
+                                    .then(text => {
+                                        console.log('剪贴板的内容:', text);
+                                    })
+                                    .catch(err => {
+                                        console.error('读取剪贴板内容时出错:', err);
+                                    });
+                            } else {
+                                console.error('当前浏览器不支持Clipboard API');
+                            }
+                            // if(!disableSearch) loadImage();
                         }}>
                         {
                             !searchFile
@@ -342,7 +353,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                             searchFile
                             &&
                             <div className="image-search-image-file">
-                                <img style={{ width: "36px", height: "36px", objectFit: "contain"}}
+                                <img style={{ width: "36px", height: "36px", objectFit: "contain" }}
                                     src={searchFile.path} />
                                 <span>{searchFile.name}</span>
                             </div>
@@ -362,11 +373,11 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
             } */}
             {
-                storehouseState?
-                <Gallery files={imgs} isSearch={isSearch} canScroll={canScroll} scrollBottom={scrollBottom} downloader={downloader} toDownload={downloadFile}  >
-                    <FormatCheckboxs key={"FormatCheckboxs"} formats={formats} changeFormats={changeFormats} />
-                </Gallery>:
-                <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
+                storehouseState ?
+                    <Gallery files={imgs} isSearch={isSearch} canScroll={canScroll} scrollBottom={scrollBottom} downloader={downloader} toDownload={downloadFile}  >
+                        <FormatCheckboxs key={"FormatCheckboxs"} formats={formats} changeFormats={changeFormats} />
+                    </Gallery> :
+                    <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
             }
         </div>
     );

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<ExtensionManifest Version="7.0" ExtensionBundleId="posidon-ps"
+<ExtensionManifest Version="7.0" ExtensionBundleId="posidon-ps-cep_dev"
     ExtensionBundleVersion="1.0.1"
-    ExtensionBundleName="CEPPanelStart" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    ExtensionBundleName="PosidonPsCEPPanel_dev"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <ExtensionList>
-        <Extension Id="posidon-ps" Version="1.0" />
+        <Extension Id="posidon-ps-cep-main_dev" Version="1.0" />
+        <Extension Id="posidon-ps-cep-invisible" Version="1.0" />
     </ExtensionList>
     <ExecutionEnvironment>
         <HostList>
@@ -19,7 +21,7 @@
         </RequiredRuntimeList>
     </ExecutionEnvironment>
     <DispatchInfoList>
-        <Extension Id="posidon-ps">
+        <Extension Id="posidon-ps-cep-main_dev">
             <DispatchInfo>
                 <Resources>
                     <MainPath>./index.html</MainPath>
@@ -33,7 +35,7 @@
                 </Lifecycle>
                 <UI>
                     <Type>Panel</Type>
-                    <Menu>Posidon-PS-CEP</Menu>
+                    <Menu>Posidon插件(CEP)_dev</Menu>
                     <Geometry>
                         <Size>
                             <Height>350</Height>
@@ -54,6 +56,38 @@
                         <Icon Type="DarkNormal">./dist/static/images/logo.png</Icon>
                         <Icon Type="DarkRollOver">./dist/static/images/logo.png</Icon>
                     </Icons>
+                </UI>
+            </DispatchInfo>
+        </Extension>
+        <Extension Id="posidon-ps-cep-invisible">
+            <DispatchInfo>
+                <Resources>
+                    <MainPath>./src/public/invisible.html</MainPath>
+                    <CEFCommandLine>
+                        <Parameter>--enable-nodejs</Parameter>
+                    </CEFCommandLine>
+                </Resources>
+                <Lifecycle>
+                    <AutoVisible>false</AutoVisible>
+                    <StartOn>
+                        <!-- Photoshop dispatches this event on startup -->
+                        <Event>applicationActivate</Event>
+                        <!-- Premiere Pro dispatches this event on startup -->
+                        <Event>com.adobe.csxs.events.ApplicationActivate</Event>
+                        <!-- PS on Windows isn't consistently firing the above events on launch.
+                        To ensure that we're launched, also start on the following -->
+                        <Event>com.adobe.csxs.events.AppOnline</Event>
+                        <Event>documentAfterActivate</Event>
+                    </StartOn>
+                </Lifecycle>
+                <UI>
+                    <Type>Custom</Type>
+                    <Geometry>
+                        <Size>
+                            <Height>1</Height>
+                            <Width>1</Width>
+                        </Size>
+                    </Geometry>
                 </UI>
             </DispatchInfo>
         </Extension>

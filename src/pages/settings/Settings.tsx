@@ -9,6 +9,7 @@ import utilHttps from "@/utlis/util-https";
 import { IPosidonResponse, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
 import { defaultProjectHeadImage } from "@/utlis/const";
 import { useTranslation } from "react-i18next";
+import psHandler from "@/service/handler";
 interface SettingsRefType { };
 interface SettingsProps { }
 export const SettingsRef = React.createRef<SettingsRefType>();
@@ -107,6 +108,11 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                         setUser(undefined);
                     }}>
                         注销
+                    </Button>
+                    <Button variant={"primary"} onPress={() => {
+                        psHandler.restart();
+                    }}>
+                        重启
                     </Button>
                     {/* 
                     <button onClick={() => {
