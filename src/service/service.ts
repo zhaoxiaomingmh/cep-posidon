@@ -15,8 +15,10 @@ class psSerive {
         }
         return psSerive.instance;
     }
-    public async generateImageUrl(path: string): Promise<string | undefined> {
-        const imageData = window.cep.fs.readFile(path, "Base64")
+    public async generateImageUrl(path: string, isBase64?:boolean): Promise<string | undefined> {
+        const imageData = isBase64?{data:path}:window.cep.fs.readFile(path, "Base64")
+        console.log("imageData:", imageData);
+        
         const binary = window.cep.encoding.convertion.b64_to_binary(imageData.data)
         const binaryLength = binary.length;
         const binaryArray = new Uint8Array(binaryLength);
@@ -50,7 +52,7 @@ class psSerive {
         const blob = new Blob([binaryArray], { type: 'application/octet-stream' });
         const formData = new FormData();
         formData.append('file', blob, path.split('/').pop());
-        const result = await axios.post(psConfig.host + psConfig.generateURL, formData, {
+        const result = await axios.post(psConfig.host + psConfig.generateElement, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -84,7 +86,9 @@ class psSerive {
             if (result.data?.code === 0) {
                 const imgData = result.data?.data as ISearchResult[];
                 console.log("搜索结果", imgData);
+                console.log('before notifySearchResult');
                 this.notifySearchResult(type, imgData);
+                console.log('after notifySearchResult');
                 return;
             }
         }

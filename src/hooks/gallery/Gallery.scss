@@ -36,9 +36,17 @@
         flex-wrap: wrap;
         align-content: flex-start;
         margin-top: 5px;
+        .scrollbar-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(106px, 1fr));
+            width: 100%;
+            grid-gap: 4px;
+            grid-auto-rows: min-content;
+        }
 
         .image-gallery-hint {
-            width: calc(100% - 5px);
+            width: 100%;
+            grid-column: 1 / -1;
             height: 50px;
             border-top: 1px solid var(--primary-border);
             display: flex;

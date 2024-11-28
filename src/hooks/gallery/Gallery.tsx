@@ -8,6 +8,8 @@ import { Loading } from "../loading/Loading";
 import { PreviewBox } from "./PreviewBox";
 import { Artbook } from "./Artbook";
 import { bg } from "@/utlis/const";
+import 'react-perfect-scrollbar/dist/css/styles.css';
+import PerfectScrollbar from 'react-perfect-scrollbar'
 
 
 
@@ -40,6 +42,9 @@ export const Gallery = forwardRef<GalleryRefType, GalleryProps>((props, ref) => 
     const changeBg = (type:number) => {
         setBackground(type)
         props.onChangeBg(type)
+    }
+    const handleScrollEnd = () => {
+        props.scrollBottom()
     }
 
     return (
@@ -92,54 +97,56 @@ export const Gallery = forwardRef<GalleryRefType, GalleryProps>((props, ref) => 
                 </div>
             </div>
             {
-                props.files ? <div className="image-gallery" ref={containerRef} onScroll={handleScroll} >
-                    {
-                        props.files?.map((file, index) => {
-                            if (file.isFile) {
-                                return <PreviewBox
-                                    key={index}
-                                    background={background}
-                                    callback={props.toDownload}
-                                    downloadBody={props.downloader}
-                                    img={file}
-                                />
-                            } else {
-                                return <Artbook
-                                    background={background}
-                                    file={file}
-                                    key={index}
-                                    enterTheFolder={props.enterTheFolder} />
-                            }
-                        })
-                    }
-                    {
-                        props.files
-                        &&
-                        <div className="image-gallery-hint">
-                            {
-                                props.isSearch &&
-                                <Loading />
-                            }
-                            {
-                                !props.isSearch &&
-                                <div>
-                                    {
-                                        !props.canScroll &&
-                                        <span>已经拉倒底了</span>
-                                    }
-                                    {
-                                        props.canScroll
-                                        &&
-                                        <span style={{
-                                            fontSize: "16px",
-                                            fontWeight: "bold",
-                                            color: "#efefef",
-                                        }}>下拉进行刷新</span>
-                                    }
-                                </div>
-                            }
-                        </div>
-                    }
+                props.files ? <div className="image-gallery" >
+                    <PerfectScrollbar onYReachEnd={handleScrollEnd}>
+                        {
+                            props.files?.map((file, index) => {
+                                if (file.isFile) {
+                                    return <PreviewBox
+                                        key={index}
+                                        background={background}
+                                        callback={props.toDownload}
+                                        downloadBody={props.downloader}
+                                        img={file}
+                                    />
+                                } else {
+                                    return <Artbook
+                                        background={background}
+                                        file={file}
+                                        key={index}
+                                        enterTheFolder={props.enterTheFolder} />
+                                }
+                            })
+                        }
+                        {
+                            props.files
+                            &&
+                            <div className="image-gallery-hint">
+                                {
+                                    props.isSearch &&
+                                    <Loading />
+                                }
+                                {
+                                    !props.isSearch &&
+                                    <div>
+                                        {
+                                            !props.canScroll &&
+                                            <span>已经拉倒底了</span>
+                                        }
+                                        {
+                                            props.canScroll
+                                            &&
+                                            <span style={{
+                                                fontSize: "16px",
+                                                fontWeight: "bold",
+                                                color: "#efefef",
+                                            }}>下拉进行刷新</span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </PerfectScrollbar>
                 </div> : <NoSVNLibrary desc="这里是空空如也。。。" />
             }
         </div>
