@@ -19,7 +19,6 @@ class levelService {
     }
     public async downFile(img: IGalleryItem, projectInfo: IProject) {
         const account = await iService.getSVNAccountById(img.id as number);
-        console.log('account', account)
         if (!account) {
             PsdLevelRef.current.setProgress(undefined);
         }

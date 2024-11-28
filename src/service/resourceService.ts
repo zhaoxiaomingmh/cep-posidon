@@ -46,49 +46,41 @@ class resourceService {
     }
 
     public async downloadfromUrl(account: IAccountResponse, img: IGalleryItem, type: string) {
-        const options = {
-            method: 'GET',
-            headers: account.data ? {
-                'Authorization': `Basic ${account.data}`
-            } : undefined,
-        };
-        const length = await axios.head(img.fileUrl, {
-            headers: options.headers,
-        }).then(resp => {
-            return parseInt(resp.headers['content-length'], 10);;
-        }).catch(err => {
-            console.log('err', err);
-            this.notifyProgerss(type, 0);
-            throw err;
-        });
-        console.log('开始下载，下载内容大小为：', length);
-        await axios.get(img.fileUrl, {
-            headers: options.headers,
-            responseType: 'arraybuffer',
-            onDownloadProgress: (progressEvent) => {
-                let progress = (progressEvent.loaded / length) * 100;
-                this.notifyProgerss(type, parseFloat(progress.toFixed(2)));
-            },
-        }).then((response) => {
-            const binary = new Uint8Array(response.data);
-            const binaryString = Array.from(binary).map(byte => String.fromCharCode(byte)).join('');
-            const base64Data = window.btoa(binaryString);
+        try {
+            const headers = account.data ? { 'Authorization': `Basic ${account.data}` } : undefined;
+    
+            const lengthResponse = await axios.head(img.fileUrl, { headers });
+            const length = parseInt(lengthResponse.headers['content-length'], 10);
+            console.log('开始下载，下载内容大小为：', length);
+    
+            const response = await axios.get(img.fileUrl, {
+                headers,
+                responseType: 'arraybuffer',
+                onDownloadProgress: (progressEvent) => {
+                    const progress = (progressEvent.loaded / length) * 100;
+                    this.notifyProgerss(type, parseFloat(progress.toFixed(2)));
+                },
+            });
+    
+            const binary = Buffer.from(response.data, 'binary').toString('base64');
             const userDir = psConfig.userDir();
-            let filePath = path.join(userDir, img.name.replace(/#/g, ""));
-            window.cep.fs.writeFile(filePath, base64Data, "Base64");
+            const filePath = path.join(userDir, img.name.replace(/#/g, ""));
+            window.cep.fs.writeFile(filePath, binary, "Base64");
+    
             const cs = new CSInterface();
             const req = {
                 path: filePath,
-                isImport: img.format === 'psd' ? false : true,
-            }
-            cs.evalScript(`openImage(${JSON.stringify(req)})`, (data) => {
+                isImport: img.format !== 'psd',
+            };
+    
+            cs.evalScript(`openImage(${JSON.stringify(req)})`, () => {
                 window.cep.fs.deleteFile(filePath);
                 this.notifyProgerss(type, 0);
-            })
-        }).catch(err => {
+            });
+        } catch (err) {
             console.log('err', err);
             this.notifyProgerss(type, 0);
-        });
+        }
     }
     private async downloadFromSmb(account: IAccountResponse, img: IGalleryItem, projectInfo: IProject, type: string) {
         const address = account.baseUrl;

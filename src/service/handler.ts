@@ -28,23 +28,23 @@ class handler {
         return handler.instance;
     }
 
-    public getCurrentTheme(): {theme:Theme, currentInterface: string} {
-        const bgColor =  this.csInterface.getHostEnvironment().appSkinInfo.appBarBackgroundColor;
+    public getCurrentTheme(): { theme: Theme, currentInterface: string } {
+        const bgColor = this.csInterface.getHostEnvironment().appSkinInfo.appBarBackgroundColor;
         const red = Math.round(bgColor.color.red)
-        let theme:Theme = defaultTheme
+        let theme: Theme = defaultTheme
         let colorScheme = 'dark'
         let currentInterface = 'dark'
-        if(red < 60){
+        if (red < 60) {
             theme = darkTheme
             currentInterface = 'darkest'
             colorScheme = 'dark'
             console.log('darkest');
-        } else if(60 <= red && red < 127) {
+        } else if (60 <= red && red < 127) {
             theme = darkTheme
             currentInterface = 'dark'
             colorScheme = 'dark'
             console.log('dark');
-        } else if(127 <= red && red < 200) {
+        } else if (127 <= red && red < 200) {
             theme = defaultTheme
             currentInterface = 'default'
             colorScheme = 'light'
@@ -55,8 +55,8 @@ class handler {
             colorScheme = 'light'
             console.log('light');
         }
-        
-        return {theme, currentInterface}
+
+        return { theme, currentInterface }
     }
 
     private init() {
@@ -64,8 +64,8 @@ class handler {
         this.registerEvent('close');
         this.registerEvent('open');
         this.getCurrentTheme();
-        
-        
+
+
         this.csInterface.addEventListener('com.adobe.csxs.events.ThemeColorChanged', () => {
             this.getCurrentTheme();
             // console.log('颜色更换')
@@ -132,7 +132,20 @@ class handler {
             });
         });
     }
-
+    public restart() {
+        const event: CSEvent = {
+            type: "my.restart.event",
+            scope: "APPLICATION",
+            appId: this.appId,
+            extensionId: this.extId,
+            data: JSON.stringify({ restart: 1000, extensionId: this.extId })
+        };
+        this.csInterface.dispatchEvent(event);
+        // 发送完消息后，延迟会，关闭当前插件面板
+        setTimeout(() => {
+            this.csInterface.closeExtension();
+        }, 100);
+    }
 
 }
 

@@ -20,19 +20,19 @@ interface TextSearchImageRefType {
 };
 
 
-const options:selectOption[] = [{
+const options: selectOption[] = [{
     value: 'All',
     name: '全局'
-},{
+}, {
     value: 'ENGINEERING',
     name: '资源库'
-},{
+}, {
     value: 'DESIGN',
     name: '资产库'
-},{
+}, {
     value: 'components',
     name: '组件库'
-},{
+}, {
     value: 'interfaces',
     name: '界面库'
 }]
@@ -63,7 +63,7 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
         }
     })
     useEffect(() => {
-        if (!project.storehouses || project.storehouses.length === 0) {
+        if (!project?.storehouses?.length) {
             setDisableSearch(true)
             return
         };
@@ -83,7 +83,7 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
         });
         setFilterOptions(filterList)
         setSearchItems(searchs);
-    }, [project.storehouses])
+    }, [project?.storehouses])
     useEffect(() => {
         if (!searchItems) return;
         updateState();
@@ -239,11 +239,11 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
             {
                 project
                 &&
-                <div className={`image-search-image-search-box ${disableSearch?'disabled':''}`}>
+                <div className={`image-search-image-search-box ${disableSearch ? 'disabled' : ''}`}>
                     <DropSelect isDisabled={disableSearch} options={options} onChange={(val) => {
-                                const value = val;
-                                setAssetType(value)
-                            }}></DropSelect>
+                        const value = val;
+                        setAssetType(value)
+                    }}></DropSelect>
                     <div className="image-search-image-input" >
                         <input type="text"
                             className="searchInput"
@@ -267,11 +267,16 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
                 <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
             } */}
             {
-                storehouseState?
-                <Gallery files={imgs} isSearch={isSearch} canScroll={canScroll} scrollBottom={scrollBottom} downloader={downloader} toDownload={downloadFile}  >
-                    <FormatCheckboxs key={"FormatCheckboxs"} formats={formats} changeFormats={changeFormats} />
-                </Gallery>:
-                <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
+                (project?.storehouses?.length && storehouseState) ?
+                    <Gallery files={imgs} isSearch={isSearch} canScroll={canScroll} scrollBottom={scrollBottom} downloader={downloader} toDownload={downloadFile}  >
+                        <FormatCheckboxs key={"FormatCheckboxs"} formats={formats} changeFormats={changeFormats} />
+                    </Gallery> :
+                    <div>
+                        {
+                            project &&
+                            <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project?.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
+                        }
+                    </div>
             }
         </div>
     );

@@ -76,7 +76,7 @@ export const Login = forwardRef<LoginRefType, LoginProps>((props, ref) => {
             projects.push(projectInfo);
         }
         user.projects = projects;
-        if (projects.length > 0) {
+        if (projects?.length > 0) {
             let project = projects[0];
             user.last = project.id;
             const posidonResole: any = await utilHttps.httpGet(psConfig.getStorehouse, { projectId: project.id });
