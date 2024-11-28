@@ -88,14 +88,17 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                 <div className="settings__content__team">
                     <div className="settings__content__team__title">
                         <span id="currunt-team">当前项目</span>
-                        <select onChange={handleChange} defaultValue={project.id}>
+                        <select onChange={handleChange} defaultValue={project?.id}>
                             {user.projects?.map((p, index) => {
                                 return <option key={index} value={p.id}>{p.name}</option>
                             })}
                         </select>
                     </div>
                     <div className="settings__content__team__preview">
-                        <img id='project-head' src={project?.head ? psConfig.host + project.head.replace('..', '') : psConfig.host + defaultProjectHeadImage.replace('..', '')} />
+                        {
+                            project &&
+                            <img id='project-head' src={project?.head ? psConfig.host + project.head.replace('..', '') : psConfig.host + defaultProjectHeadImage.replace('..', '')} />
+                        }
                         <div className="settings__content__team__preview__project-name">
                             <span>{project?.name}</span>
                             <span>{project?.projectEditorType}</span>

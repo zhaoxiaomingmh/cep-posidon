@@ -63,7 +63,6 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         } else {
             let timer = new Date(user.expired)
             if (timer > new Date()) {
-                console.log(`user`, user);
                 setUser(user);
                 if (user.last != -1 && user.projects) {
                     const project = user.projects.find(p => p.id === user.last);
