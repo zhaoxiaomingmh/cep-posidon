@@ -1,6 +1,6 @@
 import { Login, LoginRef } from "@/pages/welcome/Login";
 import psHandler from "@/service/handler";
-import { IUser } from "@/store/iTypes/iTypes";
+import { IPosidonResponse, IProject, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
 import useDocumentStore from "@/store/modules/documentStore";
 import useUserStore from "@/store/modules/userStore";
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
@@ -8,6 +8,8 @@ import { Button, darkTheme, defaultTheme, lightTheme, Provider } from '@adobe/re
 import { Face } from "./Face";
 import { psConfig } from "@/utlis/util-env";
 import './app.scss'
+import utilHttps from "@/utlis/util-https";
+import { defaultProjectHeadImage } from "@/utlis/const";
 
 interface AppRefType {
     refresh: () => void;
@@ -23,7 +25,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     const activeDocument = useDocumentStore(state => state.getActiveDocument());
     const setActiveDocument = useDocumentStore(state => state.setActiveDocument);
     const [currentTheme, setCurrentTheme] = useState(defaultTheme)
-    const [currentScheme, setCurrentScheme] = useState<'dark'|'light'>('dark')
+    const [currentScheme, setCurrentScheme] = useState<'dark' | 'light'>('dark')
     const [themeClass, setThemeClass] = useState('dark')
     const handler = psHandler;
     useImperativeHandle(ref, () => {
@@ -39,8 +41,8 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     }, [])
 
     const syncTheme = () => {
-        const {theme, currentInterface} = handler.getCurrentTheme();
-        if(theme === darkTheme) {
+        const { theme, currentInterface } = handler.getCurrentTheme();
+        if (theme === darkTheme) {
             setCurrentScheme('dark')
         } else {
             setCurrentScheme('light')
@@ -53,16 +55,48 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         const activeDocument = await handler.getActiveDocument();
         setActiveDocument(activeDocument);
     }
-    const getUserInLocalStorage = () => {
+    const getUserInLocalStorage = async () => {
         const userStr = localStorage.getItem('cep-user');
         if (!userStr) return;
         const user = JSON.parse(userStr) as IUser;
-        console.log('userLocal', user)
         if (user.env !== psConfig.env) {
             localStorage.removeItem('cep-user');
         } else {
             let timer = new Date(user.expired)
             if (timer > new Date()) {
+                const posidonResole: any = await utilHttps.httpGet(psConfig.getProject, { userId: user.id });
+                const data = posidonResole.data;
+                let projects: IProject[] = [];
+                for (let i = 0; i < data.length; i++) {
+                    let item = data[i];
+                    let projectInfo: IProject = {
+                        name: item.name,
+                        id: item.id,
+                        head: item.headImageUrl ? item.headImageUrl : defaultProjectHeadImage,
+                        projectEditorType: item.projectEditorType,
+                    }
+                    projects.push(projectInfo);
+                }
+                user.projects = projects;
+                if (projects?.length > 0) {
+                    let project = projects[0];
+                    user.last = project.id;
+                    const posidonResole: any = await utilHttps.httpGet(psConfig.getStorehouse, { projectId: project.id });
+                    if (posidonResole.status == 200) {
+                        const response = posidonResole.data as IPosidonResponse;
+                        if (response.code == 0) {
+                            const data: IProjectStorehouse = response.data;
+                            project.storehouses = data.storehouses;
+                            const foundProject = user.projects.find(x => x.id === project.id);
+                            if (foundProject) {
+                                foundProject.storehouses = data.storehouses;
+                            } else {
+                                user.last = -1;
+                            }
+                        }
+                    }
+                    setProject(project);
+                }
                 setUser(user);
                 if (user.last != -1 && user.projects) {
                     const project = user.projects.find(p => p.id === user.last);

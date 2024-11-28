@@ -42,7 +42,7 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
         }
     })
     useEffect(() => {
-        if (project?.storehouses) {
+        if (project?.storehouses?.length) {
             const hasTypeOne = project.storehouses.some(item => item.type === 'DESIGN');
             if (hasTypeOne) {
                 setIsCreate(true)
@@ -51,7 +51,7 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
                 setIsCreate(false)
             }
         }
-    }, [project.storehouses])
+    }, [project?.storehouses])
     useEffect(() => {
         setPage(1);
         setIsSearch(false);
@@ -197,7 +197,7 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
         }
     }
     return (
-        <div className="psd-level" style={{width: "100%",display: "flex", flexDirection: "column", overflow:"hidden"}}>
+        <div className="psd-level" style={{ width: "100%", display: "flex", flexDirection: "column", overflow: "hidden" }}>
             {!project
                 &&
                 <NoSVNLibrary desc={"请先选择一个可用的项目"} />
@@ -236,7 +236,7 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
                         paths={treePath}
                         toRoot={toRoot}
                         toTarget={returnToFolder}
-                    ></TreePath>
+                    />
                 </Gallery>
             }
         </div>

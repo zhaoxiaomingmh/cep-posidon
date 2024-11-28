@@ -18,7 +18,7 @@ export const Login = forwardRef<LoginRefType, LoginProps>((props, ref) => {
     const setUser = useUserStore(state => state.setUser);
     const setProject = useUserStore(state => state.setProject);
 
-    const {theme, colorScheme} = useProvider()
+    const { theme, colorScheme } = useProvider()
 
     const handleLogin = () => {
         let currentStateId = util.uuid();
@@ -82,10 +82,15 @@ export const Login = forwardRef<LoginRefType, LoginProps>((props, ref) => {
             const posidonResole: any = await utilHttps.httpGet(psConfig.getStorehouse, { projectId: project.id });
             if (posidonResole.status == 200) {
                 const response = posidonResole.data as IPosidonResponse;
-                if(response.code == 0) {
+                if (response.code == 0) {
                     const data: IProjectStorehouse = response.data;
                     project.storehouses = data.storehouses;
-                    user.projects.find(x => x.id === project.id).storehouses = data.storehouses;
+                    const foundProject = user.projects.find(x => x.id === project.id);
+                    if (foundProject) {
+                        foundProject.storehouses = data.storehouses;
+                    } else {
+                        user.last = -1;
+                    }
                 }
             }
             setProject(project);
@@ -97,7 +102,7 @@ export const Login = forwardRef<LoginRefType, LoginProps>((props, ref) => {
     return (
         <div className="login-wrap">
             <div className="login-wrap-icon">
-                <svg style={{ flex: "1" }} width="146" height="112" viewBox="0 0 146 112" fill={colorScheme=='dark'?'#fff':'#000'} xmlns="http://www.w3.org/2000/svg">
+                <svg style={{ flex: "1" }} width="146" height="112" viewBox="0 0 146 112" fill={colorScheme == 'dark' ? '#fff' : '#000'} xmlns="http://www.w3.org/2000/svg">
                     <path d="M81.0516 76.3042C80.0156 63.7992 78.8202 30.665 78.4217 16.9653C75.8715 11.7085 73.7994 6.05336 72.6039 0C71.4085 6.05336 69.3364 11.7085 66.7862 16.9653C66.3877 30.665 65.1923 63.8788 64.1562 76.3838C69.3364 75.9856 74.9948 75.8263 81.0516 76.3042Z" />
                     <path d="M41.0436 50.4181L40.9639 50.4977C41.0436 50.4977 41.442 50.4977 41.9999 50.4977C43.8329 50.5774 47.1801 51.2146 46.3034 54.7192C45.108 60.215 42.0796 70.6491 35.0664 83.0744C35.0664 83.0744 41.8405 80.0477 52.7588 77.8972C56.7435 61.3301 58.6562 34.7272 58.8953 30.1871C50.8461 41.9753 42.0796 49.5419 41.0436 50.4181Z" />
                     <path d="M104.162 50.4181L104.242 50.4977C104.162 50.4977 103.764 50.4977 103.206 50.4977C101.373 50.5774 98.0257 51.2146 98.9024 54.7192C100.098 60.215 103.126 70.6491 110.139 83.0744C110.139 83.0744 103.365 80.0477 92.4471 77.8972C88.4623 61.3301 86.5496 34.7272 86.3105 30.1871C94.3598 41.9753 103.126 49.5419 104.162 50.4181Z" />
