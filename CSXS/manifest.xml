@@ -6,7 +6,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <ExtensionList>
         <Extension Id="posidon-ps-cep-main_dev" Version="1.0" />
-        <Extension Id="posidon-ps-cep-invisible" Version="1.0" />
+        <Extension Id="posidon-ps-cep-invisible_dev" Version="1.0" />
     </ExtensionList>
     <ExecutionEnvironment>
         <HostList>
@@ -59,10 +59,10 @@
                 </UI>
             </DispatchInfo>
         </Extension>
-        <Extension Id="posidon-ps-cep-invisible">
+        <Extension Id="posidon-ps-cep-invisible_dev">
             <DispatchInfo>
                 <Resources>
-                    <MainPath>./src/public/invisible.html</MainPath>
+                    <MainPath>./invisible.html</MainPath>
                     <CEFCommandLine>
                         <Parameter>--enable-nodejs</Parameter>
                     </CEFCommandLine>

@@ -1,4 +1,4 @@
-import React, { forwardRef, useTransition } from "react";
+import React, { forwardRef, useEffect, useTransition } from "react";
 import './Settings.scss'
 import useUserStore from "@/store/modules/userStore";
 import { PsFuncItem } from "@/hooks/func/PsFuncItem";
@@ -6,7 +6,7 @@ import { PsFunc } from "@/hooks/func/PsFunc";
 import { Button, defaultTheme, Heading, Provider, } from "@adobe/react-spectrum";
 import { psConfig } from "@/utlis/util-env";
 import utilHttps from "@/utlis/util-https";
-import { IPosidonResponse, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
+import { IPosidonResponse, IProject, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
 import { defaultProjectHeadImage } from "@/utlis/const";
 import { useTranslation } from "react-i18next";
 import psHandler from "@/service/handler";
@@ -55,6 +55,46 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
         }
         setProject(p);
     };
+    const reProject = async () => {
+        const posidonResole: any = await utilHttps.httpGet(psConfig.getProject, { userId: user.id });
+        const data = posidonResole.data;
+        let projects: IProject[] = [];
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            let projectInfo: IProject = {
+                name: item.name,
+                id: item.id,
+                head: item.headImageUrl ? item.headImageUrl : defaultProjectHeadImage,
+                projectEditorType: item.projectEditorType,
+            }
+            projects.push(projectInfo);
+        }
+        user.projects = projects;
+        if (projects?.length > 0) {
+            let project = projects[0];
+            user.last = project.id;
+            const posidonResole: any = await utilHttps.httpGet(psConfig.getStorehouse, { projectId: project.id });
+            if (posidonResole.status == 200) {
+                const response = posidonResole.data as IPosidonResponse;
+                if (response.code == 0) {
+                    const data: IProjectStorehouse = response.data;
+                    project.storehouses = data.storehouses;
+                    const foundProject = user.projects.find(x => x.id === project.id);
+                    if (foundProject) {
+                        foundProject.storehouses = data.storehouses;
+                    } else {
+                        user.last = -1;
+                    }
+                }
+            }
+            setProject(project);
+        }
+        setUser(user);
+        if (user.last != -1 && user.projects) {
+            const project = user.projects.find(p => p.id === user.last);
+            setProject(project)
+        }
+    }
 
     return (
         <PsFunc>
@@ -87,7 +127,8 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                 </div>
                 <div className="settings__content__team">
                     <div className="settings__content__team__title">
-                        <span id="currunt-team">当前项目</span>
+                        <span id="currunt-team">当前项目
+                        </span>
                         <select onChange={handleChange} defaultValue={project?.id}>
                             {user.projects?.map((p, index) => {
                                 return <option key={index} value={p.id}>{p.name}</option>
@@ -117,13 +158,11 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                     }}>
                         重启
                     </Button>
-                    {/* 
-                    <button onClick={() => {
-                        window.localStorage.removeItem('cep-user');
-                        setUser(undefined);
-                    }}>
-                        注销
-                    </button> */}
+                    <Button variant={"primary"}
+                        onPress={() => {
+                            reProject();
+                        }}
+                    > 刷新</Button>
                 </div>
             </PsFuncItem>
         </PsFunc>
