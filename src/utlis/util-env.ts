@@ -2,8 +2,10 @@ import { IEnv } from "@/store/iTypes/iTypes";
 import config from './config.json'
 import JSEncrypt from "jsencrypt";
 import path from "path";
+import psHandler from "@/service/handler";
 const env = IEnv.test;
 export const psConfig = {
+    version: "1.1.0",
     env: env,
     publicKey: config[env].posidon.publicKey,
     clientId: config[env].posidon.clientId,
@@ -21,7 +23,31 @@ export const psConfig = {
     userDir: function () {
         const cs = new CSInterface();
         const userHomeDir = cs.getSystemPath(SystemPath.USER_DATA)
-        const parts = ['Adobe', 'CEP', 'Temp_Dir'];
+        const parts = ['Adobe', 'CEP', 'Temp_Dir', psHandler.extId];
+        let filePath = userHomeDir;
+        for (const part of parts) {
+            const subFiles = window.cep.fs.readdir(filePath);
+            if (subFiles.err == 0) {
+                filePath = path.join(filePath, part);
+                if (!subFiles.data.includes(part)) {
+                    window.cep.fs.makedir(filePath);
+                } else {
+                    const result = window.cep.fs.stat(filePath);
+                    if (0 == result.err) {
+                        if (result.data.isFile) {
+                            window.cep.fs.makedir(filePath);
+                        }
+                    }
+                }
+
+            }
+        }
+        return filePath;
+    },
+    downloadDir: function () {
+        const cs = new CSInterface();
+        const userHomeDir = cs.getSystemPath(SystemPath.USER_DATA)
+        const parts = ['Adobe', 'CEP', 'Temp_Dir', psHandler.extId, 'download'];
         let filePath = userHomeDir;
         for (const part of parts) {
             const subFiles = window.cep.fs.readdir(filePath);

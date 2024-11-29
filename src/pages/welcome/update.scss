@@ -1,0 +1,30 @@
+.update-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+
+    .update-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .update-text {
+        display: flex;
+        flex-direction: column;
+
+        .update-text-title {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .update-text-desc {
+            display: flex;
+            flex-direction: column;
+
+        }
+
+    }
+}

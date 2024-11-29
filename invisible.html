@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <script src="../../photoshop/CSInterface-6.1.0.js"></script>
+    <script src="./photoshop/CSInterface-6.1.0.js"></script>
     <script>
         console.log('I\'m a hidden extension')
         var cs = new CSInterface();
@@ -22,7 +22,7 @@
                 cs.requestOpenExtension(extensionId)
                 setTimeout(function () { cs.requestOpenExtension(extensionId) }, 1500)
             }, time);
-        });
+        });    
     </script>
 </body>
 

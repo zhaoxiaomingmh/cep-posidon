@@ -5,7 +5,6 @@ import { IDownloader, IGalleryItem, IPath, ISvnPsdGroup, ISvnPsdGroupItem } from
 import useUserStore from "@/store/modules/userStore";
 import { psConfig } from "@/utlis/util-env";
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { PsdLevelBar, PsdLevelBarRef } from "./component/PsdLevelBar";
 import { Gallery } from "@/hooks/gallery/Gallery";
 import { TreePath } from "./component/TreePath";
@@ -20,7 +19,6 @@ export const PsdLevelRef = React.createRef<PsdLevelRefType>();
 export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) => {
     const size: number = 20;
     const project = useUserStore(state => state.project);
-    const { t } = useTranslation()
     const myServeice = levService;
 
     const [levelGroup, setLevelGroup] = useState<ISvnPsdGroup[]>(undefined);
