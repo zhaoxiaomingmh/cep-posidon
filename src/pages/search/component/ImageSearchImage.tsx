@@ -11,6 +11,9 @@ import { Gallery } from "@/hooks/gallery/Gallery";
 import { FormatCheckboxs } from "./FormatCheckboxs";
 import reService from "@/service/resourceService";
 
+import 'react-perfect-scrollbar/dist/css/styles.css';
+import PerfectScrollbar from 'react-perfect-scrollbar'
+
 export interface selectOption {
     value: IStorehouseType,
     name: string
@@ -63,6 +66,27 @@ export const DropSelect = (props: DropSelectProps) => {
     </div>
 }
 
+interface segmentProps {
+    images: string[];
+    bgType: number;
+    onSearch: (base64: string) => void;
+}
+
+const SegmentList = (props: segmentProps) => {
+    const [currentIndex, setCurrentIndex] = useState(-1)
+    const handleSegmentSearch = (imgBase64: string, idx: number) => {
+        setCurrentIndex(idx)
+        props.onSearch(imgBase64)
+    }
+    return <div className="segment-wrap">
+        <PerfectScrollbar>
+            {props.images.map((image, idx) => {
+                return <div key={idx} className={`segment-item backgroundType_${props.bgType} ${currentIndex == idx ? 'selected' : ''}`} onClick={() => handleSegmentSearch(image, idx)}><img src={image} /></div>
+            })}
+        </PerfectScrollbar>
+    </div>
+}
+
 const options: selectOption[] = [{
     value: 'All',
     name: '全局'
@@ -88,7 +112,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
     const myService = reService;
     //局部状态
     const size = 10;
-    const [formats, setFormats] = useState<ImageFormat[]>(['psd', 'png', 'jpg', 'comp']);
+    const [formats, setFormats] = useState<ImageFormat[]>(['psd', 'png', 'jpg']);
     const [assetType, setAssetType] = useState<IStorehouseType>('All');
     const [searchFile, setSearchFile] = useState<IFile>(undefined);
     const [storehouseState, setStorehouseState] = useState<boolean>(false);
@@ -99,6 +123,8 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
     const [downloader, setDownloader] = useState<IDownloader>({ id: 0, progress: 0, complete: true });
     const [filterOptions, setFilterOptions] = useState<selectOption[]>(options)
     const [disableSearch, setDisableSearch] = useState<boolean>(false)
+    const [bgType, setBgType] = useState<number>(0)
+    const [segmentImages, setSegmentImages] = useState<string[]>([])
     useImperativeHandle(ref, () => {
         return {
             setSearchResult: setSearchResult,
@@ -143,6 +169,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         updateState();
     }, [assetType, formats])
 
+
     const updateState = () => {
         let svnState = false;
         let scroollState = false;
@@ -174,20 +201,58 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 path: filePath
             }
             setSearchFile(f);
+            newSearch(f)
+            getSegmentImages(f.path)
         }
     }
-    const toSearchImage = async (clear: boolean) => {
-        if (isSearch) return;
-        if (!storehouseState) return;
-        if (!searchFile) return;
+
+    const getImageUrl = async (file: IFile): Promise<string> => {
         let imageUrl: string = undefined;
-        if (!searchFile.url) {
-            imageUrl = await iService.generateImageUrl(searchFile.path);
+        console.log('file.url:', file.url, file);
+        if (!file.url) {
+            imageUrl = await iService.generateImageUrl(file.path);
             if (!imageUrl) {
                 // ExDialogRef.current.showMessage('失败', '生成ImageUrl失败，请联系管理员', 'error')
                 alert('犯病了')
                 return;
             }
+        } else imageUrl = file.url
+        console.log("imageUrl", file.url, imageUrl);
+        return imageUrl
+    }
+    const newSearch = async (file: IFile, isBase64?: boolean) => {
+        const imageUrl = isBase64?await getImageUrl(file):file.url
+
+        const newItems: ISearchItem[] = searchItems
+            .filter(item => (item.type === assetType || assetType === 'All'))
+            .map(item => {
+                return {
+                    projectName: item.projectName,
+                    type: item.type,
+                    page: 1,
+                    size: size,
+                    canSearch: true
+                };
+            });
+        setCanScroll(true);
+        setImages([])
+        setIsSearch(true);
+        if (imageUrl?.length > 0) await iService.searchImage(project.id, isBase64?(psConfig.host + imageUrl):file.url, newItems, formats, 0)
+    }
+
+    const getSegmentImages = async (path: string) => {
+        const images = await iService.generateImageElement(path)
+        setSegmentImages(images)
+
+    }
+    const toSearchImage = async (clear: boolean) => {
+        if (isSearch) return;
+        if (!storehouseState) return;
+        if (!searchFile) return;
+        console.log('searchFile:', searchFile);
+
+        const imageUrl = await getImageUrl(searchFile)
+        if (imageUrl?.length > 0) {
             setSearchFile({
                 ...searchFile,
                 url: imageUrl,
@@ -210,6 +275,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
             setImages([])
             iService.searchImage(project.id, imageUrl ? psConfig.host + imageUrl : psConfig.host + searchFile.url, newItems, formats, 0)
         } else {
+            console.log('searchfile', searchFile)
             const newItems: ISearchItem[] = searchItems
                 .filter(item => item.canSearch === true && (item.type === assetType || assetType === 'All'))
                 .map(item => {
@@ -226,18 +292,15 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         }
     }
     const setSearchResult = (data: ISearchResult[]) => {
-        if (!data) {
+        console.log('sousuo', data)
+        if (!data?.length) {
             setIsSearch(false);
             setDownloader({ id: 0, progress: 0, complete: true });
             return;
         }
         if (!isSearch) return;
         let allImgs: IGalleryItem[] = [];
-        let pros: string[] = [];
         data.forEach(item => {
-            if (item.isTotal) {
-                pros.push(item.projectName);
-            }
             let addImgs: IGalleryItem[] = [];
             item.data.forEach(i => {
                 if (imgs && imgs.some(img => img.id === i.id)) return;
@@ -256,9 +319,22 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
 
             allImgs = [...allImgs, ...addImgs];
         });
-        const updatedItems = searchItems.map(item =>
-            pros.includes(item.projectName) ? { ...item, canSearch: false } : item
-        );
+        const updatedItems = searchItems.map(item => {
+            let s = data.find(x => x.projectName == item.projectName)
+            if (s) {
+                let newS: ISearchItem = {
+                    projectName: s.projectName,
+                    type: item.type,
+                    page: s.page,
+                    size: item.size,
+                    canSearch: !s.isTotal
+                }
+                return newS
+            } else {
+                return item;
+            }
+        });
+        console.log('updatedItems', updatedItems)
         setSearchItems(updatedItems);
         allImgs.sort((a, b) => a.dis - b.dis);
         setImages(prevImages => prevImages ? [...prevImages, ...allImgs] : allImgs);
@@ -303,6 +379,17 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 progress: progress
             })
         }
+    }
+
+    const handleSegSearch = (imgBase64: string) => {
+        const prefix = 'data:image/png;base64,'
+        const file: IFile = {
+            name: '',
+            ext: 'png',
+            path: '',
+            url: imgBase64.substring(prefix.length),
+        }
+        newSearch(file, true)
     }
     return (
         <div className="image-search-image-container">
@@ -352,14 +439,17 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                     </div>
                 </div>
             }
+            {
+                segmentImages?.length > 0 && <SegmentList images={segmentImages} bgType={bgType} onSearch={img => handleSegSearch(img)}></SegmentList>
+            }
             {/* {
                 (project && !project.storehouses)
                 &&
                 <NoSVNLibrary desc={"暂未设置仓库地址，请点击"} url={psConfig.host + "/project/" + project.id + "/TeamDetail"} clickDesc={"这里"} gotoSet={"前往设置"} />
             } */}
             {
-                 (project?.storehouses?.length && storehouseState) ?
-                    <Gallery files={imgs} isSearch={isSearch} canScroll={canScroll} scrollBottom={scrollBottom} downloader={downloader} toDownload={downloadFile}  >
+                (project?.storehouses?.length && storehouseState) ?
+                    <Gallery files={imgs} isSearch={isSearch} canScroll={canScroll} scrollBottom={scrollBottom} downloader={downloader} toDownload={downloadFile} onChangeBg={bgType => setBgType(bgType)} >
                         <FormatCheckboxs key={"FormatCheckboxs"} formats={formats} changeFormats={changeFormats} />
                     </Gallery> :
                     <div>

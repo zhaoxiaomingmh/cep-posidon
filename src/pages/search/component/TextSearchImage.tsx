@@ -43,7 +43,7 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
     const myService = reService;
     //局部状态
     const size = 10;
-    const [formats, setFormats] = useState<ImageFormat[]>(['psd', 'png', 'jpg', 'comp']);
+    const [formats, setFormats] = useState<ImageFormat[]>(['psd', 'png', 'jpg']);
     const [assetType, setAssetType] = useState<IStorehouseType>('All');
     const [searchPa, setSearchPa] = useState<string>(undefined);
     const [storehouseState, setStorehouseState] = useState<boolean>(false);
@@ -179,9 +179,21 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
 
             allImgs = [...allImgs, ...addImgs];
         });
-        const updatedItems = searchItems.map(item =>
-            pros.includes(item.projectName) ? { ...item, canSearch: false } : item
-        );
+        const updatedItems = searchItems.map(item => {
+            let s = data.find(x => x.projectName == item.projectName)
+            if (s) {
+                let newS: ISearchItem = {
+                    projectName: s.projectName,
+                    type: item.type,
+                    page: s.page,
+                    size: item.size,
+                    canSearch: !s.isTotal
+                }
+                return newS
+            } else {
+                return item;
+            }
+        });
         setSearchItems(updatedItems);
         allImgs.sort((a, b) => a.dis - b.dis);
         setImages(prevImages => prevImages ? [...prevImages, ...allImgs] : allImgs);

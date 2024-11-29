@@ -53,7 +53,7 @@ class psSerive {
         const blob = new Blob([binaryArray], { type: 'application/octet-stream' });
         const formData = new FormData();
         formData.append('file', blob, path.split('/').pop());
-        const result = await axios.post(psConfig.host + psConfig.generateURL, formData, {
+        const result = await axios.post(psConfig.host + psConfig.generateElement, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -87,7 +87,9 @@ class psSerive {
             if (result.data?.code === 0) {
                 const imgData = result.data?.data as ISearchResult[];
                 console.log("搜索结果", imgData);
+                console.log('before notifySearchResult');
                 this.notifySearchResult(type, imgData);
+                console.log('after notifySearchResult');
                 return;
             }
         }

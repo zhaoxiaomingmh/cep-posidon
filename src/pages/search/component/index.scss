@@ -49,6 +49,47 @@
     }
     
 }
+.segment-wrap {
+    background-color: var(--primary-background);
+    border: 1px solid var(--primary-border);
+    display: flex;
+    font-size: 0;
+    margin-top: 4px;
+    height: 60px;
+    white-space: nowrap;
+    // align-items: stretch;
+    overflow: hidden;
+    padding: 4px;
+    .scrollbar-container {
+        display: flex;
+        // gap: 4px;
+        width: 100%;
+        .segment-item {
+            display: -webkit-inline-box;
+            // justify-content: center;
+            // align-items: center;
+            // flex-basis: 60px;
+            flex-shrink: 0;
+            height: calc(100% - 2px);
+            background-image: url(../../../asset/img/transBg.png);
+            background-repeat: repeat;
+            border: 1px solid var(--primary-border);
+            margin-right: 4px;
+            cursor: pointer;
+            &:last-child {
+                margin: 0;
+            }
+            &.selected {
+                background-color: #1c60e77e;
+                border-color: #1c60e7;
+            }
+            img {
+                height: 100%;
+                object-fit: contain;
+            }
+        }
+    }
+}
 
 .image-search-image-container {
     display: flex;
@@ -111,6 +152,7 @@
                 margin: 0 6px;
                 padding: 0;
                 width: 100%;
+                color: var(--primary-font-color);
                 outline: none;
                 appearance: none;
                 background-color: var(--input-bg-color);
