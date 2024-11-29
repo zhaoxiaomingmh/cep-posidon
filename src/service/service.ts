@@ -15,10 +15,8 @@ class psSerive {
         }
         return psSerive.instance;
     }
-    public async generateImageUrl(path: string, isBase64?:boolean): Promise<string | undefined> {
-        const imageData = isBase64?{data:path}:window.cep.fs.readFile(path, "Base64")
-        console.log("imageData:", imageData);
-        
+    public async generateImageUrl(path: string): Promise<string | undefined> {
+        const imageData = window.cep.fs.readFile(path, "Base64")
         const binary = window.cep.encoding.convertion.b64_to_binary(imageData.data)
         const binaryLength = binary.length;
         const binaryArray = new Uint8Array(binaryLength);

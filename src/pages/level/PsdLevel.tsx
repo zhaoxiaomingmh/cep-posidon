@@ -82,7 +82,7 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
     const GetGalleryItems = async (id: number, page: number) => {
         if (!category) return;
         try {
-            const data = await iService.getDirTree(id, page, 16);
+            const data = await iService.getDirTree(id, page, 20);
             let gItems: IGalleryItem[] = [];
             data.children.forEach(file => {
                 let gItem: IGalleryItem = {
