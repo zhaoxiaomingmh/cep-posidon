@@ -127,12 +127,12 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     return (
         <Provider theme={currentTheme} colorScheme={currentScheme} isQuiet>
             <div className={`ps-app theme-${themeClass}`}>
-                <div>
+                <div style={{width: '100%', height: '100%'}}>
                     {
                         update ?
                             <Update ref={UpdateRef}
                             /> :
-                            <div>
+                            <div style={{width: '100%', height: '100%', display: "flex"}}>
                                 {
                                     user ?
                                         (
