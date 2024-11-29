@@ -90,6 +90,20 @@
         }
     }
 }
+.scrollbar-container {
+    &.ps{
+        .ps__rail-x {
+            &:hover {
+                background-color: var(--primary-background);
+            }
+        }
+        .ps__rail-y {
+            &:hover {
+                background-color: var(--primary-background);
+            }
+        }
+    }
+}
 
 .image-search-image-container {
     display: flex;

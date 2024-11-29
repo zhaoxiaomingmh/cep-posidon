@@ -5,7 +5,6 @@ import { psConfig } from "@/utlis/util-env";
 import React, { useEffect, useImperativeHandle, useState } from "react";
 import { forwardRef } from "react";
 import path from 'path'
-import './index.scss'
 import iService from "@/service/service";
 import { Gallery } from "@/hooks/gallery/Gallery";
 import { FormatCheckboxs } from "./FormatCheckboxs";
@@ -13,6 +12,7 @@ import reService from "@/service/resourceService";
 import { useTranslation } from "react-i18next";
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar'
+import './index.scss'
 
 export interface selectOption {
     value: IStorehouseType,
@@ -79,7 +79,8 @@ const SegmentList = (props: segmentProps) => {
         props.onSearch(imgBase64)
     }
     return <div className="segment-wrap">
-        <PerfectScrollbar>
+        <PerfectScrollbar onScrollY={() => {console.log('onScrollY');
+        }}>
             {props.images.map((image, idx) => {
                 return <div key={idx} className={`segment-item backgroundType_${props.bgType} ${currentIndex == idx ? 'selected' : ''}`} onClick={() => handleSegmentSearch(image, idx)}><img src={image} /></div>
             })}
@@ -126,6 +127,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
     const [disableSearch, setDisableSearch] = useState<boolean>(false)
     const [bgType, setBgType] = useState<number>(0)
     const [segmentImages, setSegmentImages] = useState<string[]>([])
+    const [searchBase64, setSearchBas64] = useState(false)
     useImperativeHandle(ref, () => {
         return {
             setSearchResult: setSearchResult,
@@ -209,7 +211,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
 
     const getImageUrl = async (file: IFile): Promise<string> => {
         let imageUrl: string = undefined;
-        console.log('file.url:', file.url, file);
+        // console.log('file.url:', file.url, file);
         if (!file.url) {
             imageUrl = await iService.generateImageUrl(file.path);
             if (!imageUrl) {
@@ -218,11 +220,25 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 return;
             }
         } else imageUrl = file.url
-        console.log("imageUrl", file.url, imageUrl);
+
+        if (imageUrl?.length > 0) {
+            setSearchFile(prev =>{
+                return {...prev,
+                    url: imageUrl,}
+            });
+        }
+
+        // console.log("imageUrl", file.url, imageUrl);
         return imageUrl
     }
     const newSearch = async (file: IFile, isBase64?: boolean) => {
-        const imageUrl = isBase64?await getImageUrl(file):file.url
+        const imageUrl = await getImageUrl(file)
+        console.log("imageUrl:", imageUrl);
+        if(isBase64) {
+            setSearchBas64(true)
+        } else {
+            setSearchBas64(false)
+        }
 
         const newItems: ISearchItem[] = searchItems
             .filter(item => (item.type === assetType || assetType === 'All'))
@@ -238,7 +254,9 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         setCanScroll(true);
         setImages([])
         setIsSearch(true);
-        if (imageUrl?.length > 0) await iService.searchImage(project.id, isBase64?(psConfig.host + imageUrl):file.url, newItems, formats, 0)
+        console.log('newSearch', isBase64?imageUrl:(psConfig.host + imageUrl) );
+        
+        if (imageUrl?.length > 0) await iService.searchImage(project.id, (isBase64?'':psConfig.host) + imageUrl, newItems, formats, 0)
     }
 
     const getSegmentImages = async (path: string) => {
@@ -253,14 +271,9 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         console.log('searchFile:', searchFile);
 
         const imageUrl = await getImageUrl(searchFile)
-        if (imageUrl?.length > 0) {
-            setSearchFile({
-                ...searchFile,
-                url: imageUrl,
-            });
-        }
         setIsSearch(true);
         if (clear) {
+            setSearchBas64(false)
             const newItems: ISearchItem[] = searchItems
                 .filter(item => (item.type === assetType || assetType === 'All'))
                 .map(item => {
@@ -288,7 +301,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                         canSearch: item.canSearch
                     };
                 });
-            iService.searchImage(project.id, psConfig.host + searchFile.url, newItems, formats, 0)
+            iService.searchImage(project.id, (searchBase64?'':psConfig.host) + searchFile.url, newItems, formats, 0)
             setIsSearch(true);
         }
     }
@@ -388,7 +401,8 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
             name: '',
             ext: 'png',
             path: '',
-            url: imgBase64.substring(prefix.length),
+            // url: imgBase64.substring(prefix.length),
+            url: imgBase64,
         }
         newSearch(file, true)
     }
