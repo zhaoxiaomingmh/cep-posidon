@@ -4,6 +4,9 @@ import { IAccountResponse, IPosidonPageResponse, IPosidonResponse, ISearchItem, 
 import { psConfig } from '@/utlis/util-env';
 import utilHttps from '@/utlis/util-https';
 import axios from 'axios';
+import path from "path";
+import Zip from 'jszip';
+
 class psSerive {
     private static instance: psSerive;
     constructor() {
@@ -177,6 +180,32 @@ class psSerive {
         }
         const account = accountDataResp.data as IAccountResponse;
         return account;
+    }
+    public async downLoadFile(target: string) {
+        const filename = '110.zip';
+        const url = psConfig.host + `/Download/downloadfromserver?fileName=${filename}&path=${target}`;
+
+        try {
+            const result = await axios.get(url, { responseType: 'arraybuffer' });
+            if (result.status === 200) {
+                console.log('Content-Length:', result.headers['content-length']);
+                console.log('result.data-Length:', result.data.length);
+                const binary = Buffer.from(result.data, 'binary').toString('base64');
+                window.cep.fs.writeFile("D:\\file\\Temp\\Resource\\upload\\110.zip", binary, "Base64");
+                const str = window.cep.fs.readFile("D:\\file\\Temp\\Resource\\upload\\110.zip", "Base64")
+                var buf = Buffer.from(str.data, 'base64');
+                Zip.loadAsync(buf)
+                    .then(async (zip) => {
+                        const zipFileKeys = Object.keys(zip.files);
+                        zipFileKeys.map((filename) => {
+                            console.log('filename', filename);
+                        })
+                    })
+            }
+        } catch (error) {
+            console.error('Error downloading file:', error);
+        }
+
     }
 }
 

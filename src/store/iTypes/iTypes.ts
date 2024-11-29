@@ -3,6 +3,7 @@ export interface IAppState {
     tables: string[],
     func: string,
     funcs: string[],
+    latest: string,
     setTable: (table: string) => void,
     getTable: () => string | undefined,
     setTables: (tables: string[]) => void,
@@ -11,6 +12,8 @@ export interface IAppState {
     getFunc: () => string | undefined,
     setFuncs: (tables: string[]) => void,
     getFuncs: () => string[] | undefined,
+    getVersion: () => string | undefined,
+    setVersion: (version: string) => void,
 }
 export interface IUserState {
     user: IUser,

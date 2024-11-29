@@ -1,8 +1,7 @@
 import ReactDOM from 'react-dom/client';
 import { App, AppRef } from './router/App';
 import React from 'react';
-import '@/locales/i18n';
-import 'intl-pluralrules';
+
 
 if (!Object.fromEntries) {
     Object.fromEntries = function (entries) {

@@ -8,8 +8,9 @@ import { psConfig } from "@/utlis/util-env";
 import utilHttps from "@/utlis/util-https";
 import { IPosidonResponse, IProject, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
 import { defaultProjectHeadImage } from "@/utlis/const";
-import { useTranslation } from "react-i18next";
 import psHandler from "@/service/handler";
+import iService from "@/service/service";
+import axios from "axios";
 interface SettingsRefType { };
 interface SettingsProps { }
 export const SettingsRef = React.createRef<SettingsRefType>();
@@ -19,7 +20,6 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
     const setUser = useUserStore(state => state.setUser);
     const project = useUserStore(state => state.getProject());
     const setProject = useUserStore(state => state.setProject);
-    const { t, i18n } = useTranslation();
 
     const handleChange = async (event) => {
         const target = event.target.value;
@@ -71,7 +71,11 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
         }
         user.projects = projects;
         if (projects?.length > 0) {
-            let project = projects[0];
+            let project: IProject = undefined;
+            if (user.last != -1) {
+                project = projects.find(p => p.id === user.last);
+            }
+            project ? project : projects[0];
             user.last = project.id;
             const posidonResole: any = await utilHttps.httpGet(psConfig.getStorehouse, { projectId: project.id });
             if (posidonResole.status == 200) {
@@ -94,6 +98,8 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
             const project = user.projects.find(p => p.id === user.last);
             setProject(project)
         }
+    }
+    const update = () => {
     }
 
     return (
@@ -118,7 +124,6 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                     <span>语言</span>
                     < select onChange={(event) => {
                         let target = event.target.value;
-                        i18n.changeLanguage(target)
                     }} defaultValue={'cn'}>
                         <option key='cn' value='cn'>简体中文</option>
                         <option key='en' value='en'>English</option>
@@ -146,6 +151,9 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                         </div>
                     </div>
                 </div>
+                <div className="settings__version">
+                   版本号: {psConfig.version}
+                </div>
                 <div className="settings__footer">
                     <Button variant={"primary"} onPress={() => {
                         window.localStorage.removeItem('cep-user');
@@ -163,7 +171,13 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                             reProject();
                         }}
                     > 刷新</Button>
+                    <Button variant={"primary"}
+                        onPress={() => {
+                            update();
+                        }}
+                    > 更新</Button>
                 </div>
+
             </PsFuncItem>
         </PsFunc>
     );

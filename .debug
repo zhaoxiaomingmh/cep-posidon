@@ -5,7 +5,7 @@
             <Host Name="PHXS" Port="4002"/>
         </HostList>
     </Extension>
-    <Extension Id="posidon-ps-cep-invisible">
+    <Extension Id="posidon-ps-cep-invisible_dev">
         <HostList>
             <Host Name="PHXS" Port="8004"/>
         </HostList>

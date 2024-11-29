@@ -10,6 +10,9 @@ import { psConfig } from "@/utlis/util-env";
 import './app.scss'
 import utilHttps from "@/utlis/util-https";
 import { defaultProjectHeadImage } from "@/utlis/const";
+import iService from "@/service/service";
+import { Update, UpdateRef } from "@/pages/welcome/Update";
+import useAppStore from "@/store/modules/appStore";
 
 interface AppRefType {
     refresh: () => void;
@@ -18,7 +21,7 @@ interface AppRefType {
 interface AppProps { }
 export const AppRef = React.createRef<AppRefType>();
 export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
-
+    const handler = psHandler;
     const user = useUserStore(state => state.getUser());
     const setUser = useUserStore(state => state.setUser);
     const setProject = useUserStore(state => state.setProject);
@@ -27,7 +30,9 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     const [currentTheme, setCurrentTheme] = useState(defaultTheme)
     const [currentScheme, setCurrentScheme] = useState<'dark' | 'light'>('dark')
     const [themeClass, setThemeClass] = useState('dark')
-    const handler = psHandler;
+    const [update, setUpdate] = useState<boolean>(false);
+    const setVersion = useAppStore(state => state.setVersion);
+
     useImperativeHandle(ref, () => {
         return {
             refresh: checkActiveDocument,
@@ -35,11 +40,19 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         }
     })
     useEffect(() => {
+        // checkUpdate();
         checkActiveDocument();
         getUserInLocalStorage();
         syncTheme();
     }, [])
-
+    const checkUpdate = async () => {
+        const version: string = "110";
+        if (version === psConfig.version) {
+            return;
+        }
+        setVersion(version)
+        setUpdate(true);
+    }
     const syncTheme = () => {
         const { theme, currentInterface } = handler.getCurrentTheme();
         if (theme === darkTheme) {
@@ -50,7 +63,6 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         setThemeClass(currentInterface)
         setCurrentTheme(currentTheme)
     }
-
     const checkActiveDocument = async () => {
         const activeDocument = await handler.getActiveDocument();
         setActiveDocument(activeDocument);
@@ -79,7 +91,11 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
                 }
                 user.projects = projects;
                 if (projects?.length > 0) {
-                    let project = projects[0];
+                    let project: IProject = undefined;
+                    if (user.last != -1) {
+                        project = projects.find(p => p.id === user.last);
+                    }
+                    project ? project : projects[0];
                     user.last = project.id;
                     const posidonResole: any = await utilHttps.httpGet(psConfig.getStorehouse, { projectId: project.id });
                     if (posidonResole.status == 200) {
@@ -108,21 +124,29 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         }
     }
 
-
     return (
         <Provider theme={currentTheme} colorScheme={currentScheme} isQuiet>
             <div className={`ps-app theme-${themeClass}`}>
-                {
-                    user ?
-                        (
-                            activeDocument ?
-                                <Face />
-                                :
-                                <div> 求求你先打开个文档 </div>
-                        )
-                        :
-                        <Login ref={LoginRef} />
-                }
+                <div>
+                    {
+                        update ?
+                            <Update ref={UpdateRef}
+                            /> :
+                            <div>
+                                {
+                                    user ?
+                                        (
+                                            activeDocument ?
+                                                <Face />
+                                                :
+                                                <div> 求求你先打开个文档 </div>
+                                        )
+                                        :
+                                        <Login ref={LoginRef} />
+                                }
+                            </div>
+                    }
+                </div>
             </div>
         </Provider>
     );

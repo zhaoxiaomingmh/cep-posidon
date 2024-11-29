@@ -1,5 +1,5 @@
 const path = require('path');
-
+const webpack = require('webpack');
 module.exports = {
     //入口
     entry: "./src/main.js", //相对路径
@@ -52,7 +52,6 @@ module.exports = {
     },
     //插件
     plugins: [
-
     ],
     //模式
     mode: "development",
