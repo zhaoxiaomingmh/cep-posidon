@@ -58,14 +58,12 @@ class psSerive {
                 'Content-Type': 'multipart/form-data'
             }
         })
+        console.log("generateImageElement", result)
         if (result.status === 200) {
             const data = result.data as IPosidonResponse;
             if (data.code === 0) {
                 const imgEles = data.data as string[];
-                const eles = imgEles.map(ele => {
-                    return 'data:image/png;base64,' + ele
-                })
-                return eles;
+                return imgEles;
             }
         }
         return undefined;

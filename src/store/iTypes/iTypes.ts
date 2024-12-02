@@ -129,7 +129,8 @@ export interface IFile {
     name: string,
     ext: string,
     path: string,
-    url?: string
+    url?: string,
+    base64?: string,
 }
 
 export interface ISearchItem {

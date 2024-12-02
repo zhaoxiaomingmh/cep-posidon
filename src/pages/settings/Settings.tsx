@@ -75,7 +75,7 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
             if (user.last != -1) {
                 project = projects.find(p => p.id === user.last);
             }
-            project ? project : projects[0];
+            project = project ? project : projects[0];
             user.last = project.id;
             const posidonResole: any = await utilHttps.httpGet(psConfig.getStorehouse, { projectId: project.id });
             if (posidonResole.status == 200) {

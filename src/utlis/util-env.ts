@@ -3,7 +3,7 @@ import config from './config.json'
 import JSEncrypt from "jsencrypt";
 import path from "path";
 import psHandler from "@/service/handler";
-const env = IEnv.test;
+const env = IEnv.dev;
 export const psConfig = {
     version: "1.1.0",
     env: env,

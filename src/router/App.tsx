@@ -95,7 +95,8 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
                     if (user.last != -1) {
                         project = projects.find(p => p.id === user.last);
                     }
-                    project ? project : projects[0];
+                
+                    project = project ? project : projects[0];
                     user.last = project.id;
                     const posidonResole: any = await utilHttps.httpGet(psConfig.getStorehouse, { projectId: project.id });
                     if (posidonResole.status == 200) {
@@ -127,12 +128,12 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     return (
         <Provider theme={currentTheme} colorScheme={currentScheme} isQuiet>
             <div className={`ps-app theme-${themeClass}`}>
-                <div>
+                <div style={{width: '100%', height: '100%'}}>
                     {
                         update ?
                             <Update ref={UpdateRef}
                             /> :
-                            <div>
+                            <div style={{width: '100%', height: '100%', display: "flex"}}>
                                 {
                                     user ?
                                         (

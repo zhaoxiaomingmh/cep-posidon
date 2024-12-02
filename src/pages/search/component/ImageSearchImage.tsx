@@ -5,7 +5,6 @@ import { psConfig } from "@/utlis/util-env";
 import React, { useEffect, useImperativeHandle, useState } from "react";
 import { forwardRef } from "react";
 import path from 'path'
-import './index.scss'
 import iService from "@/service/service";
 import { Gallery } from "@/hooks/gallery/Gallery";
 import { FormatCheckboxs } from "./FormatCheckboxs";
@@ -13,6 +12,7 @@ import reService from "@/service/resourceService";
 
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar'
+import './index.scss'
 
 export interface selectOption {
     value: IStorehouseType,
@@ -69,17 +69,19 @@ export const DropSelect = (props: DropSelectProps) => {
 interface segmentProps {
     images: string[];
     bgType: number;
-    onSearch: (base64: string) => void;
+    onSearch: (index: number) => void;
 }
 
 const SegmentList = (props: segmentProps) => {
     const [currentIndex, setCurrentIndex] = useState(-1)
     const handleSegmentSearch = (imgBase64: string, idx: number) => {
         setCurrentIndex(idx)
-        props.onSearch(imgBase64)
+        props.onSearch(idx)
     }
     return <div className="segment-wrap">
-        <PerfectScrollbar>
+        <PerfectScrollbar onScrollY={() => {
+            console.log('onScrollY');
+        }}>
             {props.images.map((image, idx) => {
                 return <div key={idx} className={`segment-item backgroundType_${props.bgType} ${currentIndex == idx ? 'selected' : ''}`} onClick={() => handleSegmentSearch(image, idx)}><img src={image} /></div>
             })}
@@ -124,7 +126,8 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
     const [filterOptions, setFilterOptions] = useState<selectOption[]>(options)
     const [disableSearch, setDisableSearch] = useState<boolean>(false)
     const [bgType, setBgType] = useState<number>(0)
-    const [segmentImages, setSegmentImages] = useState<string[]>([])
+    const [segmentImages, setSegmentImages] = useState<string[]>([]) //图片分段元素URL
+    const [sub, setSub] = useState<number>(-1) //记录子元素的index,如果为-1则不使用子元素去搜索
     useImperativeHandle(ref, () => {
         return {
             setSearchResult: setSearchResult,
@@ -168,8 +171,6 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         setDownloader({ id: 0, progress: 0, complete: true });
         updateState();
     }, [assetType, formats])
-
-
     const updateState = () => {
         let svnState = false;
         let scroollState = false;
@@ -198,17 +199,17 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
             const f: IFile = {
                 name: fileName,
                 ext: fileExtension,
-                path: filePath
+                path: filePath,
             }
+            setSub(-1)
+            setSegmentImages([])
             setSearchFile(f);
-            newSearch(f, true)
+            newSearch(f, -1)
             getSegmentImages(f.path)
         }
     }
-
     const getImageUrl = async (file: IFile): Promise<string> => {
         let imageUrl: string = undefined;
-        console.log('file.url:', file.url, file);
         if (!file.url) {
             imageUrl = await iService.generateImageUrl(file.path);
             if (!imageUrl) {
@@ -217,14 +218,19 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 return;
             }
         } else imageUrl = file.url
-        console.log("imageUrl", file.url, imageUrl);
+
+        if (imageUrl?.length > 0) {
+            setSearchFile(prev => {
+                return {
+                    ...prev,
+                    url: imageUrl,
+                }
+            });
+        }
         return imageUrl
     }
-    const newSearch = async (file: IFile, isBase64?: boolean) => {
-        console.log('newSearch')
-        const imageUrl = isBase64 ? await getImageUrl(file) : file.url
-        console.log('imageUrl', imageUrl)
-        if (!imageUrl) return;
+    const newSearch = async (file: IFile, index: number) => {
+        setSub(index)
         const newItems: ISearchItem[] = searchItems
             .filter(item => (item.type === assetType || assetType === 'All'))
             .map(item => {
@@ -239,13 +245,15 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         setCanScroll(true);
         setImages([])
         setIsSearch(true);
-        if (imageUrl?.length > 0) await iService.searchImage(project.id, isBase64 ? (psConfig.host + imageUrl) : file.url, newItems, formats, 0)
+        const imgUrl = await getSearchUrl(file, index);
+        if (!imgUrl) {
+            alert('生成图片错误')
+            return;
+        }
+        await iService.searchImage(project.id, imgUrl, newItems, formats, 0)
     }
-
     const getSegmentImages = async (path: string) => {
-        console.log('path', path)
         const images = await iService.generateImageElement(path)
-        console.log('imagesEle', images)
         setSegmentImages(images)
 
     }
@@ -253,17 +261,11 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         if (isSearch) return;
         if (!storehouseState) return;
         if (!searchFile) return;
-        console.log('searchFile:', searchFile);
-
+        if (!canScroll) return;
         const imageUrl = await getImageUrl(searchFile)
-        if (imageUrl?.length > 0) {
-            setSearchFile({
-                ...searchFile,
-                url: imageUrl,
-            });
-        }
         setIsSearch(true);
         if (clear) {
+            setSub(-1)
             const newItems: ISearchItem[] = searchItems
                 .filter(item => (item.type === assetType || assetType === 'All'))
                 .map(item => {
@@ -292,12 +294,38 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                     };
                 });
             if (newItems.findIndex(x => x.canSearch === true) === -1) {
-                console.log("已经不能往下滚了")
                 return;
             }
-            iService.searchImage(project.id, psConfig.host + searchFile.url, newItems, formats, 0)
+            const imgUrl = await getSearchUrl(searchFile, sub);
+            if (!imgUrl) {
+                alert('生成图片错误')
+                return;
+            }
+            iService.searchImage(project.id, imgUrl, newItems, formats, 0)
             setIsSearch(true);
         }
+    }
+    const getSearchUrl = async (file: IFile, index: number) => {
+        let imgUrl = '';
+        if (index > -1) {
+            if (index >= segmentImages.length) { return undefined; }
+            imgUrl = segmentImages[index];
+        } else {
+            if (file.url?.length === 0) {
+                const url = await iService.generateImageUrl(searchFile.path)
+                if (url?.length === 0) {
+                    return undefined;
+                }
+                setSearchFile({
+                    ...searchFile,
+                    url: url
+                })
+                imgUrl = psConfig.host + url;
+            } else {
+                imgUrl = psConfig.host + file.url;
+            }
+        }
+        return imgUrl;
     }
     const setSearchResult = (data: ISearchResult[]) => {
         if (!data?.length) {
@@ -388,15 +416,8 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         }
     }
 
-    const handleSegSearch = (imgBase64: string) => {
-        const prefix = 'data:image/png;base64,'
-        const file: IFile = {
-            name: '',
-            ext: 'png',
-            path: '',
-            url: imgBase64.substring(prefix.length),
-        }
-        newSearch(file, true)
+    const handleSegSearch = (index: number) => {
+        newSearch(searchFile, index)
     }
     return (
         <div className="image-search-image-container">

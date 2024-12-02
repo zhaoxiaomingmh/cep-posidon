@@ -44,7 +44,7 @@ export const Gallery = forwardRef<GalleryRefType, GalleryProps>((props, ref) => 
         props.onChangeBg(type)
     }
     const handleScrollEnd = () => {
-        // props.scrollBottom()
+        props.scrollBottom()
     }
 
     return (
