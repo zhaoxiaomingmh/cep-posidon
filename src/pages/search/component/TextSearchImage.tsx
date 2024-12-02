@@ -261,7 +261,10 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
                             disabled={disableSearch}
                             onChange={(event) => {
                                 setSearchPa(event.target.value);
-                            }} />
+                            }} 
+                            onKeyDown={(e) =>  {
+                                if(e.key == 'Enter') toSearchImage(true)
+                            }}/>
                     </div>
                     <div className="image-search-image-button">
                         <div className="image-search-image-button-desc" onClick={() => { toSearchImage(true) }} >
