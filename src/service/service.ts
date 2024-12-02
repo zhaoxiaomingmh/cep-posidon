@@ -179,31 +179,24 @@ class psSerive {
         const account = accountDataResp.data as IAccountResponse;
         return account;
     }
-    public async downLoadFile(target: string) {
-        const filename = '110.zip';
-        const url = psConfig.host + `/Download/downloadfromserver?fileName=${filename}&path=${target}`;
-
+    public async downLoadPosidonFile(path: string, filename: string, callback?: Function) {
+        const url = psConfig.host + psConfig.downloadfromserver + `?fileName=${filename}&path=${path}`;
         try {
+            const savePath = psConfig.downloadDir() + "\\" + filename;
             const result = await axios.get(url, { responseType: 'arraybuffer' });
+            console.log('result.status', result.status)
+            console.log('savePath', savePath)
             if (result.status === 200) {
-                console.log('Content-Length:', result.headers['content-length']);
-                console.log('result.data-Length:', result.data.length);
-                const binary = Buffer.from(result.data, 'binary').toString('base64');
-                window.cep.fs.writeFile("D:\\file\\Temp\\Resource\\upload\\110.zip", binary, "Base64");
-                const str = window.cep.fs.readFile("D:\\file\\Temp\\Resource\\upload\\110.zip", "Base64")
-                var buf = Buffer.from(str.data, 'base64');
-                Zip.loadAsync(buf)
-                    .then(async (zip) => {
-                        const zipFileKeys = Object.keys(zip.files);
-                        zipFileKeys.map((filename) => {
-                            console.log('filename', filename);
-                        })
-                    })
+                // const binary = Buffer.from(result.data, 'binary').toString('base64');
+                // window.cep.fs.writeFile(savePath, binary, "Base64");
+                const buffer = Buffer.from(result.data, 'binary');
+                return buffer;
             }
+            return undefined;
         } catch (error) {
             console.error('Error downloading file:', error);
+            return undefined;
         }
-
     }
 }
 

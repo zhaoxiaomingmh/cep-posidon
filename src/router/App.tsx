@@ -1,6 +1,6 @@
 import { Login, LoginRef } from "@/pages/welcome/Login";
 import psHandler from "@/service/handler";
-import { IPosidonResponse, IProject, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
+import { IPosidonResponse, IProject, IProjectStorehouse, IUser, IVersion } from "@/store/iTypes/iTypes";
 import useDocumentStore from "@/store/modules/documentStore";
 import useUserStore from "@/store/modules/userStore";
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
@@ -30,8 +30,8 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     const [currentTheme, setCurrentTheme] = useState(defaultTheme)
     const [currentScheme, setCurrentScheme] = useState<'dark' | 'light'>('dark')
     const [themeClass, setThemeClass] = useState('dark')
-    const [update, setUpdate] = useState<boolean>(false);
-    const setVersion = useAppStore(state => state.setVersion);
+    const [version, setVersion] = useState<string>(psConfig.version);
+    const [desc, setDesc] = useState<string>("");
 
     useImperativeHandle(ref, () => {
         return {
@@ -40,18 +40,18 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         }
     })
     useEffect(() => {
-        // checkUpdate();
+        checkUpdate();
         checkActiveDocument();
         getUserInLocalStorage();
         syncTheme();
     }, [])
     const checkUpdate = async () => {
-        const version: string = "110";
-        if (version === psConfig.version) {
-            return;
-        }
-        setVersion(version)
-        setUpdate(true);
+        const buffer = await iService.downLoadPosidonFile(psConfig.versinFile, "desc.json");
+        if (!buffer) return;
+        const jsonString = buffer.toString('utf-8');
+        const lastestVersion = JSON.parse(jsonString) as IVersion;
+        setVersion(lastestVersion.version);
+        setDesc(lastestVersion.description);
     }
     const syncTheme = () => {
         const { theme, currentInterface } = handler.getCurrentTheme();
@@ -95,7 +95,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
                     if (user.last != -1) {
                         project = projects.find(p => p.id === user.last);
                     }
-                
+
                     project = project ? project : projects[0];
                     user.last = project.id;
                     const posidonResole: any = await utilHttps.httpGet(psConfig.getStorehouse, { projectId: project.id });
@@ -128,12 +128,12 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     return (
         <Provider theme={currentTheme} colorScheme={currentScheme} isQuiet>
             <div className={`ps-app theme-${themeClass}`}>
-                <div style={{width: '100%', height: '100%'}}>
+                <div style={{ width: '100%', height: '100%' }}>
                     {
-                        update ?
-                            <Update ref={UpdateRef}
+                        (psConfig.version !== version) ?
+                            <Update version={version} desc={desc} ref={UpdateRef}
                             /> :
-                            <div style={{width: '100%', height: '100%', display: "flex"}}>
+                            <div style={{ width: '100%', height: '100%', display: "flex" }}>
                                 {
                                     user ?
                                         (

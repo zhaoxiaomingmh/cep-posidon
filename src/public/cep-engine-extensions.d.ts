@@ -173,7 +173,7 @@ declare class FS {
      *          <br>ERR_NOT_FOUND
      *          <br>ERR_CANT_READ </li></ul>
      **/
-    readdir(path: string): { data: string; err: LastErrorResult };
+    readdir(path: string): { data: string[]; err: LastErrorResult };
 
     /**
      * Creates a new folder.

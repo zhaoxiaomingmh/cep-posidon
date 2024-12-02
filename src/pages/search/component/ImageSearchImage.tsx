@@ -255,7 +255,6 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
     const getSegmentImages = async (path: string) => {
         const images = await iService.generateImageElement(path)
         setSegmentImages(images)
-
     }
     const toSearchImage = async (clear: boolean) => {
         if (isSearch) return;

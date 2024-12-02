@@ -4,13 +4,20 @@ import React, { forwardRef, useImperativeHandle, useState } from "react";
 import './update.scss'
 import { IDownloader } from "@/store/iTypes/iTypes";
 import iService from "@/service/service";
+import { Loading } from "@/hooks/loading/Loading";
+import { psConfig } from "@/utlis/util-env";
+import { unZipFromBuffer as unzipFromBuffer } from "@/utlis/util-zip";
+import psHandler from "@/service/handler";
+import path from "path";
 
 interface UpdateRefType { };
 interface UpdateProps {
+    version: string
+    desc: string
 }
 export const UpdateRef = React.createRef<UpdateRefType>();
 export const Update = forwardRef<UpdateRefType, UpdateProps>((props, ref) => {
-    const latest = useAppStore(state => state.getVersion());
+    const [download, setDownload] = useState<boolean>(false)
     const [downloader, setDownloader] = useState<IDownloader>({ id: 0, progress: 0, complete: true });
     useImperativeHandle(ref, () => {
         return {
@@ -35,11 +42,17 @@ export const Update = forwardRef<UpdateRefType, UpdateProps>((props, ref) => {
                 alert("更新完成，重启插件后生效")
             }
         }
-
     }
-
-    const startUpdateTask = async () => {
-        // const result = await iService.downLoadFile("download/cep-code/110.zip")
+    const startUpdate = async () => {
+        const buffer = await iService.downLoadPosidonFile(psConfig.distFile, "dist.zip")
+        replaceLocalFile(buffer)
+    }
+    const replaceLocalFile = (buffer: Buffer) => {
+        const pluginDir = psConfig.pluginDir();
+        const boundle = path.join(pluginDir, "\\dist\\static\\bundle.js")
+        window.cep.fs.deleteFile(boundle)
+        unzipFromBuffer(buffer, pluginDir);
+        psHandler.restart();
     }
     return (
         <div className="update-content">
@@ -56,27 +69,26 @@ export const Update = forwardRef<UpdateRefType, UpdateProps>((props, ref) => {
                         发现新版本
                     </span>
                     <span>
-                        v{latest}
+                        v{props.version}
                     </span>
                 </div>
                 <div className="update-text-desc">
-                    <span>
-                        1.越更更卡
-                    </span>
-                    <span>
-                        2.强制更新，不更不给用
-                    </span>
-                    <span>
-                        3.点击更新就爆炸
-                    </span>
+                    <pre>
+                        {props.desc}
+                    </pre>
                 </div>
             </div>
             <div className="update-btn">
-                <Button variant={"accent"} onPress={()=>{
-                    startUpdateTask();
-                }}>
-                    下载新版本
-                </Button>
+                {
+                    download ?
+                        <Loading /> :
+                        <Button variant={"accent"} onPress={() => {
+                            setDownload(true)
+                            startUpdate();
+                        }}>
+                            下载新版本
+                        </Button>
+                }
             </div>
         </div>
     );

@@ -3,9 +3,9 @@ import config from './config.json'
 import JSEncrypt from "jsencrypt";
 import path from "path";
 import psHandler from "@/service/handler";
-const env = IEnv.dev;
+const env = IEnv.test;
 export const psConfig = {
-    version: "1.1.0",
+    version: "1.1.2",
     env: env,
     publicKey: config[env].posidon.publicKey,
     clientId: config[env].posidon.clientId,
@@ -19,6 +19,11 @@ export const psConfig = {
         jsencrypt.setPublicKey(this.publicKey);
         let data = (this.clientId + '-' + this.clientSecret + '-' + this.timeStamp());
         return jsencrypt.encrypt(data);
+    },
+    pluginDir: function () {
+        const cs = new CSInterface();
+        const extensionPath = cs.getSystemPath(SystemPath.EXTENSION);
+        return extensionPath;
     },
     userDir: function () {
         const cs = new CSInterface();
@@ -68,6 +73,8 @@ export const psConfig = {
         }
         return filePath;
     },
+    versinFile: config.path.desc,
+    distFile: config.path.dist,
     hubservice: config.path.hubservice,
     getProject: config.path["get-project"],
     getStorehouse: config.path["get-storehouse"],
@@ -81,5 +88,6 @@ export const psConfig = {
     querySvnPsdDir: config.path["query-svn-psd-dir"],
     getDirTree: config.path["get-dir-tree"],
     getSVNAccountById: config.path["get-svn-account-by-id"],
+    downloadfromserver: config.path["download-from-server"]
 }
 

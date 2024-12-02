@@ -146,7 +146,6 @@ class handler {
             this.csInterface.closeExtension();
         }, 100);
     }
-
 }
 
 const psHandler = handler.getInstance();

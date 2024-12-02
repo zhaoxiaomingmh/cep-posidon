@@ -6,7 +6,6 @@ const useAppStore = create<IAppState>((set, get) => ({
     tables: undefined,
     func: undefined,
     funcs: undefined,
-    latest: undefined,
     setTable(table: string) {
         set(state => ({
             ...state,
@@ -43,25 +42,5 @@ const useAppStore = create<IAppState>((set, get) => ({
     getFuncs() {
         return get().funcs;
     },
-    getVersion() {
-        const latest = get().latest;
-        if (!latest) return "1.0.0";
-        const vers = latest.split("");
-        let version = "";
-        vers.forEach((v, i) => {
-            if (i == vers.length - 1) {
-                version += v
-            } else {
-                version += v + ".";
-            }
-        })
-        return version;
-    },
-    setVersion(latest: string) {
-        set(state => ({
-            ...state,
-            latest: latest
-        }))
-    }
 }));
 export default useAppStore; 

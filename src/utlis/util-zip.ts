@@ -1,24 +1,27 @@
 import Zip from 'jszip';
-import fs from 'fs/promises';
-import path from 'path';
+import pathLib from 'path';
+const fs = window.cep.fs;
 
-
-
-export async function unzip(archivePath: string, outputDir: string) {
-    return fs
-        .readFile(archivePath)
-        .then((buf) => Zip.loadAsync(buf))
+export function unZipFromBuffer(buffer: Buffer, localPath: string) {
+    Zip.loadAsync(buffer)
         .then(async (zip) => {
-            for (const [relativePath, file] of Object.entries(zip.files)) {
-                const filePath = path.join(outputDir, relativePath);
-                if (file.dir) {
-                    // 创建目录
-                    await fs.mkdir(filePath, { recursive: true });
-                } else {
-                    // 写入文件
-                    const content = await file.async('nodebuffer');
-                    await fs.writeFile(filePath, content);
+            const zipFileKeys = Object.keys(zip.files);
+            zipFileKeys.map(async (filename) => {
+                console.log('开始处理', filename);
+                const isFile = !zip.files[filename].dir;
+                console.log('是否为文件', isFile);
+                const fullPath = pathLib.join(localPath!, filename);
+                console.log('要保存的完整路径', fullPath);
+                const directory = isFile ? pathLib.dirname(fullPath) : fullPath;
+                if (isFile) {
+                    const content = await zip.files[filename].async('nodebuffer');
+                    if (content) {
+                        return fs.writeFile(fullPath, content.toString('base64'), "Base64");
+                    } else {
+                        return true;
+                    }
                 }
-            }
-        });
+            })
+        })
 }
+

@@ -24,6 +24,8 @@
         }
     },
     "path": {
+        "desc": "storage/plugins/cep/desc.json",
+        "dist": "storage/plugins/cep/dist.zip",
         "hubservice": "/hubservice",
         "get-project": "/ProjectInfo/GetProjectDataByUserId",
         "get-storehouse": "/ImageSeach/GetStorehouseByProjectId",
@@ -36,6 +38,7 @@
         "query-svn-psd-dir": "/ImageSeach/QuerySvnPsdDirs",
         "get-dir-tree": "/ImageSeach/GetDirTree",
         "get-svn-account-by-id": "/ImageSeach/GetSVNAccountById",
-        "generate-element": "/ImageSeach/UploadImageToAnalyze"
+        "generate-element": "/ImageSeach/UploadImageToAnalyze",
+        "download-from-server": "/Download/downloadfromserver"
     }
 }
