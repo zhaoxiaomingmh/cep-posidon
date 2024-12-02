@@ -152,7 +152,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
 
             const option = options.find(el => el.value == element.type)
             filterList.push(option)
-        });
+        }, []);
 
         setFilterOptions(filterList)
         setSearchItems(searchs);
@@ -201,7 +201,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 path: filePath
             }
             setSearchFile(f);
-            newSearch(f)
+            newSearch(f, true)
             getSegmentImages(f.path)
         }
     }
@@ -221,8 +221,10 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         return imageUrl
     }
     const newSearch = async (file: IFile, isBase64?: boolean) => {
-        const imageUrl = isBase64?await getImageUrl(file):file.url
-
+        console.log('newSearch')
+        const imageUrl = isBase64 ? await getImageUrl(file) : file.url
+        console.log('imageUrl', imageUrl)
+        if (!imageUrl) return;
         const newItems: ISearchItem[] = searchItems
             .filter(item => (item.type === assetType || assetType === 'All'))
             .map(item => {
@@ -237,11 +239,13 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         setCanScroll(true);
         setImages([])
         setIsSearch(true);
-        if (imageUrl?.length > 0) await iService.searchImage(project.id, isBase64?(psConfig.host + imageUrl):file.url, newItems, formats, 0)
+        if (imageUrl?.length > 0) await iService.searchImage(project.id, isBase64 ? (psConfig.host + imageUrl) : file.url, newItems, formats, 0)
     }
 
     const getSegmentImages = async (path: string) => {
+        console.log('path', path)
         const images = await iService.generateImageElement(path)
+        console.log('imagesEle', images)
         setSegmentImages(images)
 
     }
@@ -287,12 +291,15 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                         canSearch: item.canSearch
                     };
                 });
+            if (newItems.findIndex(x => x.canSearch === true) === -1) {
+                console.log("已经不能往下滚了")
+                return;
+            }
             iService.searchImage(project.id, psConfig.host + searchFile.url, newItems, formats, 0)
             setIsSearch(true);
         }
     }
     const setSearchResult = (data: ISearchResult[]) => {
-        console.log('sousuo', data)
         if (!data?.length) {
             setIsSearch(false);
             setDownloader({ id: 0, progress: 0, complete: true });
@@ -327,7 +334,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                     type: item.type,
                     page: s.page,
                     size: item.size,
-                    canSearch: !s.isTotal
+                    canSearch: s.page === 10 ? false : !s.isTotal
                 }
                 return newS
             } else {

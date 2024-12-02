@@ -39,7 +39,7 @@ export const Update = forwardRef<UpdateRefType, UpdateProps>((props, ref) => {
     }
 
     const startUpdateTask = async () => {
-        const result = await iService.downLoadFile("download/cep-code/110.zip")
+        // const result = await iService.downLoadFile("download/cep-code/110.zip")
     }
     return (
         <div className="update-content">
