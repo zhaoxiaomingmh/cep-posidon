@@ -63,6 +63,5 @@ module.exports = {
             path.resolve(__dirname, 'src'),
         ],
         extensions: [".js", ".jsx", ".ts", ".tsx"],
-    },
-
+    }
 }

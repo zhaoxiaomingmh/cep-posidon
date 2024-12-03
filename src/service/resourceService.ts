@@ -19,7 +19,6 @@ class resourceService {
         }
         return resourceService.instance;
     }
-
     public async downloadFile(img: IGalleryItem, type: string, projectInfo: IProject) {
         if (img.format === 'comp') {
             this.downloadFromFigma(img, projectInfo, type);
@@ -44,15 +43,14 @@ class resourceService {
             this.notifyProgerss(type, 0);
         }
     }
-
     public async downloadfromUrl(account: IAccountResponse, img: IGalleryItem, type: string) {
         try {
             const headers = account.data ? { 'Authorization': `Basic ${account.data}` } : undefined;
-    
+
             const lengthResponse = await axios.head(img.fileUrl, { headers });
             const length = parseInt(lengthResponse.headers['content-length'], 10);
             console.log('开始下载，下载内容大小为：', length);
-    
+
             const response = await axios.get(img.fileUrl, {
                 headers,
                 responseType: 'arraybuffer',
@@ -61,18 +59,18 @@ class resourceService {
                     this.notifyProgerss(type, parseFloat(progress.toFixed(2)));
                 },
             });
-    
+
             const binary = Buffer.from(response.data, 'binary').toString('base64');
             const userDir = psConfig.userDir();
             const filePath = path.join(userDir, img.name.replace(/#/g, ""));
             window.cep.fs.writeFile(filePath, binary, "Base64");
-    
+
             const cs = new CSInterface();
             const req = {
                 path: filePath,
                 isImport: img.format !== 'psd',
             };
-    
+
             cs.evalScript(`openImage(${JSON.stringify(req)})`, () => {
                 window.cep.fs.deleteFile(filePath);
                 this.notifyProgerss(type, 0);
@@ -82,11 +80,11 @@ class resourceService {
             this.notifyProgerss(type, 0);
         }
     }
-    private async downloadFromSmb(account: IAccountResponse, img: IGalleryItem, projectInfo: IProject, type: string) {
+    public async downloadFromSmb(account: IAccountResponse, img: IGalleryItem, projectInfo: IProject, type: string) {
         const address = account.baseUrl;
         const username = account.username;
         const password = account.password;
-        // downSmbFileCMD(address)
+
 
     }
     private async downloadFromFigma(img: IGalleryItem, projectInfo: IProject, type: string) {
@@ -139,11 +137,10 @@ class resourceService {
         }
         this.downloadfromUrl(account, newImg, type);
     }
-
     private notifyProgerss(type: string, progress?: number) {
         if (type == 'imgRef') {
             ImageSearchImageRef.current?.setProgress(progress);
-        } else if(type === 'textRef') {
+        } else if (type === 'textRef') {
             TextSearchImageRef.current?.setProgress(progress);
         } else {
             PsdLevelRef.current.setProgress(progress);

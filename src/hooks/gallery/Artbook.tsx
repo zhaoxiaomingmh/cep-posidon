@@ -21,7 +21,7 @@ export const Artbook = forwardRef<ArtbookRefType, ArtbookProps>((props, ref) => 
     }
 
     return (
-        <div className="artbook-container" onDoubleClick={() => { props.enterTheFolder(props.file) }}>
+        <div className="artbook-container" onClick={() => { props.enterTheFolder(props.file) }}>
             <div className="preview-content" key={"preview-content-1"}>
                 {props.file.files.map((file, index) => {
                     if (index < 2) {

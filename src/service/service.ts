@@ -4,8 +4,7 @@ import { IAccountResponse, IPosidonPageResponse, IPosidonResponse, ISearchItem, 
 import { psConfig } from '@/utlis/util-env';
 import utilHttps from '@/utlis/util-https';
 import axios from 'axios';
-import path from "path";
-import Zip from 'jszip';
+
 
 class psSerive {
     private static instance: psSerive;
@@ -58,7 +57,6 @@ class psSerive {
                 'Content-Type': 'multipart/form-data'
             }
         })
-        console.log("generateImageElement", result)
         if (result.status === 200) {
             const data = result.data as IPosidonResponse;
             if (data.code === 0) {

@@ -9,8 +9,6 @@ import utilHttps from "@/utlis/util-https";
 import { IPosidonResponse, IProject, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
 import { defaultProjectHeadImage } from "@/utlis/const";
 import psHandler from "@/service/handler";
-import iService from "@/service/service";
-import axios from "axios";
 interface SettingsRefType { };
 interface SettingsProps { }
 export const SettingsRef = React.createRef<SettingsRefType>();
@@ -134,7 +132,7 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                     <div className="settings__content__team__title">
                         <span id="currunt-team">当前项目
                         </span>
-                        <select style={{minHeight : "20px"}} onChange={handleChange} defaultValue={project?.id}> 
+                        <select style={{ minHeight: "20px" }} onChange={handleChange} defaultValue={project?.id}>
                             {user.projects?.map((p, index) => {
                                 return <option key={index} value={p.id}>{p.name}</option>
                             })}
@@ -152,7 +150,7 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                     </div>
                 </div>
                 <div className="settings__version">
-                   版本号: {psConfig.version}
+                    版本号: {psConfig.version}
                 </div>
                 <div className="settings__footer">
                     <Button variant={"primary"} onPress={() => {
@@ -175,7 +173,7 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                         onPress={() => {
                             update();
                         }}
-                    > 更新</Button>
+                    > 测试</Button>
                 </div>
 
             </PsFuncItem>
