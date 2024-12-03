@@ -47,12 +47,14 @@ export const Update = forwardRef<UpdateRefType, UpdateProps>((props, ref) => {
         const buffer = await iService.downLoadPosidonFile(psConfig.distFile, "dist.zip")
         replaceLocalFile(buffer)
     }
-    const replaceLocalFile = (buffer: Buffer) => {
+    const replaceLocalFile = async (buffer: Buffer) => {
         const pluginDir = psConfig.pluginDir();
         const boundle = path.join(pluginDir, "\\dist\\static\\bundle.js")
         window.cep.fs.deleteFile(boundle)
-        unzipFromBuffer(buffer, pluginDir);
-        psHandler.restart();
+        const result = await unzipFromBuffer(buffer, pluginDir, () => { psHandler.restart() });
+        if(result) {
+            alert("解压失败")
+        }
     }
     return (
         <div className="update-content">
