@@ -30,7 +30,6 @@ class levelService {
             const downloadDir = psConfig.downloadDir();
             const filePath = path.join(downloadDir, img.name.replace(/#/g, ""));
             const url = img.fileUrl.replace("file:", "").trim();
-            console.log('filePath', url);
             //@ts-ignore
             const downResult = await downloadFromSmb(account, url, filePath, img.name, type, reService.notifyProgerss, reService.openFile, true);
         } else {

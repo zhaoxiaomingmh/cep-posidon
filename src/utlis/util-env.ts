@@ -5,7 +5,7 @@ import path from "path";
 import psHandler from "@/service/handler";
 const env = IEnv.test;
 export const psConfig = {
-    version: "1.1.2",
+    version: "1.1.3",
     env: env,
     publicKey: config[env].posidon.publicKey,
     clientId: config[env].posidon.clientId,
