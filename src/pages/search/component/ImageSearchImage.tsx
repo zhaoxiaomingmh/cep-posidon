@@ -310,8 +310,10 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
             if (index >= segmentImages.length) { return undefined; }
             imgUrl = segmentImages[index];
         } else {
-            if (file.url?.length === 0) {
-                const url = await iService.generateImageUrl(searchFile.path)
+            console.log('file.url', file.url)
+            if (!file.url || file.url?.length === 0) {
+                const url = await iService.generateImageUrl(file.path)
+                console.log('url', url)
                 if (url?.length === 0) {
                     return undefined;
                 }
@@ -324,6 +326,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 imgUrl = psConfig.host + file.url;
             }
         }
+        console.log('imgUrl', imgUrl)
         return imgUrl;
     }
     const setSearchResult = (data: ISearchResult[]) => {
