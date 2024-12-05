@@ -315,10 +315,12 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 if (url?.length === 0) {
                     return undefined;
                 }
-                setSearchFile({
-                    ...searchFile,
-                    url: url
-                })
+                setSearchFile(prev => {
+                    return {
+                        ...prev,
+                        url: url,
+                    }
+                });
                 imgUrl = psConfig.host + url;
             } else {
                 imgUrl = psConfig.host + file.url;

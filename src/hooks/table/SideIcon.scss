@@ -19,12 +19,20 @@
             fill: var(--primary-font-color)
         }
 
+        .iconfont {
+            font-size: 24px;
+            color: var(--primary-font-color);
+        }
+
         &.selected {
             background-color: var(--panel-bg-color);
             width: 100%;
             height: 100%;
             svg {
                 fill: #1c61e7;
+            }
+            .iconfont {
+                color: #1c61e7;
             }
         }
 
