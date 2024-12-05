@@ -23,6 +23,7 @@ class levelService {
         const account = await iService.getSVNAccountById(img.id as number);
         if (!account) {
             PsdLevelRef.current.setProgress(-1);
+            return;
         }
         const type = "levlRef";
         if (account.accountType === 1) {

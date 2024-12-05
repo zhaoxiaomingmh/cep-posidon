@@ -37,7 +37,6 @@ class resourceService {
                 const filePath = path.join(downloadDir, img.name.replace(/#/g, ""));
                 //@ts-ignore
                 const downResult = await downloadFromSmb(account, img.fileUrl, filePath, img.name, type, this.notifyProgerss, this.openFile);
-                console.log('下载完成', downResult);
             } else {
                 this.downloadfromUrl(account, img, type);
             }
