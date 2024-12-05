@@ -63,5 +63,9 @@ module.exports = {
             path.resolve(__dirname, 'src'),
         ],
         extensions: [".js", ".jsx", ".ts", ".tsx"],
+    },
+    externals: {
+        'node:fs': 'commonjs fs',
+        'node:buffer': 'commonjs buffer',
     }
 }

@@ -401,7 +401,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
 
     const setProgress = (progress: number | undefined) => {
         if (downloader.complete) return;
-        if (!progress) {
+        if (progress === -1 || progress === 100) {
             setDownloader({
                 ...downloader,
                 complete: true,
@@ -410,7 +410,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         } else {
             setDownloader({
                 ...downloader,
-                progress: progress
+                progress: progress,
             })
         }
     }

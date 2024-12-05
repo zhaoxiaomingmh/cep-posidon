@@ -28,12 +28,16 @@ class resourceService {
         if (!account) {
             //todo 回滚
             alert('账号信息不存在')
-            this.notifyProgerss(type, 0);
+            this.notifyProgerss(type, -1);
             return;
         }
         try {
             if (account.accountType === 1) {
-                this.downloadFromSmb(account, img, projectInfo, type);
+                const downloadDir = psConfig.downloadDir();
+                const filePath = path.join(downloadDir, img.name.replace(/#/g, ""));
+                //@ts-ignore
+                const downResult = await downloadFromSmb(account, img.fileUrl, filePath, img.name, type, this.notifyProgerss, this.openFile);
+                console.log('下载完成', downResult);
             } else {
                 this.downloadfromUrl(account, img, type);
             }
@@ -44,54 +48,39 @@ class resourceService {
         }
     }
     public async downloadfromUrl(account: IAccountResponse, img: IGalleryItem, type: string) {
+        console.log('开始下载', img);
         try {
             const headers = account.data ? { 'Authorization': `Basic ${account.data}` } : undefined;
-
             const lengthResponse = await axios.head(img.fileUrl, { headers });
             const length = parseInt(lengthResponse.headers['content-length'], 10);
-            console.log('开始下载，下载内容大小为：', length);
 
+            console.log('开始下载，下载内容大小为：', length);
             const response = await axios.get(img.fileUrl, {
                 headers,
                 responseType: 'arraybuffer',
                 onDownloadProgress: (progressEvent) => {
                     const progress = (progressEvent.loaded / length) * 100;
-                    this.notifyProgerss(type, parseFloat(progress.toFixed(2)));
+                    let p = parseFloat(progress.toFixed(2));
+                    this.notifyProgerss(type, p);
                 },
             });
-
-            const binary = Buffer.from(response.data, 'binary').toString('base64');
+            const buffer = Buffer.from(response.data);
             const userDir = psConfig.userDir();
             const filePath = path.join(userDir, img.name.replace(/#/g, ""));
-            window.cep.fs.writeFile(filePath, binary, "Base64");
-
-            const cs = new CSInterface();
-            const req = {
-                path: filePath,
-                isImport: img.format !== 'psd',
-            };
-
-            cs.evalScript(`openImage(${JSON.stringify(req)})`, () => {
-                window.cep.fs.deleteFile(filePath);
-                this.notifyProgerss(type, 0);
-            });
+            //@ts-ignore
+            writeFileFromBuff(filePath, buffer);
+            this.openFile(filePath, img.format !== 'psd', type);
         } catch (err) {
             console.log('err', err);
-            this.notifyProgerss(type, 0);
+            alert('下载失败,资源已失效');
+            this.notifyProgerss(type, -1);
         }
-    }
-    public async downloadFromSmb(account: IAccountResponse, img: IGalleryItem, projectInfo: IProject, type: string) {
-        const address = account.baseUrl;
-        const username = account.username;
-        const password = account.password;
-
-
     }
     private async downloadFromFigma(img: IGalleryItem, projectInfo: IProject, type: string) {
         const taskId = await iService.getFigmaMsg(img.fileUrl, AppRef.current.user.id, projectInfo.id);
         if (!taskId) {
             alert('figma组件下载任务创建失败');
-            this.notifyProgerss(type);
+            this.notifyProgerss(type, -1);
             return;
         }
         let status: number = 1;
@@ -137,7 +126,7 @@ class resourceService {
         }
         this.downloadfromUrl(account, newImg, type);
     }
-    private notifyProgerss(type: string, progress?: number) {
+    public notifyProgerss(type: string, progress?: number) {
         if (type == 'imgRef') {
             ImageSearchImageRef.current?.setProgress(progress);
         } else if (type === 'textRef') {
@@ -145,6 +134,17 @@ class resourceService {
         } else {
             PsdLevelRef.current.setProgress(progress);
         }
+    }
+    public openFile(filePath: string, isImport: boolean, type: string) {
+        const cs = new CSInterface();
+        const req = {
+            path: filePath,
+            isImport: isImport,
+        };
+        // this.notifyProgerss(type, 100);
+        cs.evalScript(`openImage(${JSON.stringify(req)})`, () => {
+            window.cep.fs.deleteFile(filePath);
+        });
     }
 }
 

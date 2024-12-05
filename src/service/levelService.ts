@@ -2,6 +2,8 @@ import { PsdLevel, PsdLevelRef } from "@/pages/level/PsdLevel";
 import iService from "./service";
 import { IGalleryItem, IProject } from "@/store/iTypes/iTypes";
 import reService from "./resourceService";
+import { psConfig } from "@/utlis/util-env";
+import path from "path";
 
 class levelService {
     constructor() { }
@@ -20,10 +22,19 @@ class levelService {
     public async downFile(img: IGalleryItem, projectInfo: IProject) {
         const account = await iService.getSVNAccountById(img.id as number);
         if (!account) {
-            PsdLevelRef.current.setProgress(undefined);
+            PsdLevelRef.current.setProgress(-1);
         }
-
-        reService.downloadfromUrl(account, img, "levlRef");
+        const type = "levlRef";
+        if (account.accountType === 1) {
+            const downloadDir = psConfig.downloadDir();
+            const filePath = path.join(downloadDir, img.name.replace(/#/g, ""));
+            const url = img.fileUrl.replace("file:", "").trim();
+            console.log('filePath', url);
+            //@ts-ignore
+            const downResult = await downloadFromSmb(account, url, filePath, img.name, type, reService.notifyProgerss, reService.openFile, true);
+        } else {
+            reService.downloadfromUrl(account, img, type);
+        }
     }
 }
 

@@ -9,6 +9,7 @@ import utilHttps from "@/utlis/util-https";
 import { IPosidonResponse, IProject, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
 import { defaultProjectHeadImage } from "@/utlis/const";
 import psHandler from "@/service/handler";
+
 interface SettingsRefType { };
 interface SettingsProps { }
 export const SettingsRef = React.createRef<SettingsRefType>();
@@ -97,7 +98,7 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
             setProject(project)
         }
     }
-    const update = () => {
+    const test = () => {
     }
 
     return (
@@ -171,7 +172,7 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
                     > 刷新</Button>
                     <Button variant={"primary"}
                         onPress={() => {
-                            update();
+                            test();
                         }}
                     > 测试</Button>
                 </div>

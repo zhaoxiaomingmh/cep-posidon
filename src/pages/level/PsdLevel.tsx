@@ -155,6 +155,7 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
         GetGalleryItems(path.id, 1);
     }
     const enterTheFolder = (f: IGalleryItem) => {
+        if (treePath.findIndex(x => x.id === f.id) !== -1) return;
         const latest = treePath[treePath.length - 1];
         let parent = latest.parent;
         parent.push(latest.id);
@@ -180,8 +181,7 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
     }
     const setProgress = (progress: number | undefined) => {
         if (downloader.complete) return;
-        console.log('progress', progress);
-        if (!progress) {
+        if (progress === -1 || progress === 100) {
             setDownloader({
                 ...downloader,
                 complete: true,
@@ -190,7 +190,7 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
         } else {
             setDownloader({
                 ...downloader,
-                progress: progress
+                progress: progress,
             })
         }
     }

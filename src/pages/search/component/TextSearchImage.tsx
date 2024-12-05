@@ -224,8 +224,7 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
     }
     const setProgress = (progress: number | undefined) => {
         if (downloader.complete) return;
-        console.log('progress', progress);
-        if (!progress) {
+        if (progress === -1 || progress === 100) {
             setDownloader({
                 ...downloader,
                 complete: true,
@@ -234,7 +233,7 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
         } else {
             setDownloader({
                 ...downloader,
-                progress: progress
+                progress: progress,
             })
         }
     }
@@ -261,10 +260,10 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
                             disabled={disableSearch}
                             onChange={(event) => {
                                 setSearchPa(event.target.value);
-                            }} 
-                            onKeyDown={(e) =>  {
-                                if(e.key == 'Enter') toSearchImage(true)
-                            }}/>
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key == 'Enter') toSearchImage(true)
+                            }} />
                     </div>
                     <div className="image-search-image-button">
                         <div className="image-search-image-button-desc" onClick={() => { toSearchImage(true) }} >

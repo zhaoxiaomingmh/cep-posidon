@@ -27,7 +27,10 @@
                     <MainPath>./index.html</MainPath>
                     <ScriptPath>./photoshop/external/engine.jsx</ScriptPath>
                     <CEFCommandLine>
+                        <Parameter>--allow-file-access-from-files</Parameter>
+                        <Parameter>--allow-file-access</Parameter>
                         <Parameter>--enable-nodejs</Parameter>
+                        <Parameter>--mixed-context</Parameter>
                     </CEFCommandLine>
                 </Resources>
                 <Lifecycle>
