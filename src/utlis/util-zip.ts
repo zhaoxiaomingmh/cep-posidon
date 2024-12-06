@@ -13,6 +13,13 @@ export async function unZipFromBuffer(buffer: Buffer, localPath: string, callbac
         console.log('要保存的完整路径', fullPath);
         const directory = isFile ? pathLib.dirname(fullPath) : fullPath;
         try {
+            if (!isFile) {
+                const dirRe = window.cep.fs.stat(fullPath)
+                if (dirRe.err != 0) {
+                    window.cep.fs.makedir(fullPath);
+                }
+                return true;
+            }
             if (isFile) {
                 const content = await zip.files[filename].async('nodebuffer');
                 if (content) {
@@ -26,8 +33,6 @@ export async function unZipFromBuffer(buffer: Buffer, localPath: string, callbac
                     console.log('文件内容为空');
                     return true
                 }
-            } else {
-                return true;
             }
         } catch (error) {
             console.log('文件解压失败', error);

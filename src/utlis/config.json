@@ -25,7 +25,7 @@
     },
     "path": {
         "desc": "storage/plugins/cep/desc.json",
-        "dist": "storage/plugins/cep/dist.zip",
+        "code": "storage/plugins/cep/cepcode.zip",
         "hubservice": "/hubservice",
         "get-project": "/ProjectInfo/GetProjectDataByUserId",
         "get-storehouse": "/ImageSeach/GetStorehouseByProjectId",

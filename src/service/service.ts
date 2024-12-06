@@ -196,6 +196,18 @@ class psSerive {
             return undefined;
         }
     }
+    public async getAccountByHost(url: string) {
+        let host = '';
+        if (url.startsWith('http')) {
+            host = url;
+        } else if (url.startsWith('file')) {
+            url = url.replace('file://', '');
+            host = url.split('/')[0]
+        } else {
+            host = url.replace('\\\\', '');
+            host = host.split('\\')[0];
+        }
+    }
 }
 
 const iService = psSerive.getInstance();

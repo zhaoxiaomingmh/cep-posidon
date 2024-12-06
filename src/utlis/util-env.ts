@@ -74,7 +74,7 @@ export const psConfig = {
         return filePath;
     },
     versinFile: config.path.desc,
-    distFile: config.path.dist,
+    codeFile: config.path.code,
     hubservice: config.path.hubservice,
     getProject: config.path["get-project"],
     getStorehouse: config.path["get-storehouse"],

@@ -44,6 +44,7 @@ export const DropSelect = (props: DropSelectProps) => {
 
     }
 
+
     const handleSelect = (option: { value: IStorehouseType, name: string }) => {
         props.onChange(option.value);
         setCurrentName(option.name);
@@ -108,7 +109,6 @@ const options: selectOption[] = [{
 
 export const ImageSearchImageRef = React.createRef<ImageSearchImageRefType>();
 export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchImageProps>((props, ref) => {
-
     //全局状态
     const project = useUserStore(state => state.project);
     const myService = reService;
@@ -154,7 +154,9 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
             searchs.push(item);
 
             const option = options.find(el => el.value == element.type)
-            filterList.push(option)
+            if (!filterList.some(o => o.value === option.value)) {
+                filterList.push(option);
+            }
         }, []);
 
         setFilterOptions(filterList)
@@ -175,18 +177,20 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         let svnState = false;
         let scroollState = false;
         if (assetType === 'All') {
-            if (searchItems.length !== 0) {
+            if (searchItems.length != 0) {
                 svnState = true;
                 if (searchItems.some(item => item.canSearch === true)) scroollState = true;
             }
         } else {
-            if (searchItems.some(x => x.type === assetType)) {
+            if (searchItems.some(x => x.type == assetType)) {
                 svnState = true;
                 if (searchItems.some(item => item.canSearch === true && item.type === assetType)) {
                     scroollState = true;
                 }
             }
         }
+        console.log('svnState', svnState)
+        console.log('scroollState', scroollState)
         setStorehouseState(svnState);
         setCanScroll(scroollState);
     }
@@ -262,7 +266,6 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         if (!searchFile) return;
         if (!canScroll) return;
         const imageUrl = await getImageUrl(searchFile)
-        setIsSearch(true);
         if (clear) {
             setSub(-1)
             const newItems: ISearchItem[] = searchItems
@@ -278,6 +281,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 });
             setCanScroll(true);
             setImages([])
+            setIsSearch(true);
             iService.searchImage(project.id, imageUrl ? psConfig.host + imageUrl : psConfig.host + searchFile.url, newItems, formats, 0)
         } else {
             console.log('searchfile', searchFile)
@@ -293,6 +297,8 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                     };
                 });
             if (newItems.findIndex(x => x.canSearch === true) === -1) {
+                setIsSearch(false);
+                setCanScroll(false);
                 return;
             }
             const imgUrl = await getSearchUrl(searchFile, sub);
@@ -332,6 +338,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
     const setSearchResult = (data: ISearchResult[]) => {
         if (!data?.length) {
             setIsSearch(false);
+            setCanScroll(false);
             setDownloader({ id: 0, progress: 0, complete: true });
             return;
         }
@@ -371,7 +378,6 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 return item;
             }
         });
-        console.log('updatedItems', updatedItems)
         setSearchItems(updatedItems);
         allImgs.sort((a, b) => a.dis - b.dis);
         setImages(prevImages => prevImages ? [...prevImages, ...allImgs] : allImgs);
@@ -400,8 +406,6 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
         setDownloader({ id: img.id, progress: 0, complete: false });
         myService.downloadFile(img, 'imgRef', project);
     }
-
-
     const setProgress = (progress: number | undefined) => {
         if (downloader.complete) return;
         if (progress === -1 || progress === 100) {
@@ -417,7 +421,6 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
             })
         }
     }
-
     const handleSegSearch = (index: number) => {
         newSearch(searchFile, index)
     }

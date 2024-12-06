@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
     //入口
     entry: "./src/main.js", //相对路径
@@ -52,6 +53,11 @@ module.exports = {
     },
     //插件
     plugins: [
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: './src/asset/icons', to: './static/images/icons' }
+            ]
+        })
     ],
     //模式
     mode: "development",
@@ -63,6 +69,7 @@ module.exports = {
             path.resolve(__dirname, 'src'),
         ],
         extensions: [".js", ".jsx", ".ts", ".tsx"],
+
     },
     externals: {
         'node:fs': 'commonjs fs',
