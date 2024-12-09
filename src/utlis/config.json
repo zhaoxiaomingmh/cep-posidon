@@ -17,10 +17,10 @@
     },
     "prod": {
         "posidon": {
-            "publicKey": "MIIBCgKCAQEA4MlnHpeSYIsasAhEQKvZL8vHI5/YJmDf8GfBV26gae9J1Aw8VJPFVtgSMgU4nsLpWQTUchnOZ8V1Zr5vzGuTU0vjsVVW4LTXUCHz6Hsu9SDwydVMDrj9VMimjEnGLqywN5i8mK2X42dUC+CzbLAAtRF1kpdkKOtcHpDVSEUz6sqdR8kRQCDsD8eXDWPJbLN9jpSp/Ce0xICo+Ar5jUfoof10PgqDjKbg9fxrEAedEiZ5LvjUW7RvmjcN1kwHQDOLwfF8ZwumPONcJNnEa4lJ1apCXruNmQeItCB0GvF72yvhcUemZKI2ycNHfIDLmPUpM0/4e4rFwHLW+oP2quV4nQIDAQAB",
-            "clientId": "ed62aa4a997648bf88731e72531941bc",
-            "clientSecret": "3797540112c345279474423714fcebfad8c0d219a33c443b95613f6ea5882803",
-            "host": "https://localhost:53518"
+            "publicKey": "MIIBCgKCAQEAxlyWr009AeEIlKUixwFDHqBR7If1F09FakOb2c0uL2dU9OA6QL1NR1Fk1IAQn1yAbqDrl7C8lNfM++XJhH6/DguTDM9aaxCzpsy95kXeyobwsIomxiWANYTNdCCbVZ8jFYSIkXaW3oRIdQRZs/XFeFDbvoCEnS3J/6/scq4xa2ibnMpydGVt+lVds3LSV37e0OkrvUiDKWBtTqHYOpejpJN1hjp76FV2cdTVl2kCCDUXdhM+jQ7YRw8j0oa9DScF5m1me77nNhZLImMBQqCKan/LWqf+XTuOIOUFrJHbBzw6KOiTJITzTWe8X3QXwZQeAV/owjt1cepU+0ZhvlkFWQIDAQAB",
+            "clientId": "ece18d0360fe4b6fb60073e6fed9b32b",
+            "clientSecret": "836554163575430184926e37b79e9dd0c04dc26edab9437387e5d2ead4aaae82",
+            "host": "https://posidon.netease.com"
         }
     },
     "path": {
@@ -39,6 +39,7 @@
         "get-dir-tree": "/ImageSeach/GetDirTree",
         "get-svn-account-by-id": "/ImageSeach/GetSVNAccountById",
         "generate-element": "/ImageSeach/UploadImageToAnalyze",
-        "download-from-server": "/Download/downloadfromserver"
+        "download-from-server": "/Download/downloadfromserver",
+        "get-account-by-host": "/ImageSeach/GetAccountByHost"
     }
 }

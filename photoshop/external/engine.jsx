@@ -405,7 +405,6 @@ function getActiveDocument() {
 
 function openImage(params) {
     var path = params.path;
-    psconsole.log(path);
     try {
         var file = new File(path);
         if (file.exists) {
@@ -423,7 +422,7 @@ function openImage(params) {
             return "File does not exist";
         }
     } catch (error) {
-        psconsole.log(error);
+        psconsole.log('error', error);
         return error;
     }
 

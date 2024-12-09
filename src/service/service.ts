@@ -197,16 +197,17 @@ class psSerive {
         }
     }
     public async getAccountByHost(url: string) {
-        let host = '';
-        if (url.startsWith('http')) {
-            host = url;
-        } else if (url.startsWith('file')) {
-            url = url.replace('file://', '');
-            host = url.split('/')[0]
-        } else {
-            host = url.replace('\\\\', '');
-            host = host.split('\\')[0];
+        const decodedUrl = decodeURIComponent(url);
+        const accountResponse: any = await utilHttps.httpGet(psConfig.getAccountByHost, { url: decodedUrl })
+        if (accountResponse.status != 200) {
+            return undefined;
         }
+        let accountDataResp = accountResponse.data as IPosidonResponse;
+        if (accountDataResp.code != 0) {
+            return undefined;
+        }
+        const account = accountDataResp.data as IAccountResponse;
+        return account;
     }
 }
 
