@@ -424,6 +424,72 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
     const handleSegSearch = (index: number) => {
         newSearch(searchFile, index)
     }
+
+    //是否为合法的base64图片url
+    const isValidBase64Image = (imageBase64) => {
+        return /^data:image\/([a-zA-Z]*);base64,/.test(imageBase64);
+    }
+
+    const handleFile = (file:File) => {
+        if(file!=null && file.type!=null){
+            const isImage = file.type.startsWith('image/');
+            if(isImage){
+                const reader = new FileReader();
+                reader.onload = async(e) => {
+                    console.log(e);
+                    const binaryData = e.target.result as ArrayBuffer
+                    const blobData = new Blob([binaryData])
+                    const formData = new FormData();
+                    formData.append("file", blobData, file.name);
+                    const imgurl = await iService.generateFormDataUrl(formData)
+                    console.log(formData, blobData, file.name, imgurl);
+                    const f:IFile = {
+                        name: file.name,
+                        ext: file.type,
+                        path: '',
+                        url: imgurl
+                    }
+                    setSearchFile(f)
+                    newSearch(f, -1)
+                    const images = await iService.generateFormDataImageElement(formData)
+                    setSegmentImages(images)
+
+                }
+                reader.readAsArrayBuffer(file)
+            }else{
+                //提示粘贴的必须是图片,而不能是其他类型文件
+            }
+        }
+    }
+
+    const  handlePaste = async(e) => {
+
+        if (e.clipboardData.files.length) {
+            const fileObject = e.clipboardData.files[0];
+            handleFile(fileObject)
+            
+        } else {
+            alert('No image data was found in your clipboard. Copy an image first or take a screenshot.');
+        }
+    };
+
+    const handleDrop = async(e) => {
+        e.preventDefault();
+        if(e.dataTransfer.files.length) {
+            const fileObject = e.dataTransfer.files[0]
+            handleFile(fileObject)
+        } else {
+
+        }
+        
+    }
+
+    const handleInputChange = (e) => {
+        console.log(e);
+        setSearchFile(undefined)
+        
+    }
+
     return (
         <div className="image-search-image-container">
             {
@@ -439,7 +505,7 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                         const value = val as IStorehouseType;
                         setAssetType(value)
                     }}></DropSelect>
-                    <div className="image-search-image-input"
+                    {/* <div className="image-search-image-input"
                         onClick={async () => {
                             if (!disableSearch) loadImage();
                         }}>
@@ -463,6 +529,14 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                                 <span>{searchFile.name}</span>
                             </div>
                         }
+                    </div> */}
+                    <div className="image-search-image-input">
+                        {
+                            searchFile&& <div className="image-wrap">
+                                <img src={searchFile.path?.length>0?searchFile.path:psConfig.host+searchFile.url} />
+                            </div>
+                        }
+                        <input type="text" onPaste={handlePaste} onDrop={handleDrop} placeholder="黏贴截图或拖入图片" onChange={handleInputChange} value={searchFile?searchFile.name:''} />
                     </div>
                     <div className="image-search-image-button">
                         <div className="image-search-image-button-desc" onClick={() => { toSearchImage(true) }} >
