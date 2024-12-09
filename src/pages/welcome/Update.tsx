@@ -18,39 +18,15 @@ interface UpdateProps {
 export const UpdateRef = React.createRef<UpdateRefType>();
 export const Update = forwardRef<UpdateRefType, UpdateProps>((props, ref) => {
     const [download, setDownload] = useState<boolean>(false)
-    const [downloader, setDownloader] = useState<IDownloader>({ id: 0, progress: 0, complete: true });
-    useImperativeHandle(ref, () => {
-        return {
-            updateDownloader: updateDownloader
-        }
-    })
-    const updateDownloader = (progress: number | undefined) => {
-        if (downloader.complete) return;
-        if (!progress) {
-            setDownloader({
-                ...downloader,
-                complete: true,
-                progress: 0
-            })
-        } else {
-            setDownloader({
-                ...downloader,
-                complete: progress == 100 ? true : false,
-                progress: progress
-            })
-            if (progress == 100) {
-                alert("更新完成，重启插件后生效")
-            }
-        }
-    }
+
     const startUpdate = async () => {
-        const buffer = await iService.downLoadPosidonFile(psConfig.codeFile, "dist.zip")
+        const buffer = await iService.downLoadPosidonFile(psConfig.codeFile, "cepcode.zip")
         replaceLocalFile(buffer)
     }
     const replaceLocalFile = async (buffer: Buffer) => {
         const pluginDir = psConfig.pluginDir();
         const result = await unzipFromBuffer(buffer, pluginDir, () => { psHandler.restart() });
-        if(result) {
+        if (result) {
             alert("解压失败")
             setDownload(false)
         }

@@ -3,9 +3,9 @@ import config from './config.json'
 import JSEncrypt from "jsencrypt";
 import path from "path";
 import psHandler from "@/service/handler";
-const env = IEnv.test;
+const env = IEnv.prod;
 export const psConfig = {
-    version: "1.1.3",
+    version: "1.1.4",
     env: env,
     publicKey: config[env].posidon.publicKey,
     clientId: config[env].posidon.clientId,
@@ -88,6 +88,7 @@ export const psConfig = {
     querySvnPsdDir: config.path["query-svn-psd-dir"],
     getDirTree: config.path["get-dir-tree"],
     getSVNAccountById: config.path["get-svn-account-by-id"],
-    downloadfromserver: config.path["download-from-server"]
+    downloadfromserver: config.path["download-from-server"],
+    getAccountByHost: config.path["get-account-by-host"],
 }
 

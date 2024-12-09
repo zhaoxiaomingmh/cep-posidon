@@ -171,7 +171,7 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
                     name: i.name,
                     format: i.ext as ImageFormat,
                     fileUrl: i.path,
-                    thumb: `data:image/png;base64,` + i.thumbnail,
+                    thumb: i.thumbnail.startsWith('http') ? i.thumbnail : `data:image/png;base64,` + i.thumbnail,
                     projectName: item.projectName
                 };
                 addImgs.push(son);

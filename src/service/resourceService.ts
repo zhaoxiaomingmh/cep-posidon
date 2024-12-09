@@ -31,7 +31,6 @@ class resourceService {
             this.notifyProgerss(type, -1);
             return;
         }
-        const result = await iService.getAccountByHost(account.baseUrl);
         try {
             if (account.accountType === 1) {
                 const downloadDir = psConfig.downloadDir();
