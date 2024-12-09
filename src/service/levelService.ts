@@ -22,13 +22,6 @@ class levelService {
     public async downFile(img: IGalleryItem, projectInfo: IProject) {
         const account = await iService.getSVNAccountById(img.id as number);
         if (!account) {
-            // let url = '';
-            // if (img.fileUrl.startsWith('http')) {
-            //     url = img.fileUrl;
-            // } else if (img.fileUrl.startsWith('file')) {
-
-            // }
-            // await iService.getAccountByHost(img.fileUrl);
             alert('账号信息已失效')
             PsdLevelRef.current.setProgress(-1);
             return;
