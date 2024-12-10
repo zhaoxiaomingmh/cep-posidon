@@ -34,6 +34,7 @@
     "@spectrum-web-components/button": "^1.0.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "antd": "^5.22.4",
     "axios": "^1.1.1",
     "babel-plugin-proposal-object-rest-spread-stable": "^1.0.3",
     "jsencrypt": "^3.3.2",

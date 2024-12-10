@@ -58,19 +58,24 @@
             console.log('查看目前持有连接 ', stdout)
             const connections = stdout.split('\n').filter(line => line.trim().startsWith('OK'));
             console.log('目前持有连接 ', connections)
+            let i = 0;
             if (connections.length > 0) {
                 let con = connections[0];
                 console.log('要断开的连接 ', con)
-                con = con.replace(/^OK\s+/, '').trim();
+                con = con.replace(/^OK\s+/, '').replace('Microsoft Windows Network', '').trim();
                 console.log('要断开的连接 ', con)
                 exec(`chcp 65001 | net use ${con} /delete`, (err, stdout, stderr) => {
                     if (err || stderr) {
                         alert('断开Windows持有共享网络盘失败，可以手动断开或者关闭共享盘文件夹窗口后重试')
                         notify(refType, -1);
                         return result;
+                        i = -1;
                     }
                     console.log('断开连接成功 ', con)
                 });
+            }
+            if(i == -1) {
+                return result;
             }
             console.log('开始连接，下载 ')
             exec(connectCommand, (err, stdout, stderr) => {

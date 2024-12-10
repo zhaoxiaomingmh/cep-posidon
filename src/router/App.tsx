@@ -40,7 +40,8 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         }
     })
     useEffect(() => {
-        if (psConfig.env == "prod") {
+        const exid = handler.extId;
+        if (psConfig.env == "prod" && exid == "posidon-ps-cep-main") {
             checkUpdate();
         }
         checkActiveDocument();
