@@ -1,7 +1,7 @@
 {
   "name": "cep-posidon",
-  "version": "1.1.4",
+  "version": "1.1.6",
   "restart": "false",
-  "description": "1.修复语义搜索预览图显示失败问题\n2.SMB下载添加友好提示",
+  "description": "1.修复了一些已知的BUG\n2.图片搜索可以直接使用粘贴和拖拽\n3.添加图片元素分析功能",
   "code": "cepcode.zip"
 }

@@ -77,7 +77,11 @@ class psSerive {
         formData.append('file', blob, path.split('/').pop());
         const result = await axios.post(psConfig.host + psConfig.generateElement, formData, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                'Content-Type': 'multipart/form-data',
+                'x-api-key': psConfig.rsa(),
+                'x-api-timestamp': psConfig.timeStamp(),
+                'x-api-clientid': psConfig.clientId,
+                'X-User-Email': AppRef?.current?.user?.email
             }
         })
         if (result.status === 200) {
@@ -93,7 +97,11 @@ class psSerive {
     public async generateFormDataImageElement(formData: FormData): Promise<string[] | undefined> {
         const result = await axios.post(psConfig.host + psConfig.generateElement, formData, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                'Content-Type': 'multipart/form-data',
+                'x-api-key': psConfig.rsa(),
+                'x-api-timestamp': psConfig.timeStamp(),
+                'x-api-clientid': psConfig.clientId,
+                'X-User-Email': AppRef?.current?.user?.email
             }
         })
         if (result.status === 200) {
