@@ -46,6 +46,20 @@ class psSerive {
         }
         return undefined;
     }
+    public async generateFormDataUrl(formData: FormData): Promise<string | undefined> {
+        const result = await axios.post(psConfig.host + psConfig.generateURL, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+        if (result.status === 200) {
+            const data = result.data as IPosidonResponse;
+            if (data.code === 0) {
+                return data.data.replace('..', '') as string;
+            }
+        }
+        return undefined;
+    }
     public async generateImageElement(path: string): Promise<string[] | undefined> {
         const imageData = window.cep.fs.readFile(path, "Base64")
         const binary = window.cep.encoding.convertion.b64_to_binary(imageData.data)
@@ -71,6 +85,23 @@ class psSerive {
         }
         return undefined;
     }
+
+    public async generateFormDataImageElement(formData:FormData): Promise<string[] | undefined> {
+        const result = await axios.post(psConfig.host + psConfig.generateElement, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+        if (result.status === 200) {
+            const data = result.data as IPosidonResponse;
+            if (data.code === 0) {
+                const imgEles = data.data as string[];
+                return imgEles;
+            }
+        }
+        return undefined;
+    }
+
     public async searchImage(projectId: number, pa: string, searchs: ISearchItem[], formats: string[], type: number) {
         const projectNames = searchs.map(item => { return item.projectName });
         let data = {
