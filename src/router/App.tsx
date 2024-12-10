@@ -40,7 +40,9 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         }
     })
     useEffect(() => {
-        checkUpdate();
+        if (psConfig.env == "prod") {
+            checkUpdate();
+        }
         checkActiveDocument();
         getUserInLocalStorage();
         syncTheme();

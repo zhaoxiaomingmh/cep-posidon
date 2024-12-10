@@ -1,5 +1,6 @@
 import { ImageSearchImageRef } from '@/pages/search/component/ImageSearchImage';
 import { TextSearchImageRef } from '@/pages/search/component/TextSearchImage';
+import { AppRef } from '@/router/App';
 import { IAccountResponse, IPosidonPageResponse, IPosidonResponse, ISearchItem, ISearchResult, ISvnPsdDirTreeNode, ISvnPsdGroup } from '@/store/iTypes/iTypes';
 import { psConfig } from '@/utlis/util-env';
 import utilHttps from '@/utlis/util-https';
@@ -30,7 +31,11 @@ class psSerive {
         formData.append('file', blob, path.split('/').pop());
         const result = await axios.post(psConfig.host + psConfig.generateURL, formData, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                'Content-Type': 'multipart/form-data',
+                'x-api-key': psConfig.rsa(),
+                'x-api-timestamp': psConfig.timeStamp(),
+                'x-api-clientid': psConfig.clientId,
+                'X-User-Email': AppRef?.current?.user?.email
             }
         })
         if (result.status === 200) {
