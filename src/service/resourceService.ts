@@ -54,6 +54,11 @@ class resourceService {
             const length = parseInt(lengthResponse.headers['content-length'], 10);
 
             console.log('开始下载，下载内容大小为：', length);
+            if (Number.isNaN(length) || length == 0) {
+                alert("文件已失效");
+                this.notifyProgerss(type, -1);
+                return;
+            }
             const response = await axios.get(img.fileUrl, {
                 headers,
                 responseType: 'arraybuffer',
