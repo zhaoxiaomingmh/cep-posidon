@@ -4,7 +4,7 @@
             "publicKey": "MIIBCgKCAQEA4MlnHpeSYIsasAhEQKvZL8vHI5/YJmDf8GfBV26gae9J1Aw8VJPFVtgSMgU4nsLpWQTUchnOZ8V1Zr5vzGuTU0vjsVVW4LTXUCHz6Hsu9SDwydVMDrj9VMimjEnGLqywN5i8mK2X42dUC+CzbLAAtRF1kpdkKOtcHpDVSEUz6sqdR8kRQCDsD8eXDWPJbLN9jpSp/Ce0xICo+Ar5jUfoof10PgqDjKbg9fxrEAedEiZ5LvjUW7RvmjcN1kwHQDOLwfF8ZwumPONcJNnEa4lJ1apCXruNmQeItCB0GvF72yvhcUemZKI2ycNHfIDLmPUpM0/4e4rFwHLW+oP2quV4nQIDAQAB",
             "clientId": "ed62aa4a997648bf88731e72531941bc",
             "clientSecret": "3797540112c345279474423714fcebfad8c0d219a33c443b95613f6ea5882803",
-            "host": "https://localhost:53518"
+            "host": "https://localhost:58497"
         }
     },
     "test": {
@@ -40,6 +40,6 @@
         "get-svn-account-by-id": "/ImageSeach/GetSVNAccountById",
         "generate-element": "/ImageSeach/UploadImageToAnalyze",
         "download-from-server": "/Download/downloadfromserver",
-        "get-account-by-host": "/ImageSeach/GetAccountByHost"
+        "increaseDownloadCount": "/ImageSeach/IncreaseDownloadCount"
     }
 }

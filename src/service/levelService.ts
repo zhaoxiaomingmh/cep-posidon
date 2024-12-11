@@ -33,8 +33,9 @@ class levelService {
             const url = img.fileUrl.replace("file:", "").trim();
             //@ts-ignore
             const downResult = await downloadFromSmb(account, url, filePath, img.name, type, reService.notifyProgerss, reService.openFile, true);
+            iService.increaseDownloadCount(img.fileUrl, projectInfo.id, projectInfo.name, img.format == 'psd' ? '设计稿(psd)' : '资源图片(png,jpg)')
         } else {
-            reService.downloadfromUrl(account, img, type);
+            reService.downloadfromUrl(account, img, type, projectInfo);
         }
     }
 }

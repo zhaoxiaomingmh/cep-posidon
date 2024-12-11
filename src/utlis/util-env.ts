@@ -89,6 +89,6 @@ export const psConfig = {
     getDirTree: config.path["get-dir-tree"],
     getSVNAccountById: config.path["get-svn-account-by-id"],
     downloadfromserver: config.path["download-from-server"],
-    getAccountByHost: config.path["get-account-by-host"],
+    increaseDownloadCount: config.path["increaseDownloadCount"]
 }
 

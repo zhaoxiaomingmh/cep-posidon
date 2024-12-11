@@ -38,7 +38,7 @@ class resourceService {
                 //@ts-ignore
                 const downResult = await downloadFromSmb(account, img.fileUrl, filePath, img.name, type, this.notifyProgerss, this.openFile);
             } else {
-                this.downloadfromUrl(account, img, type);
+                this.downloadfromUrl(account, img, type, projectInfo);
             }
         } catch (e) {
             console.log('e', e);
@@ -46,7 +46,7 @@ class resourceService {
             this.notifyProgerss(type, 0);
         }
     }
-    public async downloadfromUrl(account: IAccountResponse, img: IGalleryItem, type: string) {
+    public async downloadfromUrl(account: IAccountResponse, img: IGalleryItem, type: string, projectInfo: IProject) {
         console.log('开始下载', img);
         try {
             const headers = account.data ? { 'Authorization': `Basic ${account.data}` } : undefined;
@@ -68,6 +68,7 @@ class resourceService {
                     this.notifyProgerss(type, p);
                 },
             });
+            iService.increaseDownloadCount(img.fileUrl, projectInfo.id, projectInfo.name, img.format == 'psd' ? '设计稿(psd)' : '资源图片(png,jpg)');
             const buffer = Buffer.from(response.data);
             const userDir = psConfig.userDir();
             const filePath = path.join(userDir, img.name.replace(/#/g, ""));
@@ -128,7 +129,7 @@ class resourceService {
             fileUrl: fullUrl,
             format: 'psd',
         }
-        this.downloadfromUrl(account, newImg, type);
+        this.downloadfromUrl(account, newImg, type, projectInfo);
     }
     public notifyProgerss(type: string, progress?: number) {
         if (type == 'imgRef') {

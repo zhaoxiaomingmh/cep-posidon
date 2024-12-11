@@ -93,7 +93,6 @@ class psSerive {
         }
         return undefined;
     }
-
     public async generateFormDataImageElement(formData: FormData): Promise<string[] | undefined> {
         const result = await axios.post(psConfig.host + psConfig.generateElement, formData, {
             headers: {
@@ -113,7 +112,6 @@ class psSerive {
         }
         return undefined;
     }
-
     public async searchImage(projectId: number, pa: string, searchs: ISearchItem[], formats: string[], type: number) {
         const projectNames = searchs.map(item => { return item.projectName });
         let data = {
@@ -244,18 +242,8 @@ class psSerive {
             return undefined;
         }
     }
-    public async getAccountByHost(url: string) {
-        const decodedUrl = decodeURIComponent(url);
-        const accountResponse: any = await utilHttps.httpGet(psConfig.getAccountByHost, { url: decodedUrl })
-        if (accountResponse.status != 200) {
-            return undefined;
-        }
-        let accountDataResp = accountResponse.data as IPosidonResponse;
-        if (accountDataResp.code != 0) {
-            return undefined;
-        }
-        const account = accountDataResp.data as IAccountResponse;
-        return account;
+    public async increaseDownloadCount(url: string, projectId: number, projectName: string, type: string) {
+        const response: any = await utilHttps.httpPost(psConfig.increaseDownloadCount, { projectId: projectId, projectName: projectName, downloadUrl: url, type: type })
     }
 }
 

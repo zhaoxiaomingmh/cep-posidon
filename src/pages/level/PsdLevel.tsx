@@ -1,13 +1,14 @@
 import { NoSVNLibrary } from "@/hooks/gallery/NoSVNLibrary";
 import levService from "@/service/levelService";
 import iService from "@/service/service";
-import { IDownloader, IGalleryItem, IPath, ISvnPsdGroup, ISvnPsdGroupItem } from "@/store/iTypes/iTypes";
+import { IDownloader, IGalleryItem, ImageFormat, IPath, ISvnPsdGroup, ISvnPsdGroupItem } from "@/store/iTypes/iTypes";
 import useUserStore from "@/store/modules/userStore";
 import { psConfig } from "@/utlis/util-env";
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { PsdLevelBar, PsdLevelBarRef } from "./component/PsdLevelBar";
 import { Gallery } from "@/hooks/gallery/Gallery";
 import { TreePath } from "./component/TreePath";
+import path from "path";
 
 type PsdLevelProps = {
 }
@@ -89,13 +90,17 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
                     name: file.name,
                 }
                 if (file.isFile) {
+                    let extWithDot = path.extname(file.name);
+                    let formate = extWithDot.startsWith('.') ? extWithDot.slice(1) : extWithDot;
                     gItem.fileUrl = file.fileUrl;
                     gItem.thumb = file.thumb;
                     gItem.svnPsdLevelId = file.svnPsdLevelId;
-                    gItem.format = 'psd';
+                    gItem.format = formate as ImageFormat;
                 } else {
                     gItem.files = [];
                     file.children.forEach(child => {
+                        let extWithDot = path.extname(child.name);
+                        let formate = extWithDot.startsWith('.') ? extWithDot.slice(1) : extWithDot;
                         let subItem: IGalleryItem = {
                             isFile: child.isFile,
                             name: child.name,
@@ -103,7 +108,7 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
                             svnPsdLevelId: child.svnPsdLevelId,
                             thumb: child.thumb,
                             fileUrl: child.fileUrl,
-                            format: 'psd',
+                            format: formate as ImageFormat
                         }
                         gItem.files.push(subItem);
                     })
