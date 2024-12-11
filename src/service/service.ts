@@ -168,6 +168,9 @@ class psSerive {
         }
         const figmaAccountResp = figmaAccountResult.data as IPosidonResponse;
         console.log('figmaAccount', figmaAccountResp)
+        if(figmaAccountResp.code != 0) {
+            return undefined;
+        }
         const account = figmaAccountResp.data as IAccountResponse;
         const downloadResp: any = await utilHttps.httpGet(psConfig.downloadPsd4Plugin, { fileKey: account.username, userId: userId, seletedNode: account.password, projectId: projectId })
         if (downloadResp.status != 200) {

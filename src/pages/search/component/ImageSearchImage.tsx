@@ -189,8 +189,6 @@ export const ImageSearchImage = forwardRef<ImageSearchImageRefType, ImageSearchI
                 }
             }
         }
-        console.log('svnState', svnState)
-        console.log('scroollState', scroollState)
         setStorehouseState(svnState);
         setCanScroll(scroollState);
     }

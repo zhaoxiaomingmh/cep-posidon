@@ -97,12 +97,12 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
         let svnState = false;
         let scroollState = false;
         if (assetType === 'All') {
-            if (searchItems.length !== 0) {
+            if (searchItems.length != 0) {
                 svnState = true;
                 if (searchItems.some(item => item.canSearch === true)) scroollState = true;
             }
         } else {
-            if (searchItems.some(x => x.type === assetType)) {
+            if (searchItems.some(x => x.type == assetType)) {
                 svnState = true;
                 if (searchItems.some(item => item.canSearch === true && item.type === assetType)) {
                     scroollState = true;
@@ -116,7 +116,7 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
         if (isSearch) return;
         if (!storehouseState) return;
         if (!searchPa) return;
-        setIsSearch(true);
+        if (!canScroll) return;
         if (clear) {
             const newItems: ISearchItem[] = searchItems
                 .filter(item => (item.type === assetType || assetType === 'All'))
@@ -130,6 +130,7 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
                     };
                 });
             setCanScroll(true);
+            setIsSearch(true);
             setImages([])
             iService.searchImage(project.id, searchPa, newItems, formats, 1)
         } else {
@@ -144,6 +145,11 @@ export const TextSearchImage = forwardRef<TextSearchImageRefType, TextSearchImag
                         canSearch: item.canSearch
                     };
                 });
+            if (newItems.findIndex(x => x.canSearch === true) === -1) {
+                setIsSearch(false);
+                setCanScroll(false);
+                return;
+            }
             iService.searchImage(project.id, searchPa, newItems, formats, 1)
             setIsSearch(true);
         }

@@ -20,7 +20,8 @@ class resourceService {
         return resourceService.instance;
     }
     public async downloadFile(img: IGalleryItem, type: string, projectInfo: IProject) {
-        if (img.format === 'comp') {
+        console.log('开始下载', img);
+        if (img.format == 'comp') {
             this.downloadFromFigma(img, projectInfo, type);
             return;
         }
