@@ -53,7 +53,8 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
     }, [project?.storehouses])
     useEffect(() => {
         setPage(1);
-        setIsSearch(false);
+        setDir(-1);
+        setIsSearch(true);
         setGItems([]);
         GetGalleryItems(category, 1);
         setTreePath([{
@@ -67,6 +68,7 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
         setPage(1)
         setCanScroll(true)
         setGItems([]);
+        setDir(-1);
         const ds = levelGroup.find(x => x.parentId === level)?.dirs;
         setCategories(ds)
         if (ds && ds.length > 0) {
