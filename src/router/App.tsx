@@ -1,6 +1,6 @@
 import { Login, LoginRef } from "@/pages/welcome/Login";
 import psHandler from "@/service/handler";
-import { IPosidonResponse, IProject, IProjectStorehouse, IUser, IVersion } from "@/store/iTypes/iTypes";
+import { ILayer, IPosidonResponse, IProject, IProjectStorehouse, IUser, IVersion } from "@/store/iTypes/iTypes";
 import useDocumentStore from "@/store/modules/documentStore";
 import useUserStore from "@/store/modules/userStore";
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
@@ -17,6 +17,7 @@ import useAppStore from "@/store/modules/appStore";
 interface AppRefType {
     refresh: () => void;
     user: IUser;
+    selectLayer: (layerID: number, _name: string) => void
 };
 interface AppProps { }
 export const AppRef = React.createRef<AppRefType>();
@@ -27,6 +28,8 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     const setProject = useUserStore(state => state.setProject);
     const activeDocument = useDocumentStore(state => state.getActiveDocument());
     const setActiveDocument = useDocumentStore(state => state.setActiveDocument);
+    const activeLayer = useDocumentStore(state => state.getActiveLayer());
+    const setActiveLayer = useDocumentStore(state => state.setActiveLayer);
     const [currentTheme, setCurrentTheme] = useState(defaultTheme)
     const [currentScheme, setCurrentScheme] = useState<'dark' | 'light'>('dark')
     const [themeClass, setThemeClass] = useState('dark')
@@ -36,7 +39,8 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     useImperativeHandle(ref, () => {
         return {
             refresh: checkActiveDocument,
-            user: user
+            user: user,
+            selectLayer: selectLayer
         }
     })
     useEffect(() => {
@@ -47,6 +51,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         checkActiveDocument();
         getUserInLocalStorage();
         syncTheme();
+
     }, [])
     const checkUpdate = async () => {
         const buffer = await iService.downLoadPosidonFile(psConfig.versinFile, "desc.json");
@@ -69,6 +74,12 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     const checkActiveDocument = async () => {
         const activeDocument = await handler.getActiveDocument();
         setActiveDocument(activeDocument);
+        if (!activeLayer) {
+            const layer = await handler.getActiveLayer();
+            if (layer) {
+                selectLayer(layer.id, layer.name, layer.kind)
+            }
+        }
     }
     const getUserInLocalStorage = async () => {
         const userStr = localStorage.getItem('cep-user');
@@ -126,6 +137,14 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
                 localStorage.removeItem('cep-user');
             }
         }
+    }
+    const selectLayer = (layerID: number, _name: string, kind?: string) => {
+        const layer: ILayer = {
+            id: layerID,
+            name: _name,
+            kind: kind ?? "layer",
+        }
+        setActiveLayer(layer);
     }
 
     return (

@@ -7,6 +7,8 @@ import { AssetSearch, AssetSearchRef } from "@/pages/search/AssetSearch";
 import { Settings, SettingsRef } from "@/pages/settings/Settings";
 import { PsdLevel, PsdLevelRef } from "@/pages/level/PsdLevel";
 import '@/asset/iconfont/font.css'
+import '../asset/svg/cutting.svg'
+import { Cutting, CuttingRef } from "@/pages/cutting/Cutting";
 
 export const Face = forwardRef(() => {
     return (
@@ -26,6 +28,13 @@ export const Face = forwardRef(() => {
                         <i className="iconfont icon-level"></i>
                     }  >
                     <PsdLevel ref={PsdLevelRef} />
+                </PsTableItem>
+                <PsTableItem
+                    id={"cutting"}
+                    icon={
+                        <img src="../cep-posidon/src/asset/svg/cutting.svg"></img>
+                    }  >
+                    <Cutting ref={CuttingRef} />
                 </PsTableItem>
                 <PsTableItem id="gap" isGap></PsTableItem>
                 <PsTableItem

@@ -386,6 +386,7 @@ function getActiveLayerName() {
     const layer = {
         name: activeLayer.name,
         id: activeLayer.id,
+        kind: activeLayer.kind,
     }
     return JSON.stringify(layer);
 }

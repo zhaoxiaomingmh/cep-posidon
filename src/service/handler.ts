@@ -1,11 +1,11 @@
 import { AppRef } from "@/router/App";
-import { IDocument, IEventResult } from "@/store/iTypes/iTypes";
+import { IDocument, IEventData, IEventResult, ILayer } from "@/store/iTypes/iTypes";
 import { darkTheme, defaultTheme, lightTheme } from '@adobe/react-spectrum';
 import { Theme } from "@react-types/provider";
 //用来与Photoshop交互
 class handler {
     private static instance: handler;
-    private csInterface: CSInterface;
+    public csInterface: CSInterface;
     public extId: string;
     public appId: string;
 
@@ -80,7 +80,9 @@ class handler {
             let data = result.data.replace(/ver1,/, '');
             let obj = JSON.parse(data);
             if (parseInt(obj.eventID) === parseInt(this.selectEventId)) {
-                //"ver1,{ "eventID": 1936483188, "eventData": {"documentID":230,"null":{"_offset":-1,"_ref":"document"}}}"
+                console.log('图层选中事件', obj);
+                const eventData = obj.eventData as IEventData;
+                AppRef.current.selectLayer(eventData.layerID[0], eventData.null._name);
             }
             if (parseInt(obj.eventID) === parseInt(this.closeEventId)) {
                 //{extensionId: "", data: "ver1,{ "eventID": 1131180832, "eventData": {"documentID":243,"forceNotify":true}}", appId: "PHXS", type: "com.adobe.PhotoshopJSONCallbackposidon-ps", scope: "APPLICATION"}
@@ -123,6 +125,23 @@ class handler {
                     if (result && result !== "undefined") {
                         const activeDocument = JSON.parse(result) as IDocument;
                         resolve(activeDocument);
+                    } else {
+                        resolve(undefined);
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        });
+    }
+    public getActiveLayer(): Promise<ILayer | undefined> {
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`getActiveLayerName()`, (result: string) => {
+                try {
+                    console.log('result', result)
+                    if (result && result !== "undefined") {
+                        const activeLayer = JSON.parse(result) as ILayer;
+                        resolve(activeLayer);
                     } else {
                         resolve(undefined);
                     }

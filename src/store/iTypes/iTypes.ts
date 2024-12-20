@@ -77,6 +77,18 @@ export interface IEventResult {
     type: string,
 }
 
+export interface IEventData {
+    _obj: string,
+    null: IlayerPro,
+    makeVisible: boolean,
+    layerID: number[],
+}
+
+export interface IlayerPro {
+    _name: string,
+    _ref: string,
+}
+
 export interface IPosidonResponse {
     code?: number,
     message?: string,
