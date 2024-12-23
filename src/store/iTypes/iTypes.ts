@@ -81,7 +81,8 @@ export interface IEventData {
     _obj: string,
     null: IlayerPro,
     makeVisible: boolean,
-    layerID: number[],
+    layerID?: number[],
+    documentID?: number
 }
 
 export interface IlayerPro {

@@ -1,10 +1,108 @@
 ﻿
+if (typeof ($) == 'undefined') {
+    $ = {};
+}
 $.level = 0;
 try {
     var xLib = new ExternalObject("lib:\PlugPlugExternalObject");
 } catch (e) {
     alert(e.toString());
 }
+$._ext = {
+    extensionDir: "",
+    evalFile: function (path) {
+        try {
+            return $.evalFile(path);
+        } catch (e) {
+            return "[ERROR] line[" + (e.line - 1) + "] message[" + e.message + "] stack[" + $.stack + "]";
+        }
+    },
+    evalFiles: function (extensionDir) {
+        $._ext.extensionDir = extensionDir;
+        var files = [];
+        var jsxDir = new Folder(extensionDir + '/photoshop/external');
+        if (jsxDir.exists) {
+            files = files.concat(jsxDir.getFiles("*.jsx"));
+        }
+        var errno = 0;
+        for (var i = 0; i < files.length; i++) {
+            if (!/engine.jsx/.test(files[i])) {
+                $._ext.evalFile(files[i]);
+            }
+        }
+        return "{\"errno\": " + errno + "}";
+    },
+    /**
+    * 根据图层的顺序，来获取图层信息
+    * @param index
+    * @return {*}
+    */
+    getLayerInfoByIndex: function (index) {
+        var ref1 = new ActionReference();
+        ref1.putIndex(stringIDToTypeID("itemIndex"), index);
+        var layerDescriptor = executeActionGet(ref1);
+        var descFlags = {
+            reference: false,
+            extended: false,
+            maxRawLimit: 10000,
+            maxXMPLimit: 100000,
+            saveToFile: null
+        };
+        var descObject = descriptorInfo.getProperties(layerDescriptor, descFlags);
+        return JSON.stringify(descObject, null, 4);
+    },
+    /**
+    * 根据图层ID来获取图层信息
+    * @param layerID
+    * @return {*}
+    */
+    getLayerInfoByID: function (pa) {
+        try {
+            var ref = new ActionReference();
+            if (pa.prpr) {
+                ref.putProperty(charIDToTypeID("Prpr"), stringIDToTypeID(pa.prpr));
+            }
+            if (pa.layerID === -1) {
+                ref.putEnumerated(charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt"));
+            } else {
+                ref.putIdentifier(charIDToTypeID("Lyr "), pa.layerID);
+            }
+            var layerDescriptor = executeActionGet(ref);
+            var descFlags = {
+                reference: false,
+                extended: false,
+                maxRawLimit: 10000,
+                maxXMPLimit: 100000,
+                saveToFile: null
+            };
+            var descObject = descriptorInfo.getProperties(layerDescriptor, descFlags);
+            return JSON.stringify(descObject, null, 4);
+        } catch (e) {
+            psconsole.log(e);
+        }
+    },
+    getActiveLayerName: function () {
+        var activeLayer = app.activeDocument.activeLayer;
+        const layer = {
+            name: activeLayer.name,
+            id: activeLayer.id,
+        }
+        return JSON.stringify(layer);
+    },
+    getActiveDocument: function () {
+        try {
+            const activeDocument = app.activeDocument;
+            const document = {
+                name: activeDocument.name,
+                id: activeDocument.id,
+            }
+            return JSON.stringify(document);
+        } catch (error) {
+            return undefined;
+        }
+    },
+};
+
 //#region 
 if (typeof JSON !== "object") {
     JSON = {};
@@ -381,28 +479,6 @@ if (typeof JSON !== "object") {
 }());
 //#endregion
 
-function getActiveLayerName() {
-    var activeLayer = app.activeDocument.activeLayer;
-    const layer = {
-        name: activeLayer.name,
-        id: activeLayer.id,
-        kind: activeLayer.kind,
-    }
-    return JSON.stringify(layer);
-}
-
-function getActiveDocument() {
-    try {
-        const activeDocument = app.activeDocument;
-        const document = {
-            name: activeDocument.name,
-            id: activeDocument.id,
-        }
-        return JSON.stringify(document);
-    } catch (error) {
-        return undefined;
-    }
-}
 
 function openImage(params) {
     var path = params.path;
@@ -444,3 +520,72 @@ var psconsole = {
     }
 };
 //#endregion
+//#region
+/**
+ * 根据图层的名称，来获取图层信息
+ * @param index
+ * @return {*}
+ */
+function getLayerInfoByName(name) {
+    var ref1 = new ActionReference();
+    ref1.putName(stringIDToTypeID("layer"), name);
+    var layerDescriptor = executeActionGet(ref1);
+    var json = ADToJson(layerDescriptor);
+    return json
+}
+
+function getCurrentDocumentInfo() {
+    var ref1 = new ActionReference();
+    ref1.putEnumerated(charIDToTypeID('Dcmn'), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
+    var docDescriptor = executeActionGet(ref1);
+    var json = ADToJson(docDescriptor);
+    return json
+}
+//#endregion
+
+
+function setGeneratorSettings(params) {
+    var classProperty = charIDToTypeID("Prpr");
+    var propNull = charIDToTypeID("null");
+    var classNull = charIDToTypeID("null");
+    var typeOrdinal = charIDToTypeID("Ordn");
+    var enumTarget = charIDToTypeID("Trgt");
+    var classDocument = charIDToTypeID("Dcmn");
+    var classLayer = charIDToTypeID("Lyr ");
+    var propProperty = stringIDToTypeID("property");
+    var actionSet = charIDToTypeID("setd");
+    var keyTo = charIDToTypeID("T   ");
+
+    // These are the generator settings
+    var generatorSettingsDesc = new ActionDescriptor();
+
+    var settings = params.settings;
+    for (var key in settings) {
+        if (settings.hasOwnProperty(key)) {
+            generatorSettingsDesc.putString(stringIDToTypeID(key), settings[key]);
+        }
+    }
+
+    // Set the generator meta data.
+    var theRef = new ActionReference();
+    // Property needs to come first
+    theRef.putProperty(classProperty, stringIDToTypeID("generatorSettings"));
+
+    if (params.layerId) {
+        theRef.putIdentifier(classLayer, params.layerId);
+    } else {
+        theRef.putEnumerated(classDocument, typeOrdinal, enumTarget);
+    }
+
+    // Execute the set action setting the descriptor into the property reference
+    var setDescriptor = new ActionDescriptor();
+    setDescriptor.putReference(propNull, theRef);
+
+    setDescriptor.putObject(keyTo, classNull, generatorSettingsDesc);
+    if (params.key) {
+        setDescriptor.putString(propProperty, params.key);
+    }
+    executeAction(actionSet, setDescriptor, DialogModes.NO);
+
+}
+

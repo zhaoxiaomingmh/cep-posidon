@@ -6,21 +6,32 @@
     line-height: 24px;
     color: #CCCCCC;
 
-    .layer-select-box {
+    .rs-layer-select-box {
         padding: 10px;
         background-color: #474747;
         border-bottom: 1px solid #999999;
 
-        .layer-info-item {
-            height: 48px;
+        .rs-layer-info-item {
+            height: 36px;
             display: flex;
             flex-direction: row;
-            .layer-select-box-title {
+            .rs-layer-select-title {
                 width: 70px;
                 display: flex;
                 align-items: center;
             }
         }
+
+    }
+
+    .rs-group-tree-box {
+        margin: 10px 0px;
+        background-color: #474747;
+        height: 100px;
+    }
+
+    .rs-footer {
+        height: 36px;
 
     }
 }

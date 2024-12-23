@@ -12,14 +12,26 @@ class handler {
     private selectEventId: string;
     private closeEventId: string;
     private openEventId: string;
+    private deleteEventId: string;
+    private pasteEventId: string;
+    private addEventId: string;
+    private cutEventId: string;
+    private makeEventId: string;
 
     constructor() {
         console.log("中央处理器注册成功");
         this.csInterface = new CSInterface();
+        this.evalFiles();
         this.appId = this.csInterface.getApplicationID();
         this.extId = this.csInterface.getExtensionID();
+        this.pasteEventId = "1885434740";
+        this.addEventId = "1097098272";
+        this.cutEventId = "1668641824";
+        this.makeEventId = "1298866208";
         this.init();
     }
+
+    
 
     public static getInstance(): handler {
         handler.instance = new handler();
@@ -63,8 +75,12 @@ class handler {
         this.registerEvent('select',);
         this.registerEvent('close');
         this.registerEvent('open');
+        this.registerEvent('delete');
+        this.registerEvent('paste');
+        this.registerEvent('add');
+        this.registerEvent('cut');
+        this.registerEvent('make');
         this.getCurrentTheme();
-
 
         this.csInterface.addEventListener('com.adobe.csxs.events.ThemeColorChanged', () => {
             this.getCurrentTheme();
@@ -80,17 +96,39 @@ class handler {
             let data = result.data.replace(/ver1,/, '');
             let obj = JSON.parse(data);
             if (parseInt(obj.eventID) === parseInt(this.selectEventId)) {
-                console.log('图层选中事件', obj);
+                console.log('Select事件', obj);
                 const eventData = obj.eventData as IEventData;
-                AppRef.current.selectLayer(eventData.layerID[0], eventData.null._name);
+                if (eventData.documentID) {
+                    this.setActiveLayer();
+                } else if (eventData.layerID?.length > 0) {
+                    AppRef.current.selectLayer(eventData.layerID[0], eventData.null._name);
+                }
             }
             if (parseInt(obj.eventID) === parseInt(this.closeEventId)) {
                 //{extensionId: "", data: "ver1,{ "eventID": 1131180832, "eventData": {"documentID":243,"forceNotify":true}}", appId: "PHXS", type: "com.adobe.PhotoshopJSONCallbackposidon-ps", scope: "APPLICATION"}
-
                 AppRef.current.refresh();
             }
             if (parseInt(obj.eventID) === parseInt(this.openEventId)) {
                 AppRef.current.refresh();
+            }
+            if (parseInt(obj.eventID) === parseInt(this.deleteEventId)) {
+                console.log('Delete事件', obj);
+                this.setActiveLayer();
+            }
+            if (parseInt(obj.eventID) === parseInt(this.pasteEventId)) {
+                console.log('Paste事件', obj);
+                this.setActiveLayer();
+            }
+            if (parseInt(obj.eventID) === parseInt(this.addEventId)) {
+                console.log('Add事件', obj);
+                this.setActiveLayer();
+            }
+            if (parseInt(obj.eventID) === parseInt(this.cutEventId)) {
+                console.log('Cut事件', obj);
+            }
+            if (parseInt(obj.eventID) === parseInt(this.makeEventId)) {
+                console.log('Make事件', obj);
+                this.setActiveLayer();
             }
         }, undefined);
 
@@ -99,12 +137,23 @@ class handler {
         }, undefined)
 
     }
-
+    private evalFiles() {
+        const extensionRoot = this.csInterface.getSystemPath(SystemPath.EXTENSION);
+        console.log('开始加载文件', extensionRoot);
+        this.csInterface.evalScript('$._ext.evalFiles(\"' + extensionRoot + '\")', (result) => {
+            console.log('evalFiles', result);
+        });
+    }
     public registerEvent(stringId: string) {
         this.csInterface.evalScript(`app.stringIDToTypeID('${stringId}')`, (data) => {
             if (stringId === 'select') this.selectEventId = data;
             if (stringId === 'close') this.closeEventId = data;
             if (stringId === 'open') this.openEventId = data;
+            if (stringId === 'delete') this.deleteEventId = data;
+            if (stringId === 'paste') this.pasteEventId = data;
+            if (stringId === 'add') this.addEventId = data;
+            if (stringId === 'cut') this.cutEventId = data;
+            if (stringId === 'make') this.makeEventId = data;
             const csEvent: CSEvent = {
                 type: 'com.adobe.PhotoshopRegisterEvent',
                 scope: 'APPLICATION',
@@ -116,10 +165,9 @@ class handler {
         });
 
     }
-
     public getActiveDocument(): Promise<IDocument | undefined> {
         return new Promise((resolve, reject) => {
-            this.csInterface.evalScript(`getActiveDocument()`, (result: string) => {
+            this.csInterface.evalScript(`$._ext.getActiveDocument()`, (result: string) => {
                 try {
                     console.log('result', result)
                     if (result && result !== "undefined") {
@@ -136,7 +184,7 @@ class handler {
     }
     public getActiveLayer(): Promise<ILayer | undefined> {
         return new Promise((resolve, reject) => {
-            this.csInterface.evalScript(`getActiveLayerName()`, (result: string) => {
+            this.csInterface.evalScript(`$._ext.getActiveLayerName()`, (result: string) => {
                 try {
                     console.log('result', result)
                     if (result && result !== "undefined") {
@@ -150,6 +198,31 @@ class handler {
                 }
             });
         });
+    }
+    public getLayerInfoByID(layerID: number, prpr: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            const req = JSON.stringify({
+                "layerID": layerID,
+                prpr: prpr
+            })
+            this.csInterface.evalScript(`$._ext.getLayerInfoByID(${req})`, (result) => {
+                try {
+                    console.log('result', result)
+                    if (result && result !== "undefined") {
+                        const layerInfo = JSON.parse(result);
+                        console.log('getLayerInfoByID返回成功', layerInfo)
+                    } else {
+                        resolve(undefined);
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        });
+    }
+    public async setActiveLayer() {
+        const layer = await this.getActiveLayer();
+        AppRef.current.selectLayer(layer.id, layer.name);
     }
     public restart() {
         const event: CSEvent = {

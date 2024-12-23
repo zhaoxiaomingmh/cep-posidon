@@ -7,12 +7,18 @@ interface PsInputRefType {
 };
 interface PsInputProps {
     children?: React.ReactNode
+    value?: string,
+    callback?: (string) => void,
+    placeholder?: string
+    disabled?: boolean
 }
 export const PsInputRef = React.createRef<PsInputRefType>();
 export const PsInput = forwardRef<PsInputRefType, PsInputProps>((props, ref) => {
     return (
         <div className="ps-input">
-            <input type="text" />
+            <input disabled={props.disabled ?? undefined} type="text" value={props.value} placeholder={props.placeholder} onChange={(event) => {
+                props.callback && props.callback(event.target.value);
+            }} />
             {props.children}
         </div>
     );

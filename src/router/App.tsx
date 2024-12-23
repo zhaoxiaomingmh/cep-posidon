@@ -74,11 +74,9 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     const checkActiveDocument = async () => {
         const activeDocument = await handler.getActiveDocument();
         setActiveDocument(activeDocument);
-        if (!activeLayer) {
-            const layer = await handler.getActiveLayer();
-            if (layer) {
-                selectLayer(layer.id, layer.name, layer.kind)
-            }
+        const layer = await handler.getActiveLayer();
+        if (layer) {
+            selectLayer(layer.id, layer.name, layer.kind)
         }
     }
     const getUserInLocalStorage = async () => {
