@@ -26,7 +26,7 @@
     "zustand": "^5.0.1"
   },
   "dependencies": {
-    "@adobe/react-spectrum": "^3.38.1",
+    "@adobe/react-spectrum": "^3.37.1",
     "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
     "@babel/plugin-syntax-class-properties": "^7.12.13",
     "@babel/plugin-transform-react-jsx": "^7.25.9",
@@ -34,6 +34,7 @@
     "@spectrum-web-components/button": "^1.0.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "antd": "^5.22.6",
     "axios": "^1.1.1",
     "babel-plugin-proposal-object-rest-spread-stable": "^1.0.3",
     "jsencrypt": "^3.3.2",

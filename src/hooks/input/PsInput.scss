@@ -7,6 +7,7 @@
     border-radius: 4px;
     background-color: #333333;
     overflow: hidden;
+
     input {
         flex: 1;
         height: 100%;
@@ -15,5 +16,11 @@
         border: none;
         outline: none;
         color: var(--primary-font-color);
+    }
+
+    &.forbid {
+        :hover {
+            cursor: no-drop;
+        }
     }
 }

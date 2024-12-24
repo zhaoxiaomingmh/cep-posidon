@@ -27,6 +27,11 @@
     .rs-group-tree-box {
         margin: 10px 0px;
         background-color: #474747;
+
+        .rs-tree-view {
+            display: flex;
+            flex-direction: column;
+        }
     }
 
     .rs-footer {

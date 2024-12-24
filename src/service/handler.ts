@@ -96,7 +96,8 @@ class handler {
                 if (eventData.documentID) {
                     this.setActiveLayer();
                 } else if (eventData.layerID?.length > 0) {
-                    AppRef.current.selectLayer(eventData.layerID[0], eventData.null._name, 1);
+                    const id = eventData.layerID[0]
+                    AppRef.current.refresh();
                 }
             }
             if (parseInt(obj.eventID) === parseInt(this.closeEventId)) {
@@ -236,13 +237,14 @@ class handler {
         return new Promise((resolve, reject) => {
             this.csInterface.evalScript(`$._ext.getLayerList(${layerKind})`, (result) => {
                 try {
-                    console.log('getLayerList', result)
                     if (result) {
                         const layers: ILayer[] = JSON.parse(result);
-                        layers.forEach(layer => {
-                            console.log('layer', layer)
+                        layers.forEach((layer) => {
+                            if (layer.generatorSettings) {
+                                layer.generatorSettings = JSON.parse(layer.generatorSettings);
+                            }
                         })
-
+                        resolve(layers);
                     } else {
                         resolve(undefined);
                     }

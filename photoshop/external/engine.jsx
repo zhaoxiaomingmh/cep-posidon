@@ -153,7 +153,7 @@ $._ext = {
             saveToFile: null
         };
         var descObject = descriptorInfo.getProperties(docDescriptor, descFlags);
-        return JSON.stringify(descObject, null, 4);
+        return JSON.stringify(descObject, null, 4).generatorSettings;
     },
     getLayerTree: function () {
 
@@ -161,7 +161,6 @@ $._ext = {
     getLayerList: function (layerKind) {
         var layers = [];
         Layer.loopLayers(function (layer) {
-            psconsole.log("layerKind: " + layer.kind() + ", name: " + layer.name());
             if ((layerKind && layerKind == layer.kind()) || (!layerKind && layer.kind() != 13)) {
                 const iLayer = {
                     name: layer.name(),
@@ -707,7 +706,7 @@ Layer.prototype.generatorSettings = function () {
         saveToFile: null
     };
     var descObject = descriptorInfo.getProperties(descriptor, descFlags);
-    return JSON.stringify(descObject, null, 4).generatorSettings;
+    return JSON.stringify(descObject.generatorSettings, null, 4);
 }
 
 /**

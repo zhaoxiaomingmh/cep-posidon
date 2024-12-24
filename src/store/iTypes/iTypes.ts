@@ -270,5 +270,6 @@ export interface IItem {
     id: number,
     name: string,
     checked: boolean,
+    icon?: string
     subItems?: IItem[],
 }
