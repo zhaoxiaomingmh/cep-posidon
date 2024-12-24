@@ -57,8 +57,39 @@ export interface IDocument {
 export interface ILayer {
     id: number,
     name: string,
-    kind: string,
+    layerKind: LayerKind,
+    index?: number,
+    bounds?: IBounds
+    generatorSettings?: any
     subLayers?: ILayer[],
+}
+
+export interface IBounds {
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+}
+
+export enum LayerKind {
+    any = 0,
+    pixel = 1,
+    adjustment = 2,
+    text = 3,
+    vector = 4,
+    smartObject = 5,
+    video = 6,
+    group = 7,
+    threeD = 8,
+    gradient = 9,
+    pattern = 10,
+    solidColor = 11,
+    background = 12,
+    groupEnd = 13
+}
+
+export interface IGeneratorSettings {
+
 }
 
 export interface IDocumentState {
@@ -221,4 +252,23 @@ export interface IVersion {
     version: string,
     name: string,
     description: string
+}
+
+export interface IGeneratorSettingsParams {
+    key: string,
+    settings: any,
+    layerId: string
+}
+
+export interface IFigmaUrlSettings {
+    resourceSynchronizationURL: string,
+    resourceSynchronizationTime: string,
+    resourceSynchronizationTimeStamp: string
+}
+
+export interface IItem {
+    id: number,
+    name: string,
+    checked: boolean,
+    subItems?: IItem[],
 }

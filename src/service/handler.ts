@@ -30,16 +30,12 @@ class handler {
         this.makeEventId = "1298866208";
         this.init();
     }
-
-    
-
     public static getInstance(): handler {
         handler.instance = new handler();
         if (!handler.instance) {
         }
         return handler.instance;
     }
-
     public getCurrentTheme(): { theme: Theme, currentInterface: string } {
         const bgColor = this.csInterface.getHostEnvironment().appSkinInfo.appBarBackgroundColor;
         const red = Math.round(bgColor.color.red)
@@ -70,7 +66,6 @@ class handler {
 
         return { theme, currentInterface }
     }
-
     private init() {
         this.registerEvent('select',);
         this.registerEvent('close');
@@ -101,7 +96,7 @@ class handler {
                 if (eventData.documentID) {
                     this.setActiveLayer();
                 } else if (eventData.layerID?.length > 0) {
-                    AppRef.current.selectLayer(eventData.layerID[0], eventData.null._name);
+                    AppRef.current.selectLayer(eventData.layerID[0], eventData.null._name, 1);
                 }
             }
             if (parseInt(obj.eventID) === parseInt(this.closeEventId)) {
@@ -184,9 +179,9 @@ class handler {
     }
     public getActiveLayer(): Promise<ILayer | undefined> {
         return new Promise((resolve, reject) => {
-            this.csInterface.evalScript(`$._ext.getActiveLayerName()`, (result: string) => {
+            this.csInterface.evalScript(`$._ext.getActiveLayer()`, (result: string) => {
                 try {
-                    console.log('result', result)
+                    console.log('getActiveLayer', result)
                     if (result && result !== "undefined") {
                         const activeLayer = JSON.parse(result) as ILayer;
                         resolve(activeLayer);
@@ -220,9 +215,42 @@ class handler {
             });
         });
     }
+    public getDocGeneratorSettings() {
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.getGeneratorSettings()`, (result) => {
+                console.log('getGeneratorSettings', result)
+                if (result) {
+                    const jStr = JSON.parse(result);
+                    resolve(jStr);
+                } else {
+                    reject(undefined);
+                }
+            });
+        });
+    }
     public async setActiveLayer() {
         const layer = await this.getActiveLayer();
-        AppRef.current.selectLayer(layer.id, layer.name);
+        AppRef.current.selectLayer(layer.id, layer.name, layer.layerKind);
+    }
+    public async getAllLayerList(layerKind?: number) {
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.getLayerList(${layerKind})`, (result) => {
+                try {
+                    console.log('getLayerList', result)
+                    if (result) {
+                        const layers: ILayer[] = JSON.parse(result);
+                        layers.forEach(layer => {
+                            console.log('layer', layer)
+                        })
+
+                    } else {
+                        resolve(undefined);
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        });
     }
     public restart() {
         const event: CSEvent = {

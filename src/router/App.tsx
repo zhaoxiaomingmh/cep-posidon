@@ -12,12 +12,11 @@ import utilHttps from "@/utlis/util-https";
 import { defaultProjectHeadImage } from "@/utlis/const";
 import iService from "@/service/service";
 import { Update, UpdateRef } from "@/pages/welcome/Update";
-import useAppStore from "@/store/modules/appStore";
 
 interface AppRefType {
     refresh: () => void;
     user: IUser;
-    selectLayer: (layerID: number, _name: string) => void
+    selectLayer: (layerID: number, _name: string, kind: number) => void
 };
 interface AppProps { }
 export const AppRef = React.createRef<AppRefType>();
@@ -76,7 +75,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         setActiveDocument(activeDocument);
         const layer = await handler.getActiveLayer();
         if (layer) {
-            selectLayer(layer.id, layer.name, layer.kind)
+            selectLayer(layer.id, layer.name, layer.layerKind)
         }
     }
     const getUserInLocalStorage = async () => {
@@ -136,11 +135,11 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
             }
         }
     }
-    const selectLayer = (layerID: number, _name: string, kind?: string) => {
+    const selectLayer = (layerID: number, _name: string, kind?: number) => {
         const layer: ILayer = {
             id: layerID,
             name: _name,
-            kind: kind ?? "layer",
+            layerKind: kind ?? 1,
         }
         setActiveLayer(layer);
     }

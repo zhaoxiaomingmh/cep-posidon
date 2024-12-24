@@ -2,7 +2,6 @@ import React, { forwardRef, useEffect } from "react";
 import './PsFunc.scss'
 import useAppStore from "@/store/modules/appStore";
 import { PsFuncItemProps } from "./PsFuncItem";
-import { ActionButton } from "@adobe/react-spectrum";
 
 interface PsFuncRef { }
 interface PsFuncProps {
