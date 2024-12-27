@@ -16,7 +16,7 @@ export const PsInputRef = React.createRef<PsInputRefType>();
 export const PsInput = forwardRef<PsInputRefType, PsInputProps>((props, ref) => {
     return (
         <div className={(props.disabled ? "ps-input forbid" : "ps-input")}>
-            <input disabled={props.disabled ?? undefined} type="text" value={props.value} placeholder={props.placeholder} onChange={(event) => {
+            <input disabled={props.disabled ?? undefined} type="text" value={props.value !== undefined ? props.value : ''} placeholder={props.placeholder} onChange={(event) => {
                 props.callback && props.callback(event.target.value);
             }} />
             {props.children}

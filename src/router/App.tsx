@@ -16,7 +16,7 @@ import { Update, UpdateRef } from "@/pages/welcome/Update";
 interface AppRefType {
     refresh: () => void;
     user: IUser;
-    selectLayer: (layerID: number, _name: string, kind: number) => void
+    selectLayer: (layer: ILayer) => void
 };
 interface AppProps { }
 export const AppRef = React.createRef<AppRefType>();
@@ -39,7 +39,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         return {
             refresh: checkActiveDocument,
             user: user,
-            selectLayer: selectLayer
+            selectLayer: setActiveLayer
         }
     })
     useEffect(() => {
@@ -73,10 +73,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     const checkActiveDocument = async () => {
         const activeDocument = await handler.getActiveDocument();
         setActiveDocument(activeDocument);
-        const layer = await handler.getActiveLayer();
-        if (layer) {
-            selectLayer(layer.id, layer.name, layer.layerKind)
-        }
+        await handler.refreshActiveLayer();
     }
     const getUserInLocalStorage = async () => {
         const userStr = localStorage.getItem('cep-user');
@@ -135,14 +132,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
             }
         }
     }
-    const selectLayer = (layerID: number, _name: string, kind?: number) => {
-        const layer: ILayer = {
-            id: layerID,
-            name: _name,
-            layerKind: kind ?? 1,
-        }
-        setActiveLayer(layer);
-    }
+
 
     return (
         <Provider theme={currentTheme} colorScheme={currentScheme} isQuiet>

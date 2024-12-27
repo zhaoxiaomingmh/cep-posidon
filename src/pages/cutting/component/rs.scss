@@ -15,6 +15,7 @@
             height: 36px;
             display: flex;
             flex-direction: row;
+
             .rs-layer-select-title {
                 width: 70px;
                 display: flex;
@@ -27,15 +28,57 @@
     .rs-group-tree-box {
         margin: 10px 0px;
         background-color: #474747;
+        padding: 10px;
+
+        .rs-group-tree-box-title {
+            height: 24px;
+        }
 
         .rs-tree-view {
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
+
+            .rs-check-all {
+                border-bottom: 1px solid #999999;
+            }
         }
     }
 
     .rs-footer {
         height: 36px;
 
+        .rs-time {
+            display: flex;
+            flex-direction: row;
+            font-size: 12px;
+            line-height: 15px;
+            color: #FFFFFF;
+            margin: 10px 0;
+        }
+
+        .rs-url-button {
+            width: 100%;
+            height: 40px;
+            background-color: #1C61E7;
+            color: #FFFFFF;
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 24px;
+            border: none;
+        }
     }
+}
+
+.ps-checkbox {
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: rgb(204, 204, 204);
+    display: flex;
+    margin: 5px 0px;
 }

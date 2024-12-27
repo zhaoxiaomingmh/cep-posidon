@@ -93,15 +93,14 @@ $._ext = {
     },
     getActiveLayer: function () {
         var activeLayer = app.activeDocument.activeLayer;
-        const pa = {
-            prpr: "layerKind",
-            layerID: activeLayer.id,
-        }
-        const result = this.getLayerInfoByID(pa);
+        var l = new Layer(activeLayer.id);
         const layer = {
             name: activeLayer.name,
             id: activeLayer.id,
-            layerKind: JSON.parse(result).layerKind,
+            layerKind: l.kind(),
+            index: l.index(),
+            generatorSettings: l.generatorSettings(),
+            bounds: l.bounds(),
         }
         return JSON.stringify(layer);
     },
@@ -153,10 +152,9 @@ $._ext = {
             saveToFile: null
         };
         var descObject = descriptorInfo.getProperties(docDescriptor, descFlags);
-        return JSON.stringify(descObject, null, 4).generatorSettings;
+        return JSON.stringify(descObject.generatorSettings, null, 4);
     },
     getLayerTree: function () {
-
     },
     getLayerList: function (layerKind) {
         var layers = [];
@@ -175,6 +173,51 @@ $._ext = {
         })
         return JSON.stringify(layers);
     },
+    quick_export_png: function (params) {
+        //暂时不用
+        try {
+            if (params.layer == undefined) layer = false;
+
+            var d = new ActionDescriptor();
+
+            var r = new ActionReference();
+
+            r.putEnumerated(stringIDToTypeID("layer"), stringIDToTypeID("ordinal"), stringIDToTypeID("targetEnum"));
+
+            d.putReference(stringIDToTypeID("null"), r);
+
+            d.putString(stringIDToTypeID("fileType"), "png");
+
+            d.putInteger(stringIDToTypeID("quality"), 32);
+
+            d.putInteger(stringIDToTypeID("metadata"), 0);
+
+            d.putString(stringIDToTypeID("destFolder"), params.path);
+
+            d.putBoolean(stringIDToTypeID("sRGB"), true);
+
+            d.putBoolean(stringIDToTypeID("openWindow"), false);
+
+            d.putString(stringIDToTypeID("Suffix"), params.suffix);
+
+            executeAction(stringIDToTypeID(params.layer ? "exportSelectionAsFileTypePressed" : "exportDocumentAsFileTypePressed"), d, DialogModes.NO);
+
+            return true;
+        } catch (e) {
+            psconsole.log(e);
+            return false;
+        }
+    },
+    sendToGenerator: function (params) {
+        try {
+            var generatorDesc = new ActionDescriptor();
+            generatorDesc.putString(stringIDToTypeID("name"), "posidon-generator");
+            generatorDesc.putString(stringIDToTypeID("sampleAttribute"), JSON.stringify(params));
+            executeAction(stringIDToTypeID("generateAssets"), generatorDesc, DialogModes.NO);
+        } catch (e) {
+            psconsole.log(e);
+        }
+    }
 };
 
 //#region 
@@ -554,6 +597,7 @@ if (typeof JSON !== "object") {
 //#endregion
 function openImage(params) {
     var path = params.path;
+    psconsole.log(path);
     try {
         var file = new File(path);
         if (file.exists) {
@@ -571,7 +615,7 @@ function openImage(params) {
             return "File does not exist";
         }
     } catch (error) {
-        psconsole.log('error', error);
+        psconsole.log(error);
         return error;
     }
 

@@ -3,6 +3,7 @@ import config from './config.json'
 import JSEncrypt from "jsencrypt";
 import path from "path";
 import psHandler from "@/service/handler";
+import nas from "@/service/nas";
 const env = IEnv.prod;
 export const psConfig = {
     version: "1.1.6",
@@ -73,6 +74,30 @@ export const psConfig = {
         }
         return filePath;
     },
+    figmaImageDir: function () {
+        const cs = new CSInterface();
+        const userHomeDir = cs.getSystemPath(SystemPath.USER_DATA)
+        const parts = ['Adobe', 'CEP', 'Temp_Dir', psHandler.extId, 'download', 'faigmaImage'];
+        let filePath = userHomeDir;
+        for (const part of parts) {
+            const subFiles = window.cep.fs.readdir(filePath);
+            if (subFiles.err == 0) {
+                filePath = path.join(filePath, part);
+                if (!subFiles.data.includes(part)) {
+                    window.cep.fs.makedir(filePath);
+                } else {
+                    const result = window.cep.fs.stat(filePath);
+                    if (0 == result.err) {
+                        if (result.data.isFile) {
+                            window.cep.fs.makedir(filePath);
+                        }
+                    }
+                }
+
+            }
+        }
+        return filePath;
+    },
     versinFile: config.path.desc,
     codeFile: config.path.code,
     hubservice: config.path.hubservice,
@@ -89,6 +114,7 @@ export const psConfig = {
     getDirTree: config.path["get-dir-tree"],
     getSVNAccountById: config.path["get-svn-account-by-id"],
     downloadfromserver: config.path["download-from-server"],
-    increaseDownloadCount: config.path["increaseDownloadCount"]
+    increaseDownloadCount: config.path["increaseDownloadCount"],
+    nas: config.nas
 }
 

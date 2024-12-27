@@ -6,9 +6,10 @@ import { PsFunc } from "@/hooks/func/PsFunc";
 import { Button, defaultTheme, Heading, Provider, } from "@adobe/react-spectrum";
 import { psConfig } from "@/utlis/util-env";
 import utilHttps from "@/utlis/util-https";
-import { IPosidonResponse, IProject, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
+import { IGeneratorAction, INosFileUploadItem, IPosidonResponse, IProject, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
 import { defaultProjectHeadImage } from "@/utlis/const";
 import psHandler from "@/service/handler";
+import nas from "@/service/nas";
 
 interface SettingsRefType { };
 interface SettingsProps { }
@@ -99,6 +100,26 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
         }
     }
     const test = () => {
+        // psHandler.sendToGenerator({
+        //     from: "com.posidon.cep.panel",
+        //     action: IGeneratorAction.fastExport,
+        //     data: {
+        //         layerId: 39,
+        //         filename: "1731580000",
+        //         path: psConfig.figmaImageDir(),
+        //         format: "png",
+        //     }
+        // })
+        const filePaht = "C:\\Users\\wb.zhaominghui01\\AppData\\Roaming\\Adobe\\CEP\\Temp_Dir\\posidon-ps-cep-main_dev\\download\\faigmaImage\\1731580000.png";
+        nas.uploadFile("C:\\Users\\wb.zhaominghui01\\AppData\\Roaming\\Adobe\\CEP\\Temp_Dir\\posidon-ps-cep-main_dev\\download\\faigmaImage\\1731580000.png", "ceptest.png", 39)
+        // const nosToken: INosFileUploadItem = {
+        //     "bucket": "skyhub-private",
+        //     fileName: "ceptest.jpg",
+        //     key: "8e258fcb7a999c1325084dd2ac420190.jpg",
+        //     token: "UPLOAD acbea29cdbac42aea6bb55cba894ca3b:NalO4Crr2jzCds+kUIO9rMbqSWXXkH/v7J+gzY7XvBQ=:eyJCdWNrZXQiOiJza3lodWItcHJpdmF0ZSIsIlJlZ2lvbiI6IkpEIiwiT2JqZWN0IjoiOGUyNThmY2I3YTk5OWMxMzI1MDg0ZGQyYWM0MjAxOTAuanBnIiwiRXhwaXJlcyI6MTczNTUyODMxOH0=",
+        //     url: "https://skyhub-private.nos-jd.163yun.com/8e258fcb7a999c1325084dd2ac420190.jpg"
+        // }
+        // nas.multiPartUpload(nosToken, filePaht, "image/png");
     }
 
     return (

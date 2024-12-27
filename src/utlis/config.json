@@ -23,6 +23,14 @@
             "host": "https://posidon.netease.com"
         }
     },
+    "nas": {
+        "url": "https://gui-storage.netease.com",
+        "appId": "colorai-prod",
+        "appSecret": "vap38qve1jmahnt958y8dgy7z205yrix",
+        "email": "wenyifan@corp.netease.com",
+        "auth": "/openapi/token",
+        "nosAuth": "/openapi/storage/jssdk/token"
+    },
     "path": {
         "desc": "storage/plugins/cep/desc.json",
         "code": "storage/plugins/cep/cepcode.zip",

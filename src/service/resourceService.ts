@@ -11,7 +11,6 @@ import { PsdLevel, PsdLevelRef } from "@/pages/level/PsdLevel";
 class resourceService {
     private static instance: resourceService;
     constructor() {
-
     }
     public static getInstance(): resourceService {
         if (!resourceService.instance) {
@@ -36,8 +35,22 @@ class resourceService {
             if (account.accountType === 1) {
                 const downloadDir = psConfig.downloadDir();
                 const filePath = path.join(downloadDir, img.name.replace(/#/g, ""));
+                let formattedFileUrl = img.fileUrl.replace(/\//g, '\\');
+                console.log('formattedFileUrl', formattedFileUrl);
+                console.log('ade', account.baseUrl);
+                const list = account.baseUrl.split('\\').filter(x => x !== '');
+                let url = "\\\\";
+                for (let i = 0; i < 2; i++) {
+                    url += list[i] + "\\";
+                }
+                if (formattedFileUrl.startsWith("\\")) {
+                    formattedFileUrl = formattedFileUrl.slice(1);
+                }
+                url += formattedFileUrl;
+                console.log('url', url);
                 //@ts-ignore
-                const downResult = await downloadFromSmb(account, img.fileUrl, filePath, img.name, type, this.notifyProgerss, this.openFile);
+                const downResult = await downloadFromSmb(account, url, filePath, img.name, type, this.notifyProgerss, this.openFile, true);
+                iService.increaseDownloadCount(img.fileUrl, projectInfo.id, projectInfo.name, img.format == 'psd' ? '设计稿(psd)' : '资源图片(png,jpg)')
             } else {
                 this.downloadfromUrl(account, img, type, projectInfo);
             }
@@ -147,7 +160,6 @@ class resourceService {
             path: filePath,
             isImport: isImport,
         };
-        // this.notifyProgerss(type, 100);
         cs.evalScript(`openImage(${JSON.stringify(req)})`, () => {
             window.cep.fs.deleteFile(filePath);
         });

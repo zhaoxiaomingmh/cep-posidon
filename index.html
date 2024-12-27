@@ -29,72 +29,66 @@
         const child_process = require('child_process')
         const exec = child_process.exec;
         const fs = require('fs');
+        const iconv = require('iconv-lite');
 
         const address = account.baseUrl;
         const username = account.username;
         const password = account.password;
+        console.log('开始下载，地址为', address, '用户名为', username, '密码为', password)
         let result = {
             code: -1,
             error: '',
             msg: ''
         }
-        const listConnectionsCommand = `chcp 65001 | net use`;
-        const disconnectCommand = `chcp 65001 | net use ${address} /delete`;
-        const connectCommand = `chcp 65001 | net use ${address} /user:${username} ${password}`;
+        let sharedFolderPath = address + url;
+        if (isAll) {
+            sharedFolderPath = url;
+        }
+        console.log('下载链接为', sharedFolderPath);
+        const listConnectionsCommand = `net use`;
+        const disconnectCommand = `net use ${address} /delete`;
+        const connectCommand = `net use ${address} /user:${username} ${password}`;
 
-        exec(listConnectionsCommand, (err, stdout, stderr) => {
-            if (err) {
-                console.error('执行命令时出错:', err);
-                result.error = err.message;
+        exec(listConnectionsCommand, { encoding: 'buffer' }, (err, stdout, stderr) => {
+            if (err && err.length > 0) {
+                const errStr = iconv.decode(err, 'gbk');
+                console.error('执行命令时出错:', errStr);
+                result.error = errStr;
                 notify(refType, -1);
                 return result;
             }
-            if (stderr) {
-                console.error('执行命令时出错:', stderr);
-                result.error = stderr;
+            if (stderr && stderr.length > 0) {
+                const stderrStr = iconv.decode(stderr, 'gbk');
+                console.error('命令返回错误:', stderrStr);
+                result.error = stderrStr;
                 notify(refType, -1);
                 return result;
             }
-            console.log('查看目前持有连接 ', stdout)
-            const connections = stdout.split('\n').filter(line => line.trim().startsWith('OK'));
+            const stdoutStr = iconv.decode(stdout, 'gbk');
+            console.log('listConnectionsCommand命令行返回值', stdoutStr)
+            const connections = stdoutStr.split('\n').filter(line => line.trim().startsWith('OK'));
             console.log('目前持有连接 ', connections)
-            let i = 0;
-            if (connections.length > 0) {
-                let con = connections[0];
-                console.log('要断开的连接 ', con)
-                con = con.replace(/^OK\s+/, '').replace('Microsoft Windows Network', '').trim();
-                console.log('要断开的连接 ', con)
-                exec(`chcp 65001 | net use ${con} /delete`, (err, stdout, stderr) => {
-                    if (err || stderr) {
-                        alert('断开Windows持有共享网络盘失败，可以手动断开或者关闭共享盘文件夹窗口后重试')
-                        notify(refType, -1);
-                        return result;
-                        i = -1;
-                    }
-                    console.log('断开连接成功 ', con)
-                });
-            }
-            if(i == -1) {
-                return result;
-            }
-            console.log('开始连接，下载 ')
-            exec(connectCommand, (err, stdout, stderr) => {
-                console.log('开始连接', err, stdout, stderr);
-                if (stderr || err) {
-                    alert('连接共享盘失败，请检查Windows系统是否已持有网络共享盘')
-                    notify(refType, -1)
-                    result.error = stderr || err.message;
+            exec(connectCommand, { encoding: 'buffer' }, (err, stdout, stderr) => {
+                if (err && err.length > 0) {
+                    const errStr = iconv.decode(err, 'gbk');
+                    console.error('执行命令时出错:', errStr);
+                    result.error = errStr;
+                    notify(refType, -1);
                     return result;
                 }
-
-
-                let sharedFolderPath = address + url;
-                if (isAll) {
-                    sharedFolderPath = url;
+                if (stderr && stderr.length > 0) {
+                    const stderrStr = iconv.decode(stderr, 'gbk');
+                    console.error('命令返回错误:', stderrStr);
+                    result.error = stderrStr;
+                    notify(refType, -1);
+                    return result;
                 }
-                console.log('下载链接为', sharedFolderPath);
+                const stdoutStr = iconv.decode(stdout, 'gbk');
+                console.log('connectCommand命令行返回值', stdoutStr)
                 fs.stat(sharedFolderPath, (statErr, stats) => {
                     if (statErr) {
+                        console.log('获取文件信息失败', statErr)
+                        alert('下载错误：' + statErr)
                         notify(refType, -1)
                         result.error = statErr;
                         return;
@@ -110,29 +104,34 @@
                         let p = parseFloat(progress.toFixed(2));
                         notify(refType, p);
                     });
-
-
                     readStream.on('end', () => {
                         console.log('SMB下载完成');
-                        exec(disconnectCommand, (err, stdout, stderr) => {
-                            console.log('断开连接', err, stdout, stderr);
-                        });
+                        // exec(disconnectCommand, (err, stdout, stderr) => {
+                        //     console.log('断开连接', err, stdout, stderr);
+                        // });
                         notify(refType, 0);
                         callback(localPath, !fileName.includes('.psd'), refType);
                         result.code = 0;
                         result.msg = 'SMB下载完成';
                         return result;
                     });
-                    readStream.on('error', (err) => {
-                        notify(refType, -1);
-                        result.error = err.message;
-                        return result;
-                    });
                     readStream.pipe(writeStream);
                 });
             });
-
+            console.log('下载完成')
         })
+    }
+</script>
+<script>
+    function getFIleInfo(path) {
+        try {
+            const fs = require('fs');
+            const stats = fs.statSync(path);
+            console.log("stats", stats)
+        } catch (e) {
+            console.log(e)
+            return undefined;
+        }
     }
 </script>
 

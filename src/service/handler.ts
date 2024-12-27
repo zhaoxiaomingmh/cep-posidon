@@ -1,7 +1,10 @@
+import { ResourceSynchronizationRef } from "@/pages/cutting/component/ResourceSynchronization";
 import { AppRef } from "@/router/App";
-import { IDocument, IEventData, IEventResult, ILayer } from "@/store/iTypes/iTypes";
+import { IDocument, IEventData, IEventResult, IGeneratorAction, IGeneratorParams, ILayer, IMessage, ISetGerParams } from "@/store/iTypes/iTypes";
+import { psConfig } from "@/utlis/util-env";
 import { darkTheme, defaultTheme, lightTheme } from '@adobe/react-spectrum';
 import { Theme } from "@react-types/provider";
+import path from "path";
 //用来与Photoshop交互
 class handler {
     private static instance: handler;
@@ -77,6 +80,10 @@ class handler {
         this.registerEvent('make');
         this.getCurrentTheme();
 
+        this.csInterface.addEventListener('com.posidon.generator.plugin', (data: IEventResult) => {
+            this.handleEventFromGenerator(data.data)
+        }, undefined);
+
         this.csInterface.addEventListener('com.adobe.csxs.events.ThemeColorChanged', () => {
             this.getCurrentTheme();
             // console.log('颜色更换')
@@ -93,38 +100,36 @@ class handler {
             if (parseInt(obj.eventID) === parseInt(this.selectEventId)) {
                 console.log('Select事件', obj);
                 const eventData = obj.eventData as IEventData;
+                this.refreshActiveLayer();
                 if (eventData.documentID) {
-                    this.setActiveLayer();
                 } else if (eventData.layerID?.length > 0) {
-                    const id = eventData.layerID[0]
-                    AppRef.current.refresh();
                 }
             }
             if (parseInt(obj.eventID) === parseInt(this.closeEventId)) {
                 //{extensionId: "", data: "ver1,{ "eventID": 1131180832, "eventData": {"documentID":243,"forceNotify":true}}", appId: "PHXS", type: "com.adobe.PhotoshopJSONCallbackposidon-ps", scope: "APPLICATION"}
-                AppRef.current.refresh();
+                this.refreshActiveLayer();
             }
             if (parseInt(obj.eventID) === parseInt(this.openEventId)) {
-                AppRef.current.refresh();
+                this.refreshActiveLayer();
             }
             if (parseInt(obj.eventID) === parseInt(this.deleteEventId)) {
                 console.log('Delete事件', obj);
-                this.setActiveLayer();
+                this.refreshActiveLayer();
             }
             if (parseInt(obj.eventID) === parseInt(this.pasteEventId)) {
                 console.log('Paste事件', obj);
-                this.setActiveLayer();
+                this.refreshActiveLayer();
             }
             if (parseInt(obj.eventID) === parseInt(this.addEventId)) {
                 console.log('Add事件', obj);
-                this.setActiveLayer();
+                this.refreshActiveLayer();
             }
             if (parseInt(obj.eventID) === parseInt(this.cutEventId)) {
                 console.log('Cut事件', obj);
             }
             if (parseInt(obj.eventID) === parseInt(this.makeEventId)) {
                 console.log('Make事件', obj);
-                this.setActiveLayer();
+                this.refreshActiveLayer();
             }
         }, undefined);
 
@@ -132,6 +137,17 @@ class handler {
             console.log('console_log_event', result);
         }, undefined)
 
+    }
+    private handleEventFromGenerator(data: IMessage) {
+        console.log('action', data.action);
+        console.log('action', data.type);
+        switch (data.action) {
+            case IGeneratorAction.fastExport: {
+                if (data.type === 'success' || data.type === 'error') {
+                    ResourceSynchronizationRef.current.updateWaitQueue("generate", data.type, data.data.layerId, data.type === 'success' ? data.data.path : data.data.error);
+                }
+            }
+        }
     }
     private evalFiles() {
         const extensionRoot = this.csInterface.getSystemPath(SystemPath.EXTENSION);
@@ -229,9 +245,12 @@ class handler {
             });
         });
     }
-    public async setActiveLayer() {
+    public async refreshActiveLayer() {
         const layer = await this.getActiveLayer();
-        AppRef.current.selectLayer(layer.id, layer.name, layer.layerKind);
+        if (layer.generatorSettings) {
+            layer.generatorSettings = JSON.parse(layer.generatorSettings);
+        }
+        AppRef.current.selectLayer(layer);
     }
     public async getAllLayerList(layerKind?: number) {
         return new Promise((resolve, reject) => {
@@ -267,6 +286,58 @@ class handler {
         setTimeout(() => {
             this.csInterface.closeExtension();
         }, 100);
+    }
+    public async setLayerGeneratorSettings(layerId: number, figmaNodeId: string, callback?: Function) {
+        const param: ISetGerParams = {
+            key: "comPosidonPSCep",
+            settings: {
+                figmaNodeId: figmaNodeId
+            },
+            layerId: layerId
+        }
+        this.csInterface.evalScript(`$._ext.setGeneratorSettings(${JSON.stringify(param)})`, (result) => {
+            callback && callback();
+        });
+    }
+    public async setDocGeneratorSettings(settings: any, callback?: Function) {
+        const param: ISetGerParams = {
+            key: "comPosidonPSCep",
+            settings: settings,
+        }
+        this.csInterface.evalScript(`$._ext.setGeneratorSettings(${JSON.stringify(param)})`, (result) => {
+            callback && callback();
+        });
+    }
+    public async fastExport(layer: ILayer) {
+        console.log('fastExport', layer)
+        const suffix = new Date().getTime();
+        // const floderPath = psConfig.downloadDir();
+        const floderPath = "C:\\Users\\wb.zhaominghui01\\Desktop\\新建文件夹";
+        const param = {
+            layer: true,
+            path: floderPath,
+            suffix: suffix
+        }
+        const fileName = suffix + '.png';
+        this.csInterface.evalScript(`$._ext.quick_export_png(${JSON.stringify(param)})`, (result) => {
+            setTimeout(() => {
+                console.log('fileName', fileName, result)
+                const oldPath = path.join(floderPath, "组 4" + ".png");
+                console.log('oldPath', oldPath)
+                const newPath = path.join(floderPath, fileName);
+                console.log('newPath', newPath)
+                console.log('newPath', window.cep.fs.stat(oldPath))
+                if (window.cep.fs.stat(oldPath).err === 0) {
+                    window.cep.fs.rename(oldPath, newPath);
+                }
+            }, 100)
+        });
+    }
+    public async sendToGenerator(params: IGeneratorParams) {
+        console.log("sendToGenerator", params)
+        this.csInterface.evalScript(`$._ext.sendToGenerator(${JSON.stringify(params)})`, (result) => {
+
+        });
     }
 }
 

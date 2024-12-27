@@ -102,7 +102,7 @@ export interface IDocumentState {
 
 export interface IEventResult {
     appId: string,
-    data: string,
+    data: any,
     extensionId: string,
     scope: string,
     type: string,
@@ -261,7 +261,7 @@ export interface IGeneratorSettingsParams {
 }
 
 export interface IFigmaUrlSettings {
-    resourceSynchronizationURL: string,
+    ResourceSynchronizationURL: string,
     resourceSynchronizationTime: string,
     resourceSynchronizationTimeStamp: string
 }
@@ -272,4 +272,55 @@ export interface IItem {
     checked: boolean,
     icon?: string
     subItems?: IItem[],
+}
+
+export interface ISetGerParams {
+    key: string,
+    settings: any,
+    layerId?: number
+}
+
+export interface IGeneratorParams {
+    from: "com.posidon.cep.panel",
+    action: IGeneratorAction,
+    data: any
+}
+
+export enum IGeneratorAction {
+    test = "communication-test",
+    fastExport = "fast-export-png-by-id"
+}
+
+export interface IMessage {
+    type: IMessageType,
+    action: IGeneratorAction,
+    message?: string,
+    error?: string
+    data?: any
+}
+
+export enum IMessageType {
+    success = "success",
+    error = "error",
+    info = "info"
+}
+
+export interface IWaitIte {
+    id: number,
+    name: string,
+    data?: any,
+}
+
+export interface INosFileUploadItem {
+    bucket: string,
+    fileName: string,
+    key: string,
+    token: string,
+    url: string,
+}
+
+export interface INosUploadResult {
+    requestID: string,
+    offset: number,
+    context: string
 }
