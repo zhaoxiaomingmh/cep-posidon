@@ -17,7 +17,8 @@ type ResourceSynchronizationProps = {
 }
 type ResourceSynchronizationRefType = {
     updateWaitQueue: (type: 'generate' | 'upload', state: 'success' | 'error', layerId: number, path: string) => void,
-    updateFigmaDownline: (url?: string) => void
+    updateFigmaDownline: (url?: string) => void,
+    init: () => void
 };
 
 export const ResourceSynchronizationRef = React.createRef<ResourceSynchronizationRefType>();
@@ -36,8 +37,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
     const [failList, setFailList] = useState<IWaitIte[]>([]);
 
     useEffect(() => {
-        refreshFigmaSettings();
-        getGroups();
+        init();
     }, [])
     useEffect(() => {
         if (activeLayer?.generatorSettings?.comPosidonPSCep?.figmaNodeId) {
@@ -83,11 +83,20 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
             }
         }
     }, [uploadList])
+    const init = () => {
+        setStatus('idle');
+        setGenerateList([]);
+        setUploadList([]);
+        setFailList([]);
+        refreshFigmaSettings();
+        getGroups();
+    }
     useImperativeHandle(ref, () => {
         return {
             updateWaitQueue: updateWaitQueue,
-            updateFigmaDownline: updateFigmaDownline
-        } 
+            updateFigmaDownline: updateFigmaDownline,
+            init: init
+        }
     })
     const updateFigmaDownline = (url?: string) => {
         toNative();
@@ -160,10 +169,18 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
         if (activeLayer.generatorSettings?.comPosidonPSCep?.figmaNodeId) {
             psHandler.setLayerGeneratorSettings(activeLayer.id, "", () => {
                 psHandler.refreshActiveLayer();
-                getGroups();
+                setUploadList([]);
+                setFailList([])
+                setGenerateList([]);
+                setGroups(prevGroups => prevGroups.filter(i => i.id !== activeLayer.id));
             });
         } else {
-            psHandler.setLayerGeneratorSettings(activeLayer.id, figmaId, getGroups);
+            psHandler.setLayerGeneratorSettings(activeLayer.id, figmaId, () => {
+                psHandler.refreshActiveLayer();
+                if (!groups.some(i => i.id === activeLayer.id)) {
+                    setGroups(prevGroups => [...prevGroups, activeLayer]);
+                }
+            });
         }
     }
     const onCheckAllChange: CheckboxProps['onChange'] = (e) => {
@@ -182,25 +199,33 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
             return;
         }
         setStatus('generate');
-        checkedList.forEach(layer => {
-            const filename = new Date().getTime();
-            psHandler.sendToGenerator({
-                from: "com.posidon.cep.panel",
-                action: IGeneratorAction.fastExport,
-                data: {
-                    layerId: layer.id,
-                    filename: filename.toString(),
-                    path: psConfig.figmaImageDir(),
-                    format: "png",
-                }
-            })
-        })
-    }
-    const toNative = () => {
-        setStatus('idle');
         setGenerateList([]);
         setUploadList([]);
         setFailList([])
+    }
+    useEffect(() => {
+        console.log("groups", groups)
+    }, [groups])
+    useEffect(() => {
+        if (status != 'generate') return;
+        if (generateList.length === 0 && uploadList.length === 0 && failList.length === 0) {
+            checkedList.forEach(layer => {
+                const filename = new Date().getTime();
+                psHandler.sendToGenerator({
+                    from: "com.posidon.cep.panel",
+                    action: IGeneratorAction.fastExport,
+                    data: {
+                        layerId: layer.id,
+                        filename: filename.toString(),
+                        path: psConfig.figmaImageDir(),
+                        format: "png",
+                    }
+                })
+            })
+        }
+    }, [generateList, uploadList, failList, status])
+    const toNative = () => {
+        setStatus('idle');
     }
 
     return (
@@ -222,7 +247,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                     <div className="rs-layer-select-title">
                         <span >关联ID:</span>
                     </div>
-                    <PsInput disabled={activeLayer ? activeLayer.layerKind != 7 : false} callback={entryFigmaId} value={figmaId} placeholder="请输入Figma节点ID">
+                    <PsInput disabled={activeLayer?.layerKind == 7 && (activeLayer?.generatorSettings?.comPosidonPSCep?.figmaNodeId)} callback={entryFigmaId} value={figmaId} placeholder="请输入Figma节点ID">
                         <PsAction callback={addOrUpdateFigmaId}>
                             {
                                 activeLayer?.generatorSettings?.comPosidonPSCep?.figmaNodeId ?
@@ -243,15 +268,29 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                     </div>
                     {
                         groups.map((group, index) => {
-                            return (<Checkbox disabled={status != 'idle'} className="ps-checkbox" key={index} checked={checkedList.includes(group)} onChange={() => { onChange(group) }}>{group.name}</Checkbox>)
+                            return (<Checkbox disabled={status != 'idle'} className="ps-checkbox" key={index} checked={checkedList.includes(group)} onChange={() => { onChange(group) }}>
+                                <div className="rs-check-item" >
+                                    <span>{group.name}</span>
+                                    {
+                                        failList.some(i => i.id === group.id)
+                                        &&
+                                        <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/fail.svg"></img>
+                                    }
+                                    {
+                                        uploadList.some(i => i.id === group.id)
+                                        &&
+                                        <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/success.svg"></img>
+                                    }
+                                </div>
+                            </Checkbox>)
                         })
                     }
                 </div>
             </div>
             <div className="rs-footer" >
-                <PsInput placeholder="点击下方按钮生成切图,生成过程中请勿关闭插件" callback={() => {
-
-                }} value={figmaSettings?.ResourceSynchronizationURL} disabled={false} >
+                <PsInput placeholder="点击下方按钮生成切图,生成过程中请勿关闭插件" callback={() => { }}
+                    value={figmaSettings?.ResourceSynchronizationURL}
+                    disabled={false} >
                     <PsAction callback={() => {
                         function copyToClipboard(txt) {
                             var textarea = document.createElement("textarea")

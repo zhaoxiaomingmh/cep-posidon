@@ -102,15 +102,17 @@ class handler {
                 const eventData = obj.eventData as IEventData;
                 this.refreshActiveLayer();
                 if (eventData.documentID) {
+                    this.refreshGroup()
                 } else if (eventData.layerID?.length > 0) {
                 }
             }
             if (parseInt(obj.eventID) === parseInt(this.closeEventId)) {
-                //{extensionId: "", data: "ver1,{ "eventID": 1131180832, "eventData": {"documentID":243,"forceNotify":true}}", appId: "PHXS", type: "com.adobe.PhotoshopJSONCallbackposidon-ps", scope: "APPLICATION"}
                 this.refreshActiveLayer();
+                this.refreshGroup()
             }
             if (parseInt(obj.eventID) === parseInt(this.openEventId)) {
                 this.refreshActiveLayer();
+                this.refreshGroup()
             }
             if (parseInt(obj.eventID) === parseInt(this.deleteEventId)) {
                 console.log('Delete事件', obj);
@@ -130,13 +132,16 @@ class handler {
             if (parseInt(obj.eventID) === parseInt(this.makeEventId)) {
                 console.log('Make事件', obj);
                 this.refreshActiveLayer();
+                this.refreshGroup()
             }
         }, undefined);
 
         this.csInterface.addEventListener(`console_log_event`, (result) => {
             console.log('console_log_event', result);
         }, undefined)
-
+    }
+    private refreshGroup() {
+        ResourceSynchronizationRef?.current?.init();
     }
     private handleEventFromGenerator(data: IMessage) {
         console.log('action', data.action);
@@ -247,6 +252,7 @@ class handler {
     }
     public async refreshActiveLayer() {
         const layer = await this.getActiveLayer();
+        console.log('refreshActiveLayer', layer)
         if (layer.generatorSettings) {
             layer.generatorSettings = JSON.parse(layer.generatorSettings);
         }

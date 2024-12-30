@@ -131,12 +131,10 @@
         });
 
     }
-
-
-
 </script>
 <script>
     function fsRemoveDir(dir) {
+        if (!flag) flag = false;
         const fs = require('fs');
         const path = require('path');
         let files = fs.readdirSync(dir)
