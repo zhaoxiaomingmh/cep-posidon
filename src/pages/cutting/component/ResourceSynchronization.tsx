@@ -111,6 +111,13 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
             }
             psHandler.setDocGeneratorSettings(settings, refreshFigmaSettings)
         }
+        const images = window.cep.fs.readdir(psConfig.figmaImageDir());
+        if (images.err === 0) {
+            images.data.forEach(i => {
+                const image = path.join(psConfig.figmaImageDir(), i)
+                window.cep.fs.deleteFile(image)
+            })
+        }
     }
     const updateWaitQueue = (type: 'generate' | 'upload', state: 'success' | 'error', layerId: number, data: string) => {
         if (type === 'generate') {
