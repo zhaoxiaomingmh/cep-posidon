@@ -29,8 +29,6 @@
         const child_process = require('child_process')
         const exec = child_process.exec;
         const fs = require('fs');
-        const iconv = require('iconv-lite');
-
         const address = account.baseUrl;
         const username = account.username;
         const password = account.password;
@@ -51,40 +49,31 @@
 
         exec(listConnectionsCommand, { encoding: 'buffer' }, (err, stdout, stderr) => {
             if (err && err.length > 0) {
-                const errStr = iconv.decode(err, 'gbk');
-                console.error('执行命令时出错:', errStr);
-                result.error = errStr;
+                console.error('执行命令时出错:', err);
+                result.error = err;
                 notify(refType, -1);
                 return result;
             }
             if (stderr && stderr.length > 0) {
-                const stderrStr = iconv.decode(stderr, 'gbk');
-                console.error('命令返回错误:', stderrStr);
-                result.error = stderrStr;
+                console.error('命令返回错误:', stderr);
+                result.error = stderr;
                 notify(refType, -1);
                 return result;
             }
-            const stdoutStr = iconv.decode(stdout, 'gbk');
-            console.log('listConnectionsCommand命令行返回值', stdoutStr)
-            const connections = stdoutStr.split('\n').filter(line => line.trim().startsWith('OK'));
-            console.log('目前持有连接 ', connections)
             exec(connectCommand, { encoding: 'buffer' }, (err, stdout, stderr) => {
                 if (err && err.length > 0) {
-                    const errStr = iconv.decode(err, 'gbk');
-                    console.error('执行命令时出错:', errStr);
-                    result.error = errStr;
+                    console.error('执行命令时出错:', err);
+                    result.error = err;
                     notify(refType, -1);
                     return result;
                 }
                 if (stderr && stderr.length > 0) {
-                    const stderrStr = iconv.decode(stderr, 'gbk');
-                    console.error('命令返回错误:', stderrStr);
-                    result.error = stderrStr;
+                    console.error('命令返回错误:', stderr);
+                    result.error = stderr;
                     notify(refType, -1);
                     return result;
                 }
-                const stdoutStr = iconv.decode(stdout, 'gbk');
-                console.log('connectCommand命令行返回值', stdoutStr)
+                console.log('connectCommand命令行返回值', stdout)
                 fs.stat(sharedFolderPath, (statErr, stats) => {
                     if (statErr) {
                         console.log('获取文件信息失败', statErr)

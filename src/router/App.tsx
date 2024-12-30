@@ -47,9 +47,8 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     })
     useEffect(() => {
         const exid = handler.extId;
-        checkUpdate();
-
         if (psConfig.env == "prod" && exid == "posidon-ps-cep-main") {
+            checkUpdate();
         }
         checkActiveDocument();
         getUserInLocalStorage();
@@ -76,7 +75,9 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         if (window.cep.fs.stat(psConfig.generator()).err === 0 && window.cep.fs.stat(generatorJson).err === 0) {
             const jsonStr = window.cep.fs.readFile(generatorJson, "Base64");
             if (jsonStr.err === 0) {
-                const gJson = JSON.parse(jsonStr.data);
+                const str = window.cep.encoding.convertion.b64_to_utf8(jsonStr.data)
+                console.log("读取到json字符串", str)
+                const gJson = JSON.parse(str);
                 console.log("生成器版本", gJson.version)
                 if (psConfig.generatorVersion == gJson.version) {
                     return;
