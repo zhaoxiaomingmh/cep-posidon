@@ -28,11 +28,6 @@ module.exports = {
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
                 type: 'asset/resource',
-                parser: {
-                    dataUrlCondition: {
-                        maxSize: 8 * 1024 // 8KB 以下的文件将被内联
-                    }
-                },
                 generator: {
                     filename: 'static/images/[hash:10][ext][query]' // 输出文件的命名规则
                 }
@@ -55,7 +50,9 @@ module.exports = {
     plugins: [
         new CopyWebpackPlugin({
             patterns: [
-                { from: './src/asset/icons', to: './static/images/icons' }
+                { from: './src/asset/icons', to: './static/images/icons' },
+                { from: './src/asset/svg', to: './static/images/svg' },
+                { from: './src/asset/bat', to: './static/bat' },
             ]
         })
     ],

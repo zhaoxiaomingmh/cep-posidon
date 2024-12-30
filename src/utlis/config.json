@@ -23,6 +23,7 @@
             "host": "https://posidon.netease.com"
         }
     },
+    "generator": "C:\\Program Files\\Common Files\\Adobe\\Plug-Ins\\CC\\Generator\\com.posidon.generator",
     "nas": {
         "url": "https://gui-storage.netease.com",
         "appId": "colorai-prod",
@@ -34,6 +35,7 @@
     "path": {
         "desc": "storage/plugins/cep/desc.json",
         "code": "storage/plugins/cep/cepcode.zip",
+        "generator": "storage/plugins/cep/generator.zip",
         "hubservice": "/hubservice",
         "get-project": "/ProjectInfo/GetProjectDataByUserId",
         "get-storehouse": "/ImageSeach/GetStorehouseByProjectId",

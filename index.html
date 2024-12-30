@@ -123,15 +123,58 @@
     }
 </script>
 <script>
-    function getFIleInfo(path) {
-        try {
-            const fs = require('fs');
-            const stats = fs.statSync(path);
-            console.log("stats", stats)
-        } catch (e) {
-            console.log(e)
-            return undefined;
+    function runBat(path, par, callback) {
+        const { exec } = require('child_process');
+        const command = `${path} ${par.join(' ')}`;
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`执行出错: ${error.message}`);
+                return;
+            }
+            if (stderr) {
+                console.error(`stderr: ${stderr}`);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+            if (callback) {
+                callback();
+            }
+        });
+
+    }
+
+
+
+</script>
+<script>
+    function fsRemoveDir(dir) {
+        const fs = require('fs');
+        const path = require('path');
+        let files = fs.readdirSync(dir)
+        for (var i = 0; i < files.length; i++) {
+            let newPath = path.join(dir, files[i]);
+            let stat = fs.statSync(newPath)
+            if (stat.isDirectory()) {
+                //如果是文件夹就递归下去
+                fsRemoveDir(newPath);
+            } else {
+                //删除文件
+                fs.unlinkSync(newPath);
+            }
         }
+        fs.rmdirSync(dir)//如果文件夹是空的，就将自己删除掉
+    }
+    function writeFileFromBuff(filePath, buff, callback) {
+        const fs = require('fs')
+        try {
+            fs.writeFileSync(filePath, buff);
+            console.log('文件已成功写入:', filePath);
+            if (callback) { callback(); }
+        } catch (e) {
+            console.log("文件写入失败", e)
+            throw e;
+        }
+
     }
 </script>
 

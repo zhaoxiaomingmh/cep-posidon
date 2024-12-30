@@ -10,6 +10,9 @@ import { IGeneratorAction, INosFileUploadItem, IPosidonResponse, IProject, IProj
 import { defaultProjectHeadImage } from "@/utlis/const";
 import psHandler from "@/service/handler";
 import nas from "@/service/nas";
+import path from 'path';
+import iService from "@/service/service";
+import { unZipFromBuffer } from "@/utlis/util-zip";
 
 interface SettingsRefType { };
 interface SettingsProps { }
@@ -99,7 +102,7 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
             setProject(project)
         }
     }
-    const test = () => {
+    const test = async () => {
         // psHandler.sendToGenerator({
         //     from: "com.posidon.cep.panel",
         //     action: IGeneratorAction.fastExport,
@@ -110,8 +113,31 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
         //         format: "png",
         //     }
         // })
-        const filePaht = "C:\\Users\\wb.zhaominghui01\\AppData\\Roaming\\Adobe\\CEP\\Temp_Dir\\posidon-ps-cep-main_dev\\download\\faigmaImage\\1731580000.png";
-        nas.uploadFile("C:\\Users\\wb.zhaominghui01\\AppData\\Roaming\\Adobe\\CEP\\Temp_Dir\\posidon-ps-cep-main_dev\\download\\faigmaImage\\1731580000.png", "ceptest.png", 39)
+        //@ts-ignore
+        // runBat("C:\\Users\\wb.zhaominghui01\\AppData\\Roaming\\Adobe\\CEP\\extensions\\cep-posidon\\publish\\updateGen.bat", [path])
+        // if (window.cep.fs.stat(psConfig.generator()).err === 0 && window.cep.fs.stat(path.join(psConfig.generator(), "package.json")).err === 0) {
+        //     console.log("文件存在")
+
+        // } else {
+        //     console.log("文件不存在,下载内容")
+        //     const generatorZip = path.join(psConfig.downloadDir(), "com.posidon.generator");
+        //     console.log("zip文件已存在，先删除", generatorZip)
+        //     if (window.cep.fs.stat(generatorZip).err === 0) {
+        //         //@ts-ignore
+        //         fsRemoveDir(generatorZip);
+        //         console.log("删除成功")
+        //     }
+        //     const buffer = await iService.downLoadPosidonFile(psConfig.generatorFile, "generator.zip");
+        //     //需要一个状态修改的按钮
+        //     if (!buffer) {
+        //         alert("下载异常");
+        //     }
+        //     await unZipFromBuffer(buffer, generatorZip, function () {
+        //         console.log("解压完成，开始移动");
+        //         //@ts-ignore
+        //         runBat("C:\\Users\\wb.zhaominghui01\\AppData\\Roaming\\Adobe\\CEP\\extensions\\cep-posidon\\publish\\updateGen.bat", [generatorZip])
+        //     })
+        // }
         // const nosToken: INosFileUploadItem = {
         //     "bucket": "skyhub-private",
         //     fileName: "ceptest.jpg",
@@ -120,6 +146,12 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
         //     url: "https://skyhub-private.nos-jd.163yun.com/8e258fcb7a999c1325084dd2ac420190.jpg"
         // }
         // nas.multiPartUpload(nosToken, filePaht, "image/png");
+
+
+        const batPath = path.join(psConfig.pluginDir(), "dist", "static", "bat", "updateGen.bat");
+        window.cep.fs.stat(batPath)
+        console.log("batPath", batPath);
+        console.log("plugin", window.cep.fs.stat(batPath));
     }
 
     return (

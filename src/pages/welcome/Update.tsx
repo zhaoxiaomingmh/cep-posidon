@@ -1,27 +1,38 @@
 import useAppStore from "@/store/modules/appStore";
-import { Button } from "@adobe/react-spectrum";
 import React, { forwardRef, useImperativeHandle, useState } from "react";
 import './update.scss'
 import { IDownloader } from "@/store/iTypes/iTypes";
 import iService from "@/service/service";
 import { Loading } from "@/hooks/loading/Loading";
 import { psConfig } from "@/utlis/util-env";
-import { unZipFromBuffer as unzipFromBuffer } from "@/utlis/util-zip";
+import { unZipFromBuffer, unZipFromBuffer as unzipFromBuffer } from "@/utlis/util-zip";
 import psHandler from "@/service/handler";
 import path from "path";
+import { Button } from "antd";
 
 interface UpdateRefType { };
 interface UpdateProps {
+    target: 'latest' | 'plugin' | 'generator',
     version: string
-    desc: string
+    pluginDesc?: string,
 }
 export const UpdateRef = React.createRef<UpdateRefType>();
 export const Update = forwardRef<UpdateRefType, UpdateProps>((props, ref) => {
     const [download, setDownload] = useState<boolean>(false)
+    const [status, setStatus] = useState<boolean>(false)
 
     const startUpdate = async () => {
-        const buffer = await iService.downLoadPosidonFile(psConfig.codeFile, "cepcode.zip")
-        replaceLocalFile(buffer)
+        if (status) {
+            alert("已完成更新，请重启Photoshop")
+            return;
+        }
+        setDownload(true)
+        if (props.target === 'plugin') {
+            const buffer = await iService.downLoadPosidonFile(psConfig.codeFile, "cepcode.zip")
+            replaceLocalFile(buffer)
+        } else {
+            updateGenerator();
+        }
     }
     const replaceLocalFile = async (buffer: Buffer) => {
         const pluginDir = psConfig.pluginDir();
@@ -31,6 +42,39 @@ export const Update = forwardRef<UpdateRefType, UpdateProps>((props, ref) => {
             setDownload(false)
         }
     }
+
+    const updateGenerator = async () => {
+        const generatorZip = path.join(psConfig.downloadDir(), "com.posidon.generator");
+        if (window.cep.fs.stat(generatorZip).err === 0) {
+            console.log("zip文件已存在，先删除", generatorZip)
+            //@ts-ignore
+            fsRemoveDir(generatorZip);
+            console.log("删除成功")
+        }
+        const buffer = await iService.downLoadPosidonFile(psConfig.generatorFile, "generator.zip");
+        if (!buffer) {
+            alert("更新文件下载异常");
+            setDownload(false);
+        }
+        await unZipFromBuffer(buffer, generatorZip, function () {
+            console.log("解压完成，开始移动");
+            const batPath = path.join(psConfig.pluginDir(), "dist", "static", "bat", "updateGen.bat");
+            if (window.cep.fs.stat(batPath).err === 0) {
+                //@ts-ignore
+                runBat(batPath, [generatorZip], () => {
+                    alert("更新完成，请重启Photoshop")
+                    setDownload(false);
+                    setStatus(true);
+                })
+
+            } else {
+                alert("系统文件丢失:更新文件，请联系管理员处理");
+                setDownload(false);
+            }
+
+        })
+    }
+
     return (
         <div className="update-content">
             <div className="update-icon">
@@ -43,29 +87,35 @@ export const Update = forwardRef<UpdateRefType, UpdateProps>((props, ref) => {
             <div className="update-text">
                 <div className="update-text-title">
                     <span>
-                        发现新版本
+                        {props.target === 'plugin' ? "插件" : "生成器"} 发现新版本
                     </span>
                     <span>
                         v{props.version}
                     </span>
                 </div>
-                <div className="update-text-desc">
-                    <pre>
-                        {props.desc}
-                    </pre>
-                </div>
+                {
+                    props.target === 'plugin'
+                    &&
+                    <div className="update-text-desc">
+                        <pre>
+                            {props.pluginDesc}
+                        </pre>
+                    </div>
+                }
+                {
+                    props.target === 'generator'
+                    &&
+                    <div className="update-text-desc">
+                        <span>1.更新过程会弹出请求管理员权限命令行框，需要点击确定后才能进行更新</span>
+                        <span>2.更新完成后需要重新启动Photoshop生成器才会生效</span>
+                        <span>3.更新过程中请勿关闭插件</span>
+                    </div>
+                }
             </div>
             <div className="update-btn">
-                {
-                    download ?
-                        <Loading /> :
-                        <Button variant={"accent"} onPress={() => {
-                            setDownload(true)
-                            startUpdate();
-                        }}>
-                            下载新版本
-                        </Button>
-                }
+                <Button className="update-download-button" loading={download} onClick={() => { startUpdate() }}>
+                    下载新版本
+                </Button>
             </div>
         </div>
     );

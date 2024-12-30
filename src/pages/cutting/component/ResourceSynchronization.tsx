@@ -87,7 +87,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
         return {
             updateWaitQueue: updateWaitQueue,
             updateFigmaDownline: updateFigmaDownline
-        }
+        } 
     })
     const updateFigmaDownline = (url?: string) => {
         toNative();
@@ -203,7 +203,6 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
         setFailList([])
     }
 
-
     return (
         <div className="resource-synchronization-container">
             <div className="rs-layer-select-box">
@@ -227,8 +226,8 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                         <PsAction callback={addOrUpdateFigmaId}>
                             {
                                 activeLayer?.generatorSettings?.comPosidonPSCep?.figmaNodeId ?
-                                    <img src="../cep-posidon/src/asset/svg/brush.svg"></img> :
-                                    <img src="../cep-posidon/src/asset/svg/pensou.svg"></img>
+                                    <img src="./dist/static/images/svg/brush.svg"></img> :
+                                    <img src="./dist/static/images/svg/pensou.svg"></img>
                             }
                         </PsAction>
                     </PsInput>
@@ -265,7 +264,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                         figmaSettings?.ResourceSynchronizationURL &&
                             copyToClipboard(figmaSettings?.ResourceSynchronizationURL)
                     }}>
-                        <img src="../cep-posidon/src/asset/svg/paste.svg"></img>
+                        <img src="./dist/static/images/svg/paste.svg"></img>
                     </PsAction>
                 </PsInput>
                 <div className="rs-time">

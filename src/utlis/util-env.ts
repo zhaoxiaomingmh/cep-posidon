@@ -3,10 +3,10 @@ import config from './config.json'
 import JSEncrypt from "jsencrypt";
 import path from "path";
 import psHandler from "@/service/handler";
-import nas from "@/service/nas";
 const env = IEnv.prod;
 export const psConfig = {
     version: "1.1.6",
+    generatorVersion: "0.0.1",
     env: env,
     publicKey: config[env].posidon.publicKey,
     clientId: config[env].posidon.clientId,
@@ -98,8 +98,17 @@ export const psConfig = {
         }
         return filePath;
     },
+    generator: function () {
+        console.log("window.cep.fs.stat(config.generator)", window.cep.fs.stat(config.generator))
+        if (window.cep.fs.stat(config.generator).err === 0) {
+            return config.generator;
+        } else {
+            return undefined;
+        }
+    },
     versinFile: config.path.desc,
     codeFile: config.path.code,
+    generatorFile: config.path.generator,
     hubservice: config.path.hubservice,
     getProject: config.path["get-project"],
     getStorehouse: config.path["get-storehouse"],

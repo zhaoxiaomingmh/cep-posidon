@@ -12,6 +12,7 @@ import utilHttps from "@/utlis/util-https";
 import { defaultProjectHeadImage } from "@/utlis/const";
 import iService from "@/service/service";
 import { Update, UpdateRef } from "@/pages/welcome/Update";
+import path from "path";
 
 interface AppRefType {
     refresh: () => void;
@@ -34,6 +35,8 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     const [themeClass, setThemeClass] = useState('dark')
     const [version, setVersion] = useState<string>(psConfig.version);
     const [desc, setDesc] = useState<string>("");
+    const [generate, setGenerate] = useState<string>(undefined);
+    const [update, setUpdate] = useState<'latest' | 'plugin' | 'generator'>('latest');
 
     useImperativeHandle(ref, () => {
         return {
@@ -44,13 +47,13 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     })
     useEffect(() => {
         const exid = handler.extId;
+        checkUpdate();
+
         if (psConfig.env == "prod" && exid == "posidon-ps-cep-main") {
-            checkUpdate();
         }
         checkActiveDocument();
         getUserInLocalStorage();
         syncTheme();
-
     }, [])
     const checkUpdate = async () => {
         const buffer = await iService.downLoadPosidonFile(psConfig.versinFile, "desc.json");
@@ -59,6 +62,32 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         const lastestVersion = JSON.parse(jsonString) as IVersion;
         setVersion(lastestVersion.version);
         setDesc(lastestVersion.description);
+        if (lastestVersion.version !== psConfig.version) {
+            setUpdate('plugin');
+            return;
+        }
+        setVersion(psConfig.generatorVersion);
+        if (!psConfig.generator()) {
+            setUpdate('generator');
+            return;
+        }
+        const generatorJson = path.join(psConfig.generator(), "package.json");
+        setVersion(psConfig.generatorVersion);
+        if (window.cep.fs.stat(psConfig.generator()).err === 0 && window.cep.fs.stat(generatorJson).err === 0) {
+            const jsonStr = window.cep.fs.readFile(generatorJson, "Base64");
+            if (jsonStr.err === 0) {
+                const gJson = JSON.parse(jsonStr.data);
+                console.log("生成器版本", gJson.version)
+                if (psConfig.generatorVersion == gJson.version) {
+                    return;
+                } else {
+                    setVersion(gJson.version);
+                    setUpdate('generator');
+                }
+            }
+        } else {
+            setUpdate('generator');
+        }
     }
     const syncTheme = () => {
         const { theme, currentInterface } = handler.getCurrentTheme();
@@ -133,15 +162,13 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         }
     }
 
-
     return (
         <Provider theme={currentTheme} colorScheme={currentScheme} isQuiet>
             <div className={`ps-app theme-${themeClass}`}>
                 <div style={{ width: '100%', height: '100%' }}>
                     {
-                        (psConfig.version !== version) ?
-                            <Update version={version} desc={desc} ref={UpdateRef}
-                            /> :
+                        update != 'latest' ?
+                            <Update target={update} version={version} pluginDesc={desc} ref={UpdateRef} /> :
                             <div style={{ width: '100%', height: '100%', display: "flex" }}>
                                 {
                                     user ?

@@ -9,11 +9,13 @@ import { PsdLevel, PsdLevelRef } from "@/pages/level/PsdLevel";
 import '@/asset/iconfont/font.css'
 import '../asset/svg/cutting.svg'
 import { Cutting, CuttingRef } from "@/pages/cutting/Cutting";
+import { psConfig } from "@/utlis/util-env";
+import psHandler from "@/service/handler";
 
 export const Face = forwardRef(() => {
     return (
         <div className="ps-face">
-            
+
             <PsTable>
                 <PsTableItem
                     id={"asset-search"}
@@ -32,7 +34,7 @@ export const Face = forwardRef(() => {
                 <PsTableItem
                     id={"cutting"}
                     icon={
-                        <img src="../cep-posidon/src/asset/svg/cutting.svg"></img>
+                        <img src={"./dist/static/images/svg/cutting.svg"}></img>
                     }  >
                     <Cutting ref={CuttingRef} />
                 </PsTableItem>

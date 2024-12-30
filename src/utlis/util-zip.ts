@@ -1,8 +1,7 @@
 import Zip from 'jszip';
 import pathLib from 'path';
-const fs = window.cep.fs;
 
-export async function unZipFromBuffer(buffer: Buffer, localPath: string, callback: Function) {
+export async function unZipFromBuffer(buffer: Buffer, localPath: string, callback?: Function) {
     const zip = await Zip.loadAsync(buffer);
     const zipFileKeys = Object.keys(zip.files);
     const promises = zipFileKeys.map(async (filename) => {
@@ -19,15 +18,17 @@ export async function unZipFromBuffer(buffer: Buffer, localPath: string, callbac
                 if (dirRe.err != 0) {
                     window.cep.fs.makedir(fullPath);
                 }
+                console.log('创建文件夹成功');
                 return true;
             }
             if (isFile) {
                 const content = await zip.files[filename].async('nodebuffer');
                 if (content) {
-                    const result = fs.writeFile(fullPath, content.toString('base64'), "Base64");
-                    if (result.err === 0) {
+                    try {
+                        //@ts-ignore
+                        writeFileFromBuff(fullPath, content);
                         return true;
-                    } else {
+                    } catch (e) {
                         return false;
                     }
                 } else {
@@ -42,7 +43,7 @@ export async function unZipFromBuffer(buffer: Buffer, localPath: string, callbac
     });
     const results = await Promise.all(promises);
     if (results.every(result => result === true)) {
-        callback();
+        if (callback) callback();
     } else {
         console.log('解压失败');
         return true;
