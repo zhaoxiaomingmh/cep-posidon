@@ -7,7 +7,7 @@ import { PsAction } from "@/hooks/button/PsAction";
 import psHandler from "@/service/handler";
 import { IFigmaUrlSettings, IGeneratorAction, ILayer, IWaitIte } from "@/store/iTypes/iTypes";
 
-import { Button, Checkbox, Divider } from 'antd';
+import { Button, Checkbox } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { psConfig } from "@/utlis/util-env";
 import nas from "@/service/nas";
@@ -35,6 +35,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
     const [generateList, setGenerateList] = useState<IWaitIte[]>([]);
     const [uploadList, setUploadList] = useState<IWaitIte[]>([]);
     const [failList, setFailList] = useState<IWaitIte[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         init();
@@ -159,6 +160,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
         psHandler.getAllLayerList(7).then((layers: ILayer[]) => {
             const figmaLinkGroups = layers.filter((l) => l.generatorSettings?.comPosidonPSCep?.figmaNodeId);
             setGroups(figmaLinkGroups);
+            setLoading(false);
         })
     }
     const entryFigmaId = (value) => {
@@ -173,6 +175,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                 setFailList([])
                 setGenerateList([]);
                 setGroups(prevGroups => prevGroups.filter(i => i.id !== activeLayer.id));
+                if (checkedList.some(i => i.id === activeLayer.id)) setCheckedList(prevCheckedList => prevCheckedList.filter(i => i.id !== activeLayer.id));
             });
         } else {
             psHandler.setLayerGeneratorSettings(activeLayer.id, figmaId, () => {
@@ -204,7 +207,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
         setFailList([])
     }
     useEffect(() => {
-        console.log("groups", groups)
+        console.log("g", checkAll)
     }, [groups])
     useEffect(() => {
         if (status != 'generate') return;
@@ -262,30 +265,38 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                 <div className="rs-group-tree-box-title">
                     <span>当前文件已绑定编组</span>
                 </div>
-                <div className="rs-tree-view">
-                    <div className="rs-check-all">
-                        <Checkbox disabled={status != 'idle'} className="ps-checkbox" indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>全选</Checkbox>
+                {
+                    loading &&
+                    <span>加载中....</span>
+                }
+                {
+                    !loading
+                    &&
+                    <div className="rs-tree-view">
+                        <div className="rs-check-all">
+                            <Checkbox disabled={status != 'idle'} className="ps-checkbox" indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>全选</Checkbox>
+                        </div>
+                        {
+                            groups.map((group, index) => {
+                                return (<Checkbox disabled={status != 'idle'} className="ps-checkbox" key={index} checked={checkedList.includes(group)} onChange={() => { onChange(group) }}>
+                                    <div className="rs-check-item" >
+                                        <span>{group.name}</span>
+                                        {
+                                            failList.some(i => i.id === group.id)
+                                            &&
+                                            <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/fail.svg"></img>
+                                        }
+                                        {
+                                            uploadList.some(i => i.id === group.id)
+                                            &&
+                                            <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/success.svg"></img>
+                                        }
+                                    </div>
+                                </Checkbox>)
+                            })
+                        }
                     </div>
-                    {
-                        groups.map((group, index) => {
-                            return (<Checkbox disabled={status != 'idle'} className="ps-checkbox" key={index} checked={checkedList.includes(group)} onChange={() => { onChange(group) }}>
-                                <div className="rs-check-item" >
-                                    <span>{group.name}</span>
-                                    {
-                                        failList.some(i => i.id === group.id)
-                                        &&
-                                        <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/fail.svg"></img>
-                                    }
-                                    {
-                                        uploadList.some(i => i.id === group.id)
-                                        &&
-                                        <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/success.svg"></img>
-                                    }
-                                </div>
-                            </Checkbox>)
-                        })
-                    }
-                </div>
+                }
             </div>
             <div className="rs-footer" >
                 <PsInput placeholder="点击下方按钮生成切图,生成过程中请勿关闭插件" callback={() => { }}
