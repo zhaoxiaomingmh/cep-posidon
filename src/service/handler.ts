@@ -345,6 +345,10 @@ class handler {
 
         });
     }
+    public async selectLayer(id: number) {
+        this.csInterface.evalScript(`$._ext.selectLayer(${id})`, (result) => {
+        })
+    }
 }
 
 const psHandler = handler.getInstance();

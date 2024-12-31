@@ -106,19 +106,29 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
         if (!url) {
 
         } else {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const formattedDate = `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
             const settings = {
                 ResourceSynchronizationURL: url,
-                resourceSynchronizationTime: new Date(),
-                resourceSynchronizationTimeStamp: new Date().getTime()
+                resourceSynchronizationTime: formattedDate,
+                resourceSynchronizationTimeStamp: new Date().getTime(),
             }
             psHandler.setDocGeneratorSettings(settings, refreshFigmaSettings)
-        }
-        const images = window.cep.fs.readdir(psConfig.figmaImageDir());
-        if (images.err === 0) {
-            images.data.forEach(i => {
-                const image = path.join(psConfig.figmaImageDir(), i)
-                window.cep.fs.deleteFile(image)
-            })
+            const images = window.cep.fs.readdir(psConfig.figmaImageDir());
+            if (images.err === 0) {
+                images.data.forEach(i => {
+                    const image = path.join(psConfig.figmaImageDir(), i)
+                    window.cep.fs.deleteFile(image)
+                })
+            }
+            copyToClipboard(url);
+            alert("已成功复制到剪贴板")
         }
     }
     const updateWaitQueue = (type: 'generate' | 'upload', state: 'success' | 'error', layerId: number, data: string) => {
@@ -175,6 +185,15 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
     const entryFigmaId = (value) => {
         setFigmaId(value)
     }
+
+    const copyToClipboard = (txt) => {
+        var textarea = document.createElement("textarea")
+        document.body.appendChild(textarea)
+        textarea.value = txt
+        textarea.select()
+        document.execCommand("Copy")
+        document.body.removeChild(textarea)
+    }
     const addOrUpdateFigmaId = () => {
         if (!activeLayer || !figmaId) return;
         if (activeLayer.generatorSettings?.comPosidonPSCep?.figmaNodeId) {
@@ -192,6 +211,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                 if (!groups.some(i => i.id === activeLayer.id)) {
                     setGroups(prevGroups => [...prevGroups, activeLayer]);
                 }
+                if (!checkedList.some(i => i.id === activeLayer.id)) setCheckedList(prevCheckedList => [...prevCheckedList, activeLayer]);
             });
         }
     }
@@ -239,7 +259,6 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
     const toNative = () => {
         setStatus('idle');
     }
-
     return (
         <div className="resource-synchronization-container">
             <div className="rs-layer-select-box">
@@ -275,35 +294,39 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                     <span>当前文件已绑定编组</span>
                 </div>
                 {
-                    loading?<span>加载中....</span>:
-                    <div className="rs-tree-view">
-                        <div className="rs-check-all">
-                            <Checkbox disabled={status != 'idle'} className="ps-checkbox" indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>全选</Checkbox>
+                    loading ? <span>加载中....</span> :
+                        <div className="rs-tree-view">
+                            <div className="rs-check-all">
+                                <Checkbox disabled={status != 'idle'} className="ps-checkbox" indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>全选</Checkbox>
+                            </div>
+                            <div className="checkbox_wrap">
+                                <PerfectScrollbar>
+                                    {
+                                        groups.map((group, index) => {
+                                            return (<Checkbox disabled={status != 'idle'} className="ps-checkbox" key={index} checked={checkedList.includes(group)} onChange={(eve) => {
+                                                onChange(group);
+                                            }}>
+                                                <div className="rs-check-item" onClick={(a) => {
+                                                    psHandler.selectLayer(group.id);
+                                                }}>
+                                                    <span>{group.name}</span>
+                                                    {
+                                                        failList.some(i => i.id === group.id)
+                                                        &&
+                                                        <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/fail.svg"></img>
+                                                    }
+                                                    {
+                                                        uploadList.some(i => i.id === group.id)
+                                                        &&
+                                                        <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/success.svg"></img>
+                                                    }
+                                                </div>
+                                            </Checkbox>)
+                                        })
+                                    }
+                                </PerfectScrollbar>
+                            </div>
                         </div>
-                        <div className="checkbox_wrap">
-                            <PerfectScrollbar>
-                                {
-                                    groups.map((group, index) => {
-                                        return (<Checkbox disabled={status != 'idle'} className="ps-checkbox" key={index} checked={checkedList.includes(group)} onChange={() => { onChange(group) }}>
-                                            <div className="rs-check-item" >
-                                                <span>{group.name}</span>
-                                                {
-                                                    failList.some(i => i.id === group.id)
-                                                    &&
-                                                    <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/fail.svg"></img>
-                                                }
-                                                {
-                                                    uploadList.some(i => i.id === group.id)
-                                                    &&
-                                                    <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/success.svg"></img>
-                                                }
-                                            </div>
-                                        </Checkbox>)
-                                    })
-                                }
-                            </PerfectScrollbar>
-                        </div>
-                    </div>
                 }
             </div>
             <div className="rs-footer" >
@@ -311,14 +334,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                     value={figmaSettings?.ResourceSynchronizationURL}
                     disabled={false} >
                     <PsAction callback={() => {
-                        function copyToClipboard(txt) {
-                            var textarea = document.createElement("textarea")
-                            document.body.appendChild(textarea)
-                            textarea.value = txt
-                            textarea.select()
-                            document.execCommand("Copy")
-                            document.body.removeChild(textarea)
-                        }
+
                         figmaSettings?.ResourceSynchronizationURL &&
                             copyToClipboard(figmaSettings?.ResourceSynchronizationURL)
                     }}>

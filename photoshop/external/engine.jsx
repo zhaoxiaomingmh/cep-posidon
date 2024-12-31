@@ -217,6 +217,10 @@ $._ext = {
         } catch (e) {
             psconsole.log(e);
         }
+    },
+    selectLayer: function (layerID) {
+        var layer = new Layer(layerID);
+        layer.select();
     }
 };
 
