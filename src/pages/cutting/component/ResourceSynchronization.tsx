@@ -1,6 +1,7 @@
 import useDocumentStore from "@/store/modules/documentStore";
 import React, { useEffect, useImperativeHandle, useState } from "react";
 import { forwardRef } from "react";
+import 'react-perfect-scrollbar/dist/css/styles.css';
 import './rs.scss'
 import { PsInput } from "@/hooks/input/PsInput";
 import { PsAction } from "@/hooks/button/PsAction";
@@ -12,6 +13,7 @@ import type { CheckboxProps } from 'antd';
 import { psConfig } from "@/utlis/util-env";
 import nas from "@/service/nas";
 import path from "path";
+import PerfectScrollbar from 'react-perfect-scrollbar'
 
 type ResourceSynchronizationProps = {
 }
@@ -273,35 +275,34 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                     <span>当前文件已绑定编组</span>
                 </div>
                 {
-                    loading &&
-                    <span>加载中....</span>
-                }
-                {
-                    !loading
-                    &&
+                    loading?<span>加载中....</span>:
                     <div className="rs-tree-view">
                         <div className="rs-check-all">
                             <Checkbox disabled={status != 'idle'} className="ps-checkbox" indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>全选</Checkbox>
                         </div>
-                        {
-                            groups.map((group, index) => {
-                                return (<Checkbox disabled={status != 'idle'} className="ps-checkbox" key={index} checked={checkedList.includes(group)} onChange={() => { onChange(group) }}>
-                                    <div className="rs-check-item" >
-                                        <span>{group.name}</span>
-                                        {
-                                            failList.some(i => i.id === group.id)
-                                            &&
-                                            <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/fail.svg"></img>
-                                        }
-                                        {
-                                            uploadList.some(i => i.id === group.id)
-                                            &&
-                                            <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/success.svg"></img>
-                                        }
-                                    </div>
-                                </Checkbox>)
-                            })
-                        }
+                        <div className="checkbox_wrap">
+                            <PerfectScrollbar>
+                                {
+                                    groups.map((group, index) => {
+                                        return (<Checkbox disabled={status != 'idle'} className="ps-checkbox" key={index} checked={checkedList.includes(group)} onChange={() => { onChange(group) }}>
+                                            <div className="rs-check-item" >
+                                                <span>{group.name}</span>
+                                                {
+                                                    failList.some(i => i.id === group.id)
+                                                    &&
+                                                    <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/fail.svg"></img>
+                                                }
+                                                {
+                                                    uploadList.some(i => i.id === group.id)
+                                                    &&
+                                                    <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/success.svg"></img>
+                                                }
+                                            </div>
+                                        </Checkbox>)
+                                    })
+                                }
+                            </PerfectScrollbar>
+                        </div>
                     </div>
                 }
             </div>

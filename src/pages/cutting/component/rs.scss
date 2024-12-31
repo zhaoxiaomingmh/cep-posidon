@@ -1,10 +1,13 @@
 .resource-synchronization-container {
+    overflow: hidden;
     flex: 1;
     font-family: 'Inter';
     font-style: normal;
     font-size: 14px;
     line-height: 24px;
     color: #CCCCCC;
+    display: flex;
+    flex-direction: column;
 
     .rs-layer-select-box {
         padding: 10px;
@@ -26,27 +29,40 @@
     }
 
     .rs-group-tree-box {
+        flex: 1;
         margin: 10px 0px;
         background-color: #474747;
         padding: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
 
         .rs-group-tree-box-title {
             height: 24px;
         }
 
         .rs-tree-view {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
+            overflow: hidden;
 
             .rs-check-all {
                 border-bottom: 1px solid #999999;
+            }
+            .checkbox_wrap {
+                flex: 1;
+                overflow: hidden
             }
         }
     }
 
     .rs-footer {
-        height: 36px;
+        display: flex;
+        flex-direction: column;
+        .ps-input {
+            height: 36px
+        }
 
         .rs-time {
             display: flex;
