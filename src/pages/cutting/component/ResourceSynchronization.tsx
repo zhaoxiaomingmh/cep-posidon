@@ -208,10 +208,21 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
         } else {
             psHandler.setLayerGeneratorSettings(activeLayer.id, figmaId, () => {
                 psHandler.refreshActiveLayer();
-                if (!groups.some(i => i.id === activeLayer.id)) {
-                    setGroups(prevGroups => [...prevGroups, activeLayer]);
+                const layer: ILayer = {
+                    id: activeLayer.id,
+                    name: activeLayer.name,
+                    layerKind: activeLayer.layerKind,
+                    generatorSettings: {
+                        comPosidonPSCep: {
+                            figmaNodeId: figmaId,
+                        }
+                    }
                 }
-                if (!checkedList.some(i => i.id === activeLayer.id)) setCheckedList(prevCheckedList => [...prevCheckedList, activeLayer]);
+                if (!groups.some(i => i.id === activeLayer.id)) {
+                    setGroups(prevGroups => [...prevGroups, layer]);
+                }
+
+                if (!checkedList.some(i => i.id === activeLayer.id)) setCheckedList(prevCheckedList => [...prevCheckedList, layer]);
             });
         }
     }

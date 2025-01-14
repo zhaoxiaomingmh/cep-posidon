@@ -168,7 +168,7 @@ class psSerive {
         }
         const figmaAccountResp = figmaAccountResult.data as IPosidonResponse;
         console.log('figmaAccount', figmaAccountResp)
-        if(figmaAccountResp.code != 0) {
+        if (figmaAccountResp.code != 0) {
             return undefined;
         }
         const account = figmaAccountResp.data as IAccountResponse;

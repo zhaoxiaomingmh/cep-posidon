@@ -103,55 +103,6 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
         }
     }
     const test = async () => {
-        // psHandler.sendToGenerator({
-        //     from: "com.posidon.cep.panel",
-        //     action: IGeneratorAction.fastExport,
-        //     data: {
-        //         layerId: 39,
-        //         filename: "1731580000",
-        //         path: psConfig.figmaImageDir(),
-        //         format: "png",
-        //     }
-        // })
-        //@ts-ignore
-        // runBat("C:\\Users\\wb.zhaominghui01\\AppData\\Roaming\\Adobe\\CEP\\extensions\\cep-posidon\\publish\\updateGen.bat", [path])
-        // if (window.cep.fs.stat(psConfig.generator()).err === 0 && window.cep.fs.stat(path.join(psConfig.generator(), "package.json")).err === 0) {
-        //     console.log("文件存在")
-
-        // } else {
-        //     console.log("文件不存在,下载内容")
-        //     const generatorZip = path.join(psConfig.downloadDir(), "com.posidon.generator");
-        //     console.log("zip文件已存在，先删除", generatorZip)
-        //     if (window.cep.fs.stat(generatorZip).err === 0) {
-        //         //@ts-ignore
-        //         fsRemoveDir(generatorZip);
-        //         console.log("删除成功")
-        //     }
-        //     const buffer = await iService.downLoadPosidonFile(psConfig.generatorFile, "generator.zip");
-        //     //需要一个状态修改的按钮
-        //     if (!buffer) {
-        //         alert("下载异常");
-        //     }
-        //     await unZipFromBuffer(buffer, generatorZip, function () {
-        //         console.log("解压完成，开始移动");
-        //         //@ts-ignore
-        //         runBat("C:\\Users\\wb.zhaominghui01\\AppData\\Roaming\\Adobe\\CEP\\extensions\\cep-posidon\\publish\\updateGen.bat", [generatorZip])
-        //     })
-        // }
-        // const nosToken: INosFileUploadItem = {
-        //     "bucket": "skyhub-private",
-        //     fileName: "ceptest.jpg",
-        //     key: "8e258fcb7a999c1325084dd2ac420190.jpg",
-        //     token: "UPLOAD acbea29cdbac42aea6bb55cba894ca3b:NalO4Crr2jzCds+kUIO9rMbqSWXXkH/v7J+gzY7XvBQ=:eyJCdWNrZXQiOiJza3lodWItcHJpdmF0ZSIsIlJlZ2lvbiI6IkpEIiwiT2JqZWN0IjoiOGUyNThmY2I3YTk5OWMxMzI1MDg0ZGQyYWM0MjAxOTAuanBnIiwiRXhwaXJlcyI6MTczNTUyODMxOH0=",
-        //     url: "https://skyhub-private.nos-jd.163yun.com/8e258fcb7a999c1325084dd2ac420190.jpg"
-        // }
-        // nas.multiPartUpload(nosToken, filePaht, "image/png");
-
-
-        const batPath = path.join(psConfig.pluginDir(), "dist", "static", "bat", "updateGen.bat");
-        window.cep.fs.stat(batPath)
-        console.log("batPath", batPath);
-        console.log("plugin", window.cep.fs.stat(batPath));
     }
 
     return (
