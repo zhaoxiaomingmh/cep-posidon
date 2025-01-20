@@ -1,6 +1,7 @@
+import { GridRef } from "@/pages/cutting/component/grid/Grid";
 import { ResourceSynchronizationRef } from "@/pages/cutting/component/ResourceSynchronization";
 import { AppRef } from "@/router/App";
-import { IDocument, IEventData, IEventResult, IGeneratorAction, IGeneratorParams, ILayer, IMessage, ISetGerParams } from "@/store/iTypes/iTypes";
+import { IDocument, IEventData, IEventResult, IGeneratorAction, IGeneratorParams, ILayer, IMessage, ISetGerParams, IStatus } from "@/store/iTypes/iTypes";
 import { psConfig } from "@/utlis/util-env";
 import { darkTheme, defaultTheme, lightTheme } from '@adobe/react-spectrum';
 import { Theme } from "@react-types/provider";
@@ -20,6 +21,7 @@ class handler {
     private addEventId: string;
     private cutEventId: string;
     private makeEventId: string;
+    private transformEventId: string;
 
     constructor() {
         console.log("中央处理器注册成功");
@@ -31,6 +33,7 @@ class handler {
         this.addEventId = "1097098272";
         this.cutEventId = "1668641824";
         this.makeEventId = "1298866208";
+        this.transformEventId = "1416785510";
         this.init();
     }
     public static getInstance(): handler {
@@ -78,6 +81,7 @@ class handler {
         this.registerEvent('add');
         this.registerEvent('cut');
         this.registerEvent('make');
+        this.registerEvent('transform');
         this.getCurrentTheme();
 
         this.csInterface.addEventListener('com.posidon.generator.plugin', (data: IEventResult) => {
@@ -100,7 +104,13 @@ class handler {
             if (parseInt(obj.eventID) === parseInt(this.selectEventId)) {
                 console.log('Select事件', obj);
                 const eventData = obj.eventData as IEventData;
-                this.refreshActiveLayer();
+                if (GridRef?.current) {
+                    if (GridRef?.current.refreshTask != IStatus.loading) {
+                        this.refreshActiveLayer();
+                    }
+                } else {
+                    this.refreshActiveLayer();
+                }
                 if (eventData.documentID) {
                     this.refreshGroup()
                 } else if (eventData.layerID?.length > 0) {
@@ -134,6 +144,10 @@ class handler {
                 this.refreshActiveLayer();
                 this.refreshGroup()
             }
+            if (parseInt(obj.eventID) === parseInt(this.transformEventId)) {
+                console.log('Transform事件', obj);
+                GridRef?.current?.handleResize();
+            }
         }, undefined);
 
         this.csInterface.addEventListener(`console_log_event`, (result) => {
@@ -149,7 +163,18 @@ class handler {
         switch (data.action) {
             case IGeneratorAction.fastExport: {
                 if (data.type === 'success' || data.type === 'error') {
-                    ResourceSynchronizationRef.current.updateWaitQueue("generate", data.type, data.data.layerId, data.type === 'success' ? data.data.path : data.data.error);
+                    ResourceSynchronizationRef?.current?.updateWaitQueue("generate", data.type, data.data.layerId, data.type === 'success' ? data.data.path : data.data.error);
+                    GridRef?.current?.refresh(IStatus.success);
+                } else {
+                    GridRef?.current?.refresh(IStatus.error);
+                }
+                break;
+            }
+            case IGeneratorAction.grid: {
+                if (data.type === 'success') {
+                    GridRef?.current?.handleGridTask(IStatus.success);
+                } else {
+                    GridRef?.current?.handleGridTask(IStatus.error);
                 }
             }
         }
@@ -171,6 +196,7 @@ class handler {
             if (stringId === 'add') this.addEventId = data;
             if (stringId === 'cut') this.cutEventId = data;
             if (stringId === 'make') this.makeEventId = data;
+            if (stringId === 'transform') this.transformEventId = data;
             const csEvent: CSEvent = {
                 type: 'com.adobe.PhotoshopRegisterEvent',
                 scope: 'APPLICATION',
@@ -293,12 +319,10 @@ class handler {
             this.csInterface.closeExtension();
         }, 100);
     }
-    public async setLayerGeneratorSettings(layerId: number, figmaNodeId: string, callback?: Function) {
+    public async setLayerGeneratorSettings(layerId: number, data: any, callback?: Function) {
         const param: ISetGerParams = {
             key: "comPosidonPSCep",
-            settings: {
-                figmaNodeId: figmaNodeId
-            },
+            settings: data,
             layerId: layerId
         }
         this.csInterface.evalScript(`$._ext.setGeneratorSettings(${JSON.stringify(param)})`, (result) => {
@@ -342,11 +366,121 @@ class handler {
     public async sendToGenerator(params: IGeneratorParams) {
         console.log("sendToGenerator", params)
         this.csInterface.evalScript(`$._ext.sendToGenerator(${JSON.stringify(params)})`, (result) => {
-
         });
     }
     public async selectLayer(id: number) {
         this.csInterface.evalScript(`$._ext.selectLayer(${id})`, (result) => {
+        })
+    }
+    //创建一个编组
+    public async mkGroup() {
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.mkGroup()`, (result: string) => {
+                if (result) {
+                    const makeGroup = JSON.parse(result)
+                    console.log("makeGroup", makeGroup);
+                    resolve(makeGroup.layerSectionStart);
+                } else {
+                    reject(new Error('Failed to create group'));
+                }
+            });
+        });
+    }
+    //修改图层名称
+    public async renameLayer(layerID: number, name: string) {
+        let param = {
+            layerID: layerID,
+            name: name
+        }
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.renameLayer(${JSON.stringify(param)})`, (result) => {
+                if (result) {
+                    resolve(result);
+                } else {
+                    reject(result);
+                }
+            })
+        });
+    }
+    //修改图层可见性
+    public async setLayerVisible(layerID: number, visible: boolean) {
+        let param = {
+            layerID: layerID,
+            visible: visible
+        }
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.setLayerVisible(${JSON.stringify(param)})`, (result) => {
+                if (result) {
+                    resolve(result);
+                } else {
+                    reject(result);
+                }
+            })
+        })
+    }
+    //将图片导入文档
+    public async importImage(filePath: string, offsetX: number, offsetY: number) {
+        let params = {
+            offsetX: offsetX,
+            offsetY: offsetY,
+            filePath: filePath
+        }
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.importImage(${JSON.stringify(params)})`, (result) => {
+                if (result && result.length > 0) {
+                    console.log("result", result);
+                    resolve(true);
+                } else {
+                    reject(result);
+                }
+            })
+        })
+    }
+    //将图层移动入编组
+    public async moveLayersToGroup(layerIDs: number[], groupID: number) {
+        let param = {
+            layerIDs: layerIDs,
+            groupID: groupID
+        }
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.moveLayerToGroup(${JSON.stringify(param)})`, (result) => {
+                if (result) {
+                    resolve(result);
+                } else {
+                    reject(result);
+                }
+            })
+        })
+    }
+    //获取一个组内所有图层
+    public async getLayersInGroup(groupID: number): Promise<ILayer[]> {
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.getLayersInGroup(${groupID})`, (result) => {
+                if (result) {
+                    const layers = JSON.parse(result) as ILayer[];
+                    resolve(layers);
+                } else {
+                    reject(undefined);
+                }
+            })
+        })
+    }
+    //移动当前图层
+    public async transformLayer(offsetX: number, offsetY: number, scaleX: number, scaleY: number) {
+        let param = {
+            offsetX: offsetX,
+            offsetY: offsetY,
+            scaleX: scaleX,
+            scaleY: scaleY
+        }
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.transformLayer(${JSON.stringify(param)})`, (result) => {
+                if (result) {
+                    resolve(result);
+                } else {
+                    reject(result);
+                }
+            })
         })
     }
 }

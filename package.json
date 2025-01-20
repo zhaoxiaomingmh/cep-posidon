@@ -34,7 +34,7 @@
     "@spectrum-web-components/button": "^1.0.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "antd": "^5.22.6",
+    "antd": "^5.22.4",
     "axios": "^1.1.1",
     "babel-plugin-proposal-object-rest-spread-stable": "^1.0.3",
     "iconv-lite": "^0.6.3",
@@ -43,6 +43,8 @@
     "path": "^0.12.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-perfect-scrollbar": "^1.5.8"
+    "react-draggable": "^4.4.6",
+    "react-perfect-scrollbar": "^1.5.8",
+    "react-slider": "^2.0.6"
   }
 }

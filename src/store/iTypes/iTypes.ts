@@ -50,6 +50,8 @@ export interface IProject {
 export interface IDocument {
     id: number,
     name: string,
+    width: number,
+    height: number,
     layers?: ILayer[],
     activeLayer?: ILayer,
 }
@@ -288,7 +290,8 @@ export interface IGeneratorParams {
 
 export enum IGeneratorAction {
     test = "communication-test",
-    fastExport = "fast-export-png-by-id"
+    fastExport = "fast-export-png-by-id",
+    grid = "grid",
 }
 
 export interface IMessage {
@@ -323,4 +326,70 @@ export interface INosUploadResult {
     requestID: string,
     offset: number,
     context: string
+}
+
+export enum IStatus {
+    wait = 'wait',
+    success = 'success',
+    error = 'error',
+    loading = 'loading',
+}
+
+export interface DraggableData {
+    x: number,
+    y: number,
+    deltaX: number,
+    deltaY: number,
+    lastX: number,
+    lastY: number,
+}
+
+export interface IImage {
+    id: number,
+    name: string,
+    width: number,
+    height: number,
+    path?: string,
+    data?: string,
+}
+
+export interface IGridParameter {
+    layerId: number,
+    split: ISplitLine,
+    savePath: string,
+}
+
+export interface ISplitLine {
+    leftLine: number,
+    rightLine: number,
+    topLine: number,
+    bottomLine: number,
+}
+
+export interface IRect {
+    left: number,
+    top: number,
+    width: number,
+    height: number,
+}
+
+export interface IGridInfo {
+    layerId: number,
+    width: number,
+    height: number,
+    grid: IGridRect[],
+    split: ISplitLine,
+}
+
+export interface IGridRect {
+    location: ILocation,
+    rect: IRect,
+    validImageInfo: IRect
+}
+
+export type ILocation = "topLeft" | "topMid" | "topRight" | "midLeft" | "midMid" | "midRight" | "bottomLeft" | "bottomMid" | "bottomRight";
+
+export interface IPoint {
+    x: number,
+    y: number,
 }

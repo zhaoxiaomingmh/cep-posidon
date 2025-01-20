@@ -1,0 +1,117 @@
+.grid-container {
+    display: flex;
+    flex-direction: column;
+
+    .grid-preview {
+        position: relative;
+        height: 400px;
+        flex: 1;
+        overflow: hidden;
+        background-image: url(../../../../asset/img/transBg.png);
+        background-repeat: repeat;
+        border: 1px solid #808080;
+
+        .grid-preview-content {
+            position: absolute;
+
+            #grid-image {
+                max-width: 300px;
+                max-height: 300px;
+                object-fit: contain;
+                display: block;
+            }
+
+            .grid-drag-line {
+                z-index: 100;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+
+                .horizontal:hover {
+                    cursor: ew-resize;
+                }
+
+                .vertical:hover {
+                    cursor: ns-resize;
+                }
+            }
+        }
+    }
+
+    .grid-slider {
+        margin-top: 10px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+
+        .grid-slider-bar {
+            display: flex;
+            flex-direction: row;
+
+            #grid-scale {
+                -webkit-appearance: none;
+                appearance: none;
+                margin: 0px 10px;
+                outline: 0;
+                background-color: transparent;
+                flex: 1;
+
+                &::-webkit-slider-runnable-track {
+                    height: 2px;
+                    background: #eee;
+                }
+
+                &::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    background-color: #424242;
+                    border: 1px solid transparent;
+                    margin-top: -8px;
+                }
+            }
+        }
+    }
+
+    .grid-input {
+        display: flex;
+        flex-direction: column;
+        margin-top: 10px;
+        border-bottom: 1px solid #eeeeee;
+
+        .input-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin: 10px 0px;
+
+            input {
+                height: 100%;
+                width: 60px;
+                margin: 0px 10px;
+                background: transparent;
+                padding: 0 0 0 10px;
+                border: none;
+                border-bottom: 1px solid black;
+                outline: none;
+                color: var(--primary-font-color);
+            }
+
+        }
+
+        .splider {
+            width: 100%;
+            height: 2px;
+            background-color: #808080;
+            margin: 5px 0px;
+        }
+    }
+}
+
+.pos-abs {
+    position: absolute;
+}

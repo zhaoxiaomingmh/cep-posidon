@@ -98,6 +98,54 @@ export const psConfig = {
         }
         return filePath;
     },
+    previewImageDir: function () {
+        const cs = new CSInterface();
+        const userHomeDir = cs.getSystemPath(SystemPath.USER_DATA)
+        const parts = ['Adobe', 'CEP', 'Temp_Dir', psHandler.extId, 'download', 'previewImage'];
+        let filePath = userHomeDir;
+        for (const part of parts) {
+            const subFiles = window.cep.fs.readdir(filePath);
+            if (subFiles.err == 0) {
+                filePath = path.join(filePath, part);
+                if (!subFiles.data.includes(part)) {
+                    window.cep.fs.makedir(filePath);
+                } else {
+                    const result = window.cep.fs.stat(filePath);
+                    if (0 == result.err) {
+                        if (result.data.isFile) {
+                            window.cep.fs.makedir(filePath);
+                        }
+                    }
+                }
+
+            }
+        }
+        return filePath;
+    },
+    gridDir: function () {
+        const cs = new CSInterface();
+        const userHomeDir = cs.getSystemPath(SystemPath.USER_DATA)
+        const parts = ['Adobe', 'CEP', 'Temp_Dir', psHandler.extId, 'grid'];
+        let filePath = userHomeDir;
+        for (const part of parts) {
+            const subFiles = window.cep.fs.readdir(filePath);
+            if (subFiles.err == 0) {
+                filePath = path.join(filePath, part);
+                if (!subFiles.data.includes(part)) {
+                    window.cep.fs.makedir(filePath);
+                } else {
+                    const result = window.cep.fs.stat(filePath);
+                    if (0 == result.err) {
+                        if (result.data.isFile) {
+                            window.cep.fs.makedir(filePath);
+                        }
+                    }
+                }
+
+            }
+        }
+        return filePath;
+    },
     generator: function () {
         console.log("window.cep.fs.stat(config.generator)", window.cep.fs.stat(config.generator))
         if (window.cep.fs.stat(config.generator).err === 0) {

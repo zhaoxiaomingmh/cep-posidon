@@ -185,7 +185,6 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
     const entryFigmaId = (value) => {
         setFigmaId(value)
     }
-
     const copyToClipboard = (txt) => {
         var textarea = document.createElement("textarea")
         document.body.appendChild(textarea)
@@ -197,7 +196,9 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
     const addOrUpdateFigmaId = () => {
         if (!activeLayer || !figmaId) return;
         if (activeLayer.generatorSettings?.comPosidonPSCep?.figmaNodeId) {
-            psHandler.setLayerGeneratorSettings(activeLayer.id, "", () => {
+            let data = activeLayer.generatorSettings?.comPosidonPSCep;
+            data.figmaNodeId = undefined;
+            psHandler.setLayerGeneratorSettings(activeLayer.id, data, () => {
                 psHandler.refreshActiveLayer();
                 setUploadList([]);
                 setFailList([])
@@ -206,7 +207,9 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                 if (checkedList.some(i => i.id === activeLayer.id)) setCheckedList(prevCheckedList => prevCheckedList.filter(i => i.id !== activeLayer.id));
             });
         } else {
-            psHandler.setLayerGeneratorSettings(activeLayer.id, figmaId, () => {
+            let data = activeLayer.generatorSettings?.comPosidonPSCep;
+            data.figmaNodeId = figmaId;
+            psHandler.setLayerGeneratorSettings(activeLayer.id, data, () => {
                 psHandler.refreshActiveLayer();
                 const layer: ILayer = {
                     id: activeLayer.id,
@@ -246,9 +249,6 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
         setUploadList([]);
         setFailList([])
     }
-    useEffect(() => {
-        console.log("g", checkAll)
-    }, [groups])
     useEffect(() => {
         if (status != 'generate') return;
         if (generateList.length === 0 && uploadList.length === 0 && failList.length === 0) {
@@ -345,7 +345,6 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                     value={figmaSettings?.ResourceSynchronizationURL}
                     disabled={false} >
                     <PsAction callback={() => {
-
                         figmaSettings?.ResourceSynchronizationURL &&
                             copyToClipboard(figmaSettings?.ResourceSynchronizationURL)
                     }}>
