@@ -105,7 +105,7 @@ class handler {
                 console.log('Select事件', obj);
                 const eventData = obj.eventData as IEventData;
                 if (GridRef?.current) {
-                    if (GridRef?.current.refreshTask != IStatus.loading) {
+                    if (GridRef?.current.refreshStatus != IStatus.loading && GridRef?.current.gridStatus != IStatus.loading) {
                         this.refreshActiveLayer();
                     }
                 } else {

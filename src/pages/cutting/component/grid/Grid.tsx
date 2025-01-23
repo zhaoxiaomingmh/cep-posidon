@@ -14,8 +14,10 @@ type GridProps = {
 type GridRefType = {
     refresh: (status: IStatus) => void,
     handleGridTask: (status: IStatus) => void,
-    refreshTask: IStatus,
+    refreshStatus: IStatus,
+    gridStatus: IStatus,
     handleResize: () => void,
+
 };
 export const GridRef = React.createRef<GridRefType>();
 export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
@@ -23,18 +25,20 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         return {
             refresh: refresh,
             handleGridTask: handleGridTask,
-            refreshTask: refreshTask,
+            refreshStatus: refreshStatus,
+            gridStatus: gridStatus,
             handleResize: handleResize,
         }
     })
     //原始数据
     const doc = useDocumentStore(state => state.getActiveDocument());
     const activeLayer = useDocumentStore(state => state.getActiveLayer());
+    const setActiveLayer = useDocumentStore(state => state.setActiveLayer);
     const [status, setStatus] = useState<IStatus>(IStatus.wait);
     const [image, setImage] = useState<IImage>(undefined);
     //初始化图片
     useEffect(() => {
-        if (activeLayer && taskStatus !== IStatus.loading && refreshTask !== IStatus.loading) {
+        if (activeLayer && gridStatus !== IStatus.loading && refreshStatus !== IStatus.loading) {
             generateImage();
         }
     }, [activeLayer])
@@ -47,11 +51,13 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
             setStatus(IStatus.error);
             return;
         }
+        let id = activeLayer.id;
         if (activeLayer.layerKind === LayerKind.group) {
             //判断是不是九宫格编组,九宫格信息存储在编组里
             if (!activeLayer.generatorSettings?.comPosidonPSCep?.isGrid) {
                 return;
             }
+            id = JSON.parse(activeLayer.generatorSettings?.comPosidonPSCep.gridInfo).layerId;
         }
         const filename = new Date().getTime().toString();
         const filePath = path.join(psConfig.previewImageDir(), filename + ".png");
@@ -70,7 +76,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
                 from: "com.posidon.cep.panel",
                 action: IGeneratorAction.fastExport,
                 data: {
-                    layerId: activeLayer.id,
+                    layerId: id,
                     filename: filename,
                     path: psConfig.previewImageDir(),
                     format: "png",
@@ -125,11 +131,15 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
                 //左右
                 const leftDisPx = Math.round(imgRef.current?.naturalWidth * 0.3);
                 setLeftPx(leftDisPx)
+                setLeftPer(30)
                 setRightPx(leftDisPx)
+                setRightPer(30)
                 //上下
                 const topPreviewPx = Math.round(imgRef.current?.naturalHeight * 0.3);
                 setTopPx(topPreviewPx)
+                setTopPer(30)
                 setBottomPx(topPreviewPx)
+                setBottomPer(30)
             };
             imgRef.current.src = imagePath;
         }
@@ -439,14 +449,14 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         }
     }, [leftPer, rightPer, topPer, bottomPer])
     //底部按钮组
-    const [taskStatus, setTaskStatus] = useState<IStatus>(IStatus.wait);
-    const [refreshTask, setRefreshTask] = useState<IStatus>(IStatus.wait);
+    const [gridStatus, setGridStatus] = useState<IStatus>(IStatus.wait);
+    const [refreshStatus, setRefreshStatus] = useState<IStatus>(IStatus.wait);
     const generateGrid = () => {
         if (!(activeLayer.layerKind == LayerKind.pixel || activeLayer.layerKind == LayerKind.smartObject)) {
             alert("当前图层不支持九宫格");
             return;
         }
-        setTaskStatus(IStatus.loading);
+        setGridStatus(IStatus.loading);
         let gridParameter: IGridParameter = {
             layerId: activeLayer.id,
             split: {
@@ -466,13 +476,13 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
     const handleGridTask = async (status: IStatus) => {
         if (status === IStatus.error) {
             alert("生成失败，请检查参数是否正确");
-            setTaskStatus(IStatus.error);
+            setGridStatus(IStatus.error);
             return;
         }
         //读取grid信息
         const gridPath = path.join(psConfig.gridDir(), "gridInfo.json");
         if (window.cep.fs.stat(gridPath).err !== 0) {
-            setTaskStatus(IStatus.error);
+            setGridStatus(IStatus.error);
             alert("生成失败，图片资源生成失败");
             return;
         }
@@ -538,21 +548,25 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         let cepSettings = generatorSettings?.comPosidonPSCep ?? {};
         cepSettings.isGrid = true;
         cepSettings.group = groupId;
-        setTaskStatus(IStatus.success);
+        setGridStatus(IStatus.success);
+        await psHandler.selectLayer(groupId);
+        const gridLayer = await psHandler.getActiveLayer();
+        setActiveLayer(gridLayer);
         alert("生成成功");
     }
     //尺寸整理
     const handleResize = async () => {
+        console.log("activeLayer", activeLayer.generatorSettings);
         if (!(activeLayer.layerKind === LayerKind.group && activeLayer.generatorSettings?.comPosidonPSCep?.isGrid)) {
             return;
         }
         //计算缩放倍率
         const gridInfo = JSON.parse(activeLayer.generatorSettings?.comPosidonPSCep?.gridInfo) as IGridInfo;
-        if (activeLayer.bounds.width == gridInfo.width && activeLayer.bounds.height == gridInfo.height) {
+        const gridLayer = await psHandler.getActiveLayer();
+        if (gridLayer.bounds.width == gridInfo.width && gridLayer.bounds.height == gridInfo.height) {
             return;
         }
         const id = activeLayer.id;
-        const gridLayer = await psHandler.getActiveLayer();
         const bounds = gridLayer.bounds;
         const layers = await psHandler.getLayersInGroup(id);
         console.log("layers", layers);
@@ -737,7 +751,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
             }
         }
         await psHandler.selectLayer(id);
-        setRefreshTask(IStatus.success)
+        setRefreshStatus(IStatus.success)
     }
     return (
         <div className="grid-container">
@@ -989,10 +1003,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
                 </div>
             </div>
             <div className="grid-footer">
-                {/* <Button className="grid-gen" disabled={!isGrid} type="primary" onClick={tranResizeTaskStatus}>
-                    尺寸整理
-                </Button> */}
-                <Button className="grid-gen" disabled={!(activeLayer.layerKind == LayerKind.pixel || activeLayer.layerKind == LayerKind.smartObject)} type="primary" loading={taskStatus === IStatus.loading} onClick={generateGrid}>
+                <Button className="grid-gen" disabled={!(activeLayer.layerKind == LayerKind.pixel || activeLayer.layerKind == LayerKind.smartObject)} type="primary" loading={gridStatus === IStatus.loading} onClick={generateGrid}>
                     生成九宫格
                 </Button>
             </div>
