@@ -53,6 +53,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
         checkActiveDocument();
         getUserInLocalStorage();
         syncTheme();
+        clearTheCache();
     }, [])
     const checkUpdate = async () => {
         const buffer = await iService.downLoadPosidonFile(psConfig.versinFile, "desc.json");
@@ -161,6 +162,11 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
                 localStorage.removeItem('cep-user');
             }
         }
+    }
+    const clearTheCache = () => {
+        const previewImageDir = psConfig.previewImageDir();
+        //@ts-ignore
+        fsRemoveDir(previewImageDir, true);
     }
 
     return (

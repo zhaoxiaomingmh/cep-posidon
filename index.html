@@ -133,7 +133,7 @@
     }
 </script>
 <script>
-    function fsRemoveDir(dir) {
+    function fsRemoveDir(dir, flag) {
         if (!flag) flag = false;
         const fs = require('fs');
         const path = require('path');
@@ -149,7 +149,9 @@
                 fs.unlinkSync(newPath);
             }
         }
-        fs.rmdirSync(dir)//如果文件夹是空的，就将自己删除掉
+        if (!flag) {
+            fs.rmdirSync(dir)//如果文件夹是空的，就将自己删除掉
+        }
     }
     function writeFileFromBuff(filePath, buff, callback) {
         const fs = require('fs')

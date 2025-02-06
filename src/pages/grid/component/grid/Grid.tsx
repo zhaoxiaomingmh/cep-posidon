@@ -256,11 +256,19 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         setLeftPer(per);
         setLeftPx(width);
         setRightPer(per);
-        setRightPx(width);
+        if (width * 2 > image.width) {
+            setRightPx(image.width - width);
+        } else {
+            setRightPx(width);
+        }
         setTopPer(per);
         setTopPx(height);
         setBottomPer(per);
-        setBottomPx(height);
+        if (height * 2 > image.height) {
+            setBottomPx(image.height - height);
+        } else {
+            setBottomPx(height);
+        }
         //更改分割线
         const previewWidth = Math.round(imgRef?.current?.width * per / 100);
         const previewHeight = Math.round(imgRef?.current?.height * per / 100);
@@ -291,6 +299,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         setLeftPer(leftDisPer);
 
         //更改分割线
+        console.log('leftBounds', leftBounds)
         const disPx = Math.round(imgRef.current.width * per)
         setLeftPosition({ x: disPx, y: 0 });
         setRightBounds({ left: disPx, right: imgRef?.current?.width });
@@ -341,7 +350,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         //更改分割线
         const disPx = Math.round(imgRef.current.width * per)
         setRightPosition({ x: imgRef?.current?.width - disPx, y: 0 });
-        setLeftBounds({ left: 0, right: disPx });
+        setLeftBounds({ left: 0, right: imgRef?.current?.width - disPx });
         if (disPx > (imgRef?.current?.width - leftPosition.x)) {
             setLeftPosition({ x: (imgRef?.current?.width - disPx), y: 0 });
             const leftDisPer = 1 - per;
@@ -439,7 +448,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         //更改分割线
         const disPx = Math.round(imgRef.current.height * per)
         setBottomPosition({ x: 0, y: (imgRef?.current?.height - disPx) });
-        setTopBounds({ top: 0, bottom: disPx });
+        setTopBounds({ top: 0, bottom: imgRef?.current?.height - disPx });
         if (disPx > (imgRef?.current?.height - topPosition.y)) {
             setTopPosition({ x: 0, y: (imgRef?.current?.height - disPx) });
             const topDisPer = 1 - per;
@@ -484,6 +493,8 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
             return;
         }
         setGridStatus(IStatus.loading);
+        //发送任务之前需要校验一下参数
+
         let gridParameter: IGridParameter = {
             layerId: activeLayer.id,
             split: {
@@ -543,6 +554,9 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         //导入子图层
         for (let i = 0; i < gridInfo.grid.length; i++) {
             const iGrid = gridInfo.grid[i];
+            if (!iGrid.validImageInfo) {
+                continue;
+            }
             //计算图片offset
             //先计算原始图片原点
             const imageOrigin: IPoint = {
@@ -564,8 +578,6 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
                 await psHandler.moveLayersToGroup(layers, groupId);
             }
         }
-        //初始图层不可见
-        await psHandler.setLayerVisible(id, false);
         //存储grid信息
         //编组Grid信息
         await psHandler.setLayerGeneratorSettings(groupId, {
@@ -1030,9 +1042,13 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
                 </div>
             </div>
             <div className="grid-footer">
-                <Button className="grid-gen" disabled={!(activeLayer.layerKind == LayerKind.pixel || activeLayer.layerKind == LayerKind.smartObject)} type="primary" loading={gridStatus === IStatus.loading} onClick={generateGrid}>
-                    生成九宫格
-                </Button>
+                {
+                    (activeLayer.layerKind == LayerKind.pixel || activeLayer.layerKind == LayerKind.smartObject)
+                    &&
+                    <Button className="grid-gen" disabled={!(activeLayer.layerKind == LayerKind.pixel || activeLayer.layerKind == LayerKind.smartObject)} type="primary" loading={gridStatus === IStatus.loading} onClick={generateGrid}>
+                        生成九宫格
+                    </Button>
+                }
             </div>
         </div>
     );
