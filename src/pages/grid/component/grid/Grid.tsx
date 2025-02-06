@@ -246,6 +246,9 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         if (per > 50) {
             per = 50;
         }
+        if (per < 0) {
+            per = 0;
+        }
         setProportional(per);
         const height = Math.round(image.height * per / 100);
         const width = Math.round(image.width * per / 100);
@@ -277,6 +280,9 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         if (px > image.width) {
             px = image.width;
         }
+        if (px < 0) {
+            px = 0;
+        }
         //入的是实际值
         setLeftPx(px);
         //转换成实际百分比
@@ -299,6 +305,9 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         if (per > 100) {
             per = 100;
         }
+        if (per < 0) {
+            per = 0;
+        }
         let formattedNum = parseFloat(per.toFixed(2));
         setLeftPer(formattedNum);
         setLeftPx(Math.round(image.width * per / 100));
@@ -318,6 +327,9 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
     const onRightPxChange = (px: number) => {
         if (px > image.width) {
             px = image.width;
+        }
+        if (px < 0) {
+            px = 0;
         }
         //入的是实际值
         setRightPx(px);
@@ -341,6 +353,9 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         if (per > 100) {
             per = 100;
         }
+        if (per < 0) {
+            per = 0;
+        }
         let formattedNum = parseFloat(per.toFixed(2));
         setRightPer(formattedNum);
         const rpx = Math.round(image.width * per / 100)
@@ -361,6 +376,9 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
     const onTopPxChange = (px: number) => {
         if (px > image.height) {
             px = image.height;
+        }
+        if (px < 0) {
+            px = 0;
         }
         //入的是实际值
         setTopPx(px);
@@ -384,6 +402,9 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         if (per > 100) {
             per = 100;
         }
+        if (per < 0) {
+            per = 0;
+        }
         let formattedNum = parseFloat(per.toFixed(2));
         setTopPer(formattedNum);
         const tpx = Math.round(image.height * per / 100)
@@ -404,6 +425,9 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
     const onBottomPxChange = (px: number) => {
         if (px > image.height) {
             px = image.height;
+        }
+        if (px < 0) {
+            px = 0;
         }
         //入的是实际值
         setBottomPx(px);
@@ -426,6 +450,9 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
     const onBottomPerChange = (per: number) => {
         if (per > 100) {
             per = 100;
+        }
+        if (per < 0) {
+            per = 0;
         }
         let formattedNum = parseFloat(per.toFixed(2));
         setBottomPer(formattedNum);
@@ -913,7 +940,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
             </div>
             <div className="grid-input">
                 <div className="input-item">
-                    <span>
+                    <span className="input-label">
                         等比
                     </span>
                     <input type="number" value={proportional} onChange={(event) => {
@@ -926,7 +953,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
                 </div>
                 <div className="splider"></div>
                 <div className="input-item">
-                    <span>
+                    <span className="input-label">
                         左
                     </span>
                     <input type="number" value={leftPer} onChange={(event) => {
@@ -945,7 +972,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
                     </span>
                 </div>
                 <div className="input-item">
-                    <span>
+                    <span className="input-label">
                         右
                     </span>
                     <input type="number" value={rightPer} onChange={(event) => {
@@ -964,7 +991,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
                     </span>
                 </div>
                 <div className="input-item">
-                    <span>
+                    <span className="input-label">
                         上
                     </span>
                     <input type="number" value={topPer} onChange={(event) => {
@@ -983,7 +1010,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
                     </span>
                 </div>
                 <div className="input-item">
-                    <span>
+                    <span className="input-label">
                         下
                     </span>
                     <input type="number" value={bottomPer} onChange={(event) => {

@@ -1,5 +1,5 @@
-import { GridRef } from "@/pages/cutting/component/grid/Grid";
 import { ResourceSynchronizationRef } from "@/pages/cutting/component/ResourceSynchronization";
+import { GridRef } from "@/pages/grid/component/grid/Grid";
 import { AppRef } from "@/router/App";
 import { IDocument, IEventData, IEventResult, IGeneratorAction, IGeneratorParams, ILayer, IMessage, ISetGerParams, IStatus } from "@/store/iTypes/iTypes";
 import { psConfig } from "@/utlis/util-env";
