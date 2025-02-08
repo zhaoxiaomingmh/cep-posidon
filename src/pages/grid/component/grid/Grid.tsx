@@ -532,11 +532,13 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         const str = window.cep.encoding.convertion.b64_to_utf8(gridBase64.data)
         const gridInfo = JSON.parse(str) as IGridInfo;
         console.log("gridInfo", gridInfo);
-        //初始 获取图层中心点
+        const doc = await psHandler.getActiveDocument();
+        // //初始 获取图层中心点
         const centerPoint: IPoint = {
-            x: doc.width / 2,
-            y: doc.height / 2,
+            x: Math.floor(doc.width / 2),
+            y: Math.round(doc.height / 2),
         }
+        console.log("centerPoint", centerPoint);
         //开导
         const id = activeLayer.id;
         let generatorSettings = activeLayer.generatorSettings;
@@ -545,12 +547,14 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
             x: activeLayer.bounds.x,
             y: activeLayer.bounds.y,
         };
+        console.log("nativeLayerRect", layerRect);
         //第一步创建一个编组
         const groupId: number = await psHandler.mkGroup() as number;
         const name = "[grid]" + activeLayer.name;
         console.log("创建新编组", groupId);
         await psHandler.selectLayer(groupId);
         await psHandler.renameLayer(groupId, name);
+
         //导入子图层
         for (let i = 0; i < gridInfo.grid.length; i++) {
             const iGrid = gridInfo.grid[i];
@@ -560,8 +564,8 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
             //计算图片offset
             //先计算原始图片原点
             const imageOrigin: IPoint = {
-                x: centerPoint.x - iGrid.rect.width / 2,
-                y: centerPoint.y - iGrid.rect.height / 2,
+                x: centerPoint.x - Math.round(iGrid.rect.width / 2),
+                y: centerPoint.y - Math.floor(iGrid.rect.height / 2),
             }
             const imageOffset: IPoint = {
                 x: layerRect.x + iGrid.rect.left - imageOrigin.x,
@@ -571,7 +575,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
             const imgDir = path.join(psConfig.gridDir(), `${iGrid.location}.png`);
             //先算出位移再移动
             if (iGrid.validImageInfo.width > 0 && iGrid.validImageInfo.height > 0) {
-                const result = await psHandler.importImage(imgDir, imageOffset.x, imageOffset.y)
+                const result = await psHandler.importImage(imgDir, imageOffset.x, imageOffset.y);
                 const layer = await psHandler.getActiveLayer();
                 let layers: number[] = [id];
                 layers.push(layer.id);

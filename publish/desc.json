@@ -1,7 +1,7 @@
 {
   "name": "cep-posidon",
-  "version": "1.1.71",
+  "version": "1.2.1",
   "restart": "false",
-  "description": "1.添加Figma资源同步功能\n2.修复了一些已知的bug\n3.添加了生成器",
+  "description": "1.修复了一些九宫格的切图与缩放bug",
   "code": "cepcode.zip"
 }

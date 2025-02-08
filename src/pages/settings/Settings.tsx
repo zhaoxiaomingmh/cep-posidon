@@ -103,6 +103,8 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
         }
     }
     const test = async () => {
+        const layers = await psHandler.getLayersInGroup(300);
+        console.log("layers", layers);
     }
 
     return (

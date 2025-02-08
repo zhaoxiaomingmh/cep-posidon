@@ -313,7 +313,13 @@ $._ext = {
             var layer = new Layer(layerID);
             var index = layer.index();
             var layers = [];
-            for (var i = index - 2; i >= 1; i--) {
+            var k = 2;
+            try {
+                activeDocument.backgroundLayer;
+            } catch (e) {
+                k = 1;
+            }
+            for (var i = index - k; i >= 1; i--) {
                 var ref = new ActionReference();
                 ref.putIndex(charIDToTypeID('Lyr '), i);
                 var desc = executeActionGet(ref);
