@@ -1,7 +1,7 @@
 {
   "name": "cep-posidon",
-  "version": "1.2.1",
+  "version": "1.2.3",
   "restart": "false",
-  "description": "1.修复了一些九宫格的切图与缩放bug",
+  "description": "1.九宫格功能优化",
   "code": "cepcode.zip"
 }

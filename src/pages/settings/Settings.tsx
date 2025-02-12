@@ -103,8 +103,8 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
         }
     }
     const test = async () => {
-        const layers = await psHandler.getLayersInGroup(300);
-        console.log("layers", layers);
+        const layer = await psHandler.getActiveLayer();
+        await psHandler.suspendHistory('九宫格形变', 'gridDeformation', layer.id);
     }
 
     return (

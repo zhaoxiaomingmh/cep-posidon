@@ -22,6 +22,7 @@ class handler {
     private cutEventId: string;
     private makeEventId: string;
     private transformEventId: string;
+    private placeEventId: string;
 
     constructor() {
         console.log("中央处理器注册成功");
@@ -34,6 +35,7 @@ class handler {
         this.cutEventId = "1668641824";
         this.makeEventId = "1298866208";
         this.transformEventId = "1416785510";
+        this.placeEventId = "1349280544";
         this.init();
     }
     public static getInstance(): handler {
@@ -82,6 +84,7 @@ class handler {
         this.registerEvent('cut');
         this.registerEvent('make');
         this.registerEvent('transform');
+        this.registerEventByTypeID("1349280544");
         this.getCurrentTheme();
 
         this.csInterface.addEventListener('com.posidon.generator.plugin', (data: IEventResult) => {
@@ -148,6 +151,16 @@ class handler {
                 console.log('Transform事件', obj);
                 GridRef?.current?.handleResize();
             }
+            if (parseInt(obj.eventID) === parseInt(this.placeEventId)) {
+                console.log('Place事件', obj);
+                if (GridRef?.current) {
+                    if (GridRef?.current.refreshStatus != IStatus.loading && GridRef?.current.gridStatus != IStatus.loading) {
+                        this.refreshActiveLayer();
+                    }
+                } else {
+                    this.refreshActiveLayer();
+                }
+            }
         }, undefined);
 
         this.csInterface.addEventListener(`console_log_event`, (result) => {
@@ -188,6 +201,7 @@ class handler {
     }
     public registerEvent(stringId: string) {
         this.csInterface.evalScript(`app.stringIDToTypeID('${stringId}')`, (data) => {
+            console.log('stringId', stringId, data);
             if (stringId === 'select') this.selectEventId = data;
             if (stringId === 'close') this.closeEventId = data;
             if (stringId === 'open') this.openEventId = data;
@@ -197,6 +211,7 @@ class handler {
             if (stringId === 'cut') this.cutEventId = data;
             if (stringId === 'make') this.makeEventId = data;
             if (stringId === 'transform') this.transformEventId = data;
+            if (stringId === 'place') this.placeEventId = data;
             const csEvent: CSEvent = {
                 type: 'com.adobe.PhotoshopRegisterEvent',
                 scope: 'APPLICATION',
@@ -206,6 +221,17 @@ class handler {
             }
             this.csInterface.dispatchEvent(csEvent);
         });
+
+    }
+    public registerEventByTypeID(data: string) {
+        const csEvent: CSEvent = {
+            type: 'com.adobe.PhotoshopRegisterEvent',
+            scope: 'APPLICATION',
+            appId: this.appId,
+            extensionId: this.extId,
+            data: data
+        }
+        this.csInterface.dispatchEvent(csEvent);
 
     }
     public getActiveDocument(): Promise<IDocument | undefined> {
@@ -229,7 +255,6 @@ class handler {
         return new Promise((resolve, reject) => {
             this.csInterface.evalScript(`$._ext.getActiveLayer()`, (result: string) => {
                 try {
-                    console.log('getActiveLayer', result)
                     if (result && result !== "undefined") {
                         const activeLayer = JSON.parse(result) as ILayer;
                         resolve(activeLayer);
@@ -483,6 +508,49 @@ class handler {
             })
         })
     }
+    //获取当前用户的配置
+    public async getPhotoshopPreferencesInterpolation() {
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.getPhotoshopPreferencesInterpolation()`, (result) => {
+                if (result) {
+                    resolve(result);
+                } else {
+                    reject(result);
+                }
+            })
+        })
+    }
+    //修改当前用户配置
+    public async setPhotoshopPreferencesInterpolation(resampleMethod: string) {
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.setPhotoshopPreferencesInterpolation(${resampleMethod})`, (result) => {
+                if (result) {
+                    resolve(result);
+                } else {
+                    reject(result);
+                }
+            })
+        })
+    }
+    //整合历史记录
+    public async suspendHistory(historyName: string, functionName: string, functionParam: any) {
+        return new Promise((resolve, reject) => {
+            var params = {
+                historyName: historyName,
+                functionName: functionName,
+                functionParam: functionParam
+            }
+            this.csInterface.evalScript(`$._ext.suspendHistory(${JSON.stringify(params)})`, (result) => {
+                console.log("result", result);
+                if (result) {
+                    resolve(result);
+                } else {
+                    reject(result);
+                }
+            })
+        })
+    }
+
 }
 
 const psHandler = handler.getInstance();

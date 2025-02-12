@@ -268,6 +268,28 @@ $._ext = {
             return false;
         }
     },
+    moveLayerToGroup: function (groupID, subID) {
+        try {
+            var layer = new Layer(groupID);
+            var index = layer.index();
+            var desc1 = new ActionDescriptor();
+            var ref1 = new ActionReference();
+            ref1.putEnumerated(charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt"));
+            desc1.putReference(charIDToTypeID("null"), ref1);
+            var ref2 = new ActionReference();
+            ref2.putIndex(charIDToTypeID("Lyr "), index - 1);
+            desc1.putReference(charIDToTypeID("T   "), ref2);
+            desc1.putBoolean(charIDToTypeID("Adjs"), false);
+            desc1.putInteger(charIDToTypeID("Vrsn"), 5);
+            var list1 = new ActionList();
+            list1.putInteger(subID);
+            desc1.putList(charIDToTypeID("LyrI"), list1);
+            executeAction(charIDToTypeID("move"), desc1, DialogModes.NO);
+        } catch (e) {
+            psconsole.log(e);
+            return false;
+        }
+    },
     //从本地导入图层
     importImage: function (params) {
         try {
@@ -278,6 +300,30 @@ $._ext = {
             var desc2 = new ActionDescriptor();
             desc2.putUnitDouble(charIDToTypeID("Hrzn"), charIDToTypeID("#Pxl"), params.offsetX);
             desc2.putUnitDouble(charIDToTypeID("Vrtc"), charIDToTypeID("#Pxl"), params.offsetY);
+            desc1.putObject(charIDToTypeID("Ofst"), charIDToTypeID("Ofst"), desc2);
+            var descriptor = executeAction(charIDToTypeID("Plc "), desc1, DialogModes.NO);
+            var descFlags = {
+                reference: false,
+                extended: false,
+                maxRawLimit: 10000,
+                maxXMPLimit: 100000,
+                saveToFile: null
+            };
+            var descObject = descriptorInfo.getProperties(descriptor, descFlags);
+            return JSON.stringify(descObject.generatorSettings, null, 4);
+        } catch (e) {
+            psconsole.log(e);
+        }
+    },
+    importImage: function (filePath, offsetX, offsetY) {
+        try {
+            var desc1 = new ActionDescriptor();
+            desc1.putInteger(charIDToTypeID("Idnt"), 72);
+            desc1.putPath(charIDToTypeID("null"), new File(filePath));
+            desc1.putEnumerated(charIDToTypeID("FTcs"), charIDToTypeID("QCSt"), charIDToTypeID("Qcsa"));
+            var desc2 = new ActionDescriptor();
+            desc2.putUnitDouble(charIDToTypeID("Hrzn"), charIDToTypeID("#Pxl"), offsetX);
+            desc2.putUnitDouble(charIDToTypeID("Vrtc"), charIDToTypeID("#Pxl"), offsetY);
             desc1.putObject(charIDToTypeID("Ofst"), charIDToTypeID("Ofst"), desc2);
             var descriptor = executeAction(charIDToTypeID("Plc "), desc1, DialogModes.NO);
             var descFlags = {
@@ -306,6 +352,18 @@ $._ext = {
         executeAction(charIDToTypeID("Trnf"), desc1, DialogModes.NO);
         return true;
     },
+    transformLayer: function (offsetX, offsetY, scaleX, scaleY) {
+        var desc1 = new ActionDescriptor();
+        desc1.putEnumerated(charIDToTypeID("FTcs"), charIDToTypeID("QCSt"), charIDToTypeID("Qcsa"));
+        var desc2 = new ActionDescriptor();
+        desc2.putUnitDouble(charIDToTypeID("Hrzn"), charIDToTypeID("#Pxl"), offsetX);
+        desc2.putUnitDouble(charIDToTypeID("Vrtc"), charIDToTypeID("#Pxl"), offsetY);
+        desc1.putObject(charIDToTypeID("Ofst"), charIDToTypeID("Ofst"), desc2);
+        desc1.putUnitDouble(charIDToTypeID("Wdth"), charIDToTypeID("#Prc"), scaleX);
+        desc1.putUnitDouble(charIDToTypeID("Hght"), charIDToTypeID("#Prc"), scaleY);
+        executeAction(charIDToTypeID("Trnf"), desc1, DialogModes.NO);
+        return true;
+    },
     //查
     //获取编组内所有子图层信息
     getLayersInGroup: function (layerID) {
@@ -328,7 +386,6 @@ $._ext = {
                 if (sub.kind() == 13) {
                     break;
                 }
-                psconsole.log(sub.name());
                 var iLayer = {
                     name: sub.name(),
                     layerKind: sub.kind(),
@@ -344,6 +401,258 @@ $._ext = {
             psconsole.log(e);
             return false;
         }
+    },
+    //九宫格导入
+    gridGenerat: function (params) {
+        for (var i = 0; i < params.length; i++) {
+            var importInfo = params[i];
+            this.importImage(importInfo.imgDir, importInfo.offsetX, importInfo.offsetY);
+            var activeLayer = app.activeDocument.activeLayer;
+            this.moveLayerToGroup(importInfo.groupID, activeLayer.id);
+        }
+    },
+    //九宫格形变
+    gridDeformation: function (layerID) {
+        try {
+            var activeLayer = new Layer(layerID);
+            var lStr = this.getActiveLayer();
+            var l = JSON.parse(lStr);
+            var bounds = l.bounds;
+            psconsole.log(JSON.stringify(bounds));
+            var generatorSettingsStr = activeLayer.generatorSettings();
+            if (!generatorSettingsStr) {
+                return false;
+            }
+            var generatorSettings = JSON.parse(generatorSettingsStr);
+            var gridInfoStr = generatorSettings.comPosidonPSCep.gridInfo;
+            if (!gridInfoStr) {
+                return false;
+            }
+            psconsole.log(gridInfoStr)
+            var gridInfo = JSON.parse(gridInfoStr);
+            if (bounds.width == gridInfo.width && bounds.height == gridInfo.height) {
+                return true;
+            }
+            //咱们先来计算中间的实际宽高
+            var topleftRect, bottomLeftRect, topRightRect;
+            for (var i = 0; i < gridInfo.grid.length; i++) {
+                var g = gridInfo.grid[i];
+                if (g.location === 'topLeft') {
+                    topleftRect = g.rect;
+                }
+                if (g.location === 'bottomLeft') {
+                    bottomLeftRect = g.rect;
+                }
+                if (g.location === 'topRight') {
+                    topRightRect = g.rect;
+                }
+            }
+            //实际宽高
+            var theoryHeight = (bounds.height - topleftRect.height - bottomLeftRect.height);
+            var theoryWidth = (bounds.width - topleftRect.width - topRightRect.width);
+            var layersStr = this.getLayersInGroup(layerID);
+            var layers = JSON.parse(layersStr);
+            var k = 0;
+            for (var k = 0; k < layers.length; k++) {
+                var layer = layers[k];
+                var grid;
+                for (var i = 0; i < gridInfo.grid.length; i++) {
+                    var g1 = gridInfo.grid[i];
+                    if (g1.location === layer.name) {
+                        grid = g1;
+                    }
+                }
+                if (!grid) {
+                    continue;
+                }
+                var layerObj = new Layer(layer.id);
+                layerObj.select();
+                layerObj.show();
+                var subLayerBounds = layerObj.bounds();
+                psconsole.log(subLayerBounds);
+                if (grid.location === "topLeft") { }
+                switch (grid.location) {
+                    case "topLeft":
+                        {
+                            var scaleX = grid.validImageInfo.width / subLayerBounds.width;
+                            var scaleY = grid.validImageInfo.height / subLayerBounds.height;
+                            //缩放offset
+                            var offsetX = (subLayerBounds.width - grid.validImageInfo.width) / 2;
+                            var offsetY = (subLayerBounds.height - grid.validImageInfo.height) / 2;
+                            //当前原点
+                            var org = {
+                                x: subLayerBounds.x + offsetX,
+                                y: subLayerBounds.y + offsetY,
+                            }
+                            //理论位置
+                            var theoryOrg = {
+                                x: bounds.x + grid.validImageInfo.left,
+                                y: bounds.y + grid.validImageInfo.top,
+                            }
+                            this.transformLayer(theoryOrg.x - org.x, theoryOrg.y - org.y, scaleX * 100, scaleY * 100);
+                            break;
+                        }
+                    case "topMid":
+                        {
+                            if (theoryWidth <= 0) {
+                                layerObj.hide();
+                                break;
+                            }
+                            var actualScaleX = grid.validImageInfo.width / grid.rect.width;
+                            var actualWidth = subLayerBounds.width / actualScaleX;
+                            var scaleX = theoryWidth / actualWidth * 100;
+                            var scaleY = grid.validImageInfo.height / subLayerBounds.height * 100;
+                            this.transformLayer(0, 0, scaleX, scaleY);
+                            var newBounds = layerObj.bounds();
+                            var theoryOrg = {
+                                x: bounds.x + topleftRect.width + (grid.validImageInfo.left * (theoryWidth / grid.rect.width)),
+                                y: bounds.y + grid.validImageInfo.top,
+                            }
+                            this.transformLayer(theoryOrg.x - newBounds.x, theoryOrg.y - newBounds.y, 100, 100);
+                            break;
+                        }
+                    case "topRight":
+                        {
+                            var scaleX = grid.validImageInfo.width / subLayerBounds.width * 100;
+                            var scaleY = grid.validImageInfo.height / subLayerBounds.height * 100;
+                            this.transformLayer(0, 0, scaleX, scaleY);
+                            var newBounds = layerObj.bounds();
+                            var theoryOrg = {
+                                x: bounds.x + grid.validImageInfo.left + bounds.width - grid.rect.width,
+                                y: bounds.y + grid.validImageInfo.top,
+                            }
+                            this.transformLayer(theoryOrg.x - newBounds.x, theoryOrg.y - newBounds.y, 100, 100);
+                            break;
+                        }
+                    case "midLeft":
+                        {
+                            //先宽高
+                            //宽
+                            var scaleX = grid.validImageInfo.width / subLayerBounds.width * 100;
+                            //高
+                            if (theoryHeight <= 0) {
+                                layerObj.hide();
+                                break;
+                            }
+                            var actualScaleY = grid.validImageInfo.height / grid.rect.height;
+                            var actualHeight = subLayerBounds.height / actualScaleY;
+                            var scaleY = theoryHeight / actualHeight * 100;
+                            this.transformLayer(0, 0, scaleX, scaleY);
+                            var newBounds = layerObj.bounds();
+                            var theoryOrg = {
+                                x: bounds.x + grid.validImageInfo.left,
+                                y: bounds.y + topleftRect.height + (grid.validImageInfo.top * (theoryHeight / grid.rect.height)),
+                            }
+                            this.transformLayer(theoryOrg.x - newBounds.x, theoryOrg.y - newBounds.y, 100, 100);
+                            break;
+                        }
+                    case "midMid":
+                        {
+                            if (theoryHeight <= 0 || theoryWidth <= 0) {
+                                layerObj.hide();
+                                break;
+                            }
+                            var actualScaleX = grid.validImageInfo.width / grid.rect.width;
+                            var actualWidth = subLayerBounds.width / actualScaleX;
+                            var scaleX = theoryWidth / actualWidth * 100;
+                            var actualScaleY = grid.validImageInfo.height / grid.rect.height;
+                            var actualHeight = subLayerBounds.height / actualScaleY;
+                            var scaleY = theoryHeight / actualHeight * 100;
+                            this.transformLayer(0, 0, scaleX, scaleY);
+                            var newBounds = layerObj.bounds();
+                            var theoryOrg = {
+                                x: bounds.x + topleftRect.width + (grid.validImageInfo.left * (theoryWidth / grid.rect.width)),
+                                y: bounds.y + topleftRect.height + (grid.validImageInfo.top * (theoryHeight / grid.rect.height)),
+                            }
+                            this.transformLayer(theoryOrg.x - newBounds.x, theoryOrg.y - newBounds.y, 100, 100);
+                            break;
+                        }
+                    case "midRight":
+                        {
+                            if (theoryHeight <= 0) {
+                                layerObj.hide();
+                                break;
+                            }
+                            var scaleX = grid.validImageInfo.width / subLayerBounds.width * 100;
+                            var actualScaleY = grid.validImageInfo.height / grid.rect.height;
+                            var actualHeight = subLayerBounds.height / actualScaleY;
+                            var scaleY = theoryHeight / actualHeight * 100;
+                            this.transformLayer(0, 0, scaleX, scaleY);
+                            var newBounds = layerObj.bounds();
+                            var theoryOrg = {
+                                x: bounds.x + bounds.width - grid.rect.width + grid.validImageInfo.left,
+                                y: bounds.y + topleftRect.height + (grid.validImageInfo.top * (theoryHeight / grid.rect.height)),
+                            }
+                            this.transformLayer(theoryOrg.x - newBounds.x, theoryOrg.y - newBounds.y, 100, 100);
+                            break;
+                        }
+                    case "bottomLeft":
+                        {
+                            var scaleX = grid.validImageInfo.width / subLayerBounds.width * 100;
+                            var scaleY = grid.validImageInfo.height / subLayerBounds.height * 100;
+                            this.transformLayer(0, 0, scaleX, scaleY);
+                            var newBounds = layerObj.bounds();
+                            var theoryOrg = {
+                                x: bounds.x + grid.validImageInfo.left,
+                                y: bounds.y + bounds.height - bottomLeftRect.height + grid.validImageInfo.top,
+                            }
+                            this.transformLayer(theoryOrg.x - newBounds.x, theoryOrg.y - newBounds.y, 100, 100);
+                            break;
+                        }
+                    case "bottomMid":
+                        {
+                            if (theoryWidth <= 0) {
+                                layerObj.hide();
+                                break;
+                            }
+                            var actualScaleX = grid.validImageInfo.width / grid.rect.width;
+                            var actualWidth = subLayerBounds.width / actualScaleX;
+                            var scaleX = theoryWidth / actualWidth * 100;
+                            var scaleY = grid.validImageInfo.height / subLayerBounds.height * 100;
+                            this.transformLayer(0, 0, scaleX, scaleY);
+                            var newBounds = layerObj.bounds();
+                            var theoryOrg = {
+                                x: bounds.x + topleftRect.width + (grid.validImageInfo.left * (theoryWidth / grid.rect.width)),
+                                y: bounds.y + bounds.height - bottomLeftRect.height + grid.validImageInfo.top,
+                            }
+                            this.transformLayer(theoryOrg.x - newBounds.x, theoryOrg.y - newBounds.y, 100, 100);
+                            break;
+                        }
+                    case "bottomRight":
+                        {
+                            var scaleX = grid.validImageInfo.width / subLayerBounds.width * 100;
+                            var scaleY = grid.validImageInfo.height / subLayerBounds.height * 100;
+                            this.transformLayer(0, 0, scaleX, scaleY);
+                            var newBounds = layerObj.bounds();
+                            var theoryOrg = {
+                                x: bounds.x + grid.validImageInfo.left + bounds.width - grid.rect.width,
+                                y: bounds.y + bounds.height - grid.rect.height + grid.validImageInfo.top,
+                            }
+                            this.transformLayer(theoryOrg.x - newBounds.x, theoryOrg.y - newBounds.y, 100, 100);
+                            break;
+                        }
+                }
+            }
+            activeLayer.select();
+            return true;
+        } catch (e) {
+            psconsole.log(e);
+            return false;
+        }
+
+    },
+    //合并调用方法组
+    suspendHistory: function (params) {
+        var historyName = params.historyName;
+        psconsole.log(historyName);
+        var functionName = params.functionName;
+        psconsole.log(functionName);
+        var functionParam = params.functionParam;
+        psconsole.log(functionParam);
+        if (typeof (functionParam) === 'object') {
+            functionParam = JSON.stringify(functionParam);
+        }
+        app.activeDocument.suspendHistory(historyName, 'this.' + functionName + '(' + functionParam + ')');
     },
     //获取当前活动图层信息
     getActiveLayer: function () {
@@ -378,6 +687,17 @@ $._ext = {
         }
         return JSON.stringify(document);
     },
+    //获取当前Photoshop的interpolation信息
+    getPhotoshopPreferencesInterpolation: function () {
+        var interpolation = app.preferences.interpolation;
+        return interpolation;
+    },
+    setPhotoshopPreferencesInterpolation: function (resampleMethod) {
+        psconsole.log(resampleMethod);
+        app.preferences.interpolation = resampleMethod;
+        return true;
+    }
+
 };
 function openImage(params) {
     var path = params.path;
