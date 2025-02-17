@@ -1,0 +1,18 @@
+.document-slimming-container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    .doc-preview {
+        position: relative;
+        height: 600px;
+        background-image: url(../../../asset/img/transBg.png);
+        background-repeat: repeat;
+        border: 1px solid #808080;
+        border-radius: 2px;
+    }
+
+    .doc-slimming-footer {
+        width: 100%;
+        margin: 10px 0px;
+    }
+}

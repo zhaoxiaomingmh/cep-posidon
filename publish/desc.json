@@ -1,7 +1,7 @@
 {
   "name": "cep-posidon",
-  "version": "1.2.3",
+  "version": "1.2.6",
   "restart": "false",
-  "description": "1.九宫格功能优化",
+  "description": "1.九宫格功能优化\n2.修复了一些已知的BUG",
   "code": "cepcode.zip"
 }

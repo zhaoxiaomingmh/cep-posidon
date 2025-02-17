@@ -357,6 +357,7 @@ export interface IGridParameter {
     layerId: number,
     split: ISplitLine,
     savePath: string,
+    resolution: number,
 }
 
 export interface ISplitLine {

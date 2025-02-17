@@ -50,8 +50,6 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
         }
     }, [activeLayer])
     useEffect(() => {
-        console.log("uploadList.length", uploadList.length)
-        console.log("failList.length", failList.length)
         if (status != 'idle' && checkedList.length != 0 && checkedList.length === (uploadList.length + failList.length)) {
             if (uploadList.length > 0) {
                 let fuList: {
@@ -195,6 +193,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
     }
     const addOrUpdateFigmaId = () => {
         if (!activeLayer || !figmaId) return;
+        console.log('figmaId', figmaId)
         if (activeLayer.generatorSettings?.comPosidonPSCep?.figmaNodeId) {
             let data = activeLayer.generatorSettings?.comPosidonPSCep;
             data.figmaNodeId = undefined;
@@ -207,7 +206,8 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                 if (checkedList.some(i => i.id === activeLayer.id)) setCheckedList(prevCheckedList => prevCheckedList.filter(i => i.id !== activeLayer.id));
             });
         } else {
-            let data = activeLayer.generatorSettings?.comPosidonPSCep;
+            console.log('activeLayer.generatorSettings', activeLayer.generatorSettings)
+            let data = activeLayer.generatorSettings?.comPosidonPSCep ?? {};
             data.figmaNodeId = figmaId;
             psHandler.setLayerGeneratorSettings(activeLayer.id, data, () => {
                 psHandler.refreshActiveLayer();

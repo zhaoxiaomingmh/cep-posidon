@@ -9,9 +9,9 @@ import { PsdLevel, PsdLevelRef } from "@/pages/level/PsdLevel";
 import '@/asset/iconfont/font.css'
 import '../asset/svg/cutting.svg'
 import { Cutting, CuttingRef } from "@/pages/cutting/Cutting";
-import { psConfig } from "@/utlis/util-env";
 import psHandler from "@/service/handler";
 import { GridPage, GridPageRef } from "@/pages/grid/GridPage";
+import { Clean, CleanRef } from "@/pages/clean/Clean";
 
 export const Face = forwardRef(() => {
     return (
@@ -44,6 +44,13 @@ export const Face = forwardRef(() => {
                         <img src={"./dist/static/images/svg/grid.svg"}></img>
                     }  >
                     <GridPage ref={GridPageRef} />
+                </PsTableItem>
+                <PsTableItem
+                    id={"clean-page"}
+                    icon={
+                        <img src={"./dist/static/images/svg/PsClean.svg"}></img>
+                    }>
+                    <Clean ref={CleanRef} />
                 </PsTableItem>
                 <PsTableItem id="gap" isGap></PsTableItem>
                 <PsTableItem

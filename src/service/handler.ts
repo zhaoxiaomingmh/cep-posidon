@@ -550,7 +550,31 @@ class handler {
             })
         })
     }
-
+    //文档瘦身
+    public async documentSlimming() {
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.documentSlimming()`, (result) => {
+                if (result) {
+                    resolve(result);
+                } else {
+                    reject(result);
+                }
+            })
+        })
+    }
+    //获取文档分辨率
+    public async getDocumentResolution() : Promise<string> {
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.getDocumentResolution()`, (result) => {
+                console.log("result", result);
+                if (result) {
+                    resolve(result);
+                } else {
+                    reject(-1);
+                }
+            })
+        })
+    }
 }
 
 const psHandler = handler.getInstance();

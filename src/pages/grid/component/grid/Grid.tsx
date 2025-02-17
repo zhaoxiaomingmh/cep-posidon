@@ -487,12 +487,13 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
     //底部按钮组
     const [gridStatus, setGridStatus] = useState<IStatus>(IStatus.wait);
     const [refreshStatus, setRefreshStatus] = useState<IStatus>(IStatus.wait);
-    const generateGrid = () => {
+    const generateGrid = async () => {
         if (!(activeLayer.layerKind == LayerKind.pixel || activeLayer.layerKind == LayerKind.smartObject)) {
             alert("当前图层不支持九宫格");
             return;
         }
         setGridStatus(IStatus.loading);
+        const resolution = await psHandler.getDocumentResolution();
         let gridParameter: IGridParameter = {
             layerId: activeLayer.id,
             split: {
@@ -502,6 +503,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
                 bottomLine: bottomPx,
             },
             savePath: psConfig.gridDir(),
+            resolution: parseFloat(resolution)
         }
         psHandler.sendToGenerator({
             from: "com.posidon.cep.panel",

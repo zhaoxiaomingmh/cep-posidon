@@ -696,8 +696,22 @@ $._ext = {
         psconsole.log(resampleMethod);
         app.preferences.interpolation = resampleMethod;
         return true;
-    }
+    },
+    //文档瘦身
+    documentSlimming: function () {
+        try {
+            psconsole.log("文档瘦身");
+            psconsole.log(psDeepCleaner);
+            psDeepCleaner.start();
+        } catch (e) {
+            psconsole.log(e);
+        }
 
+    },
+    //获取文档分辨率
+    getDocumentResolution: function () {
+        return app.activeDocument.resolution;
+    }
 };
 function openImage(params) {
     var path = params.path;
