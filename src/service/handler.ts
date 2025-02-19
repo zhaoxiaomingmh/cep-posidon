@@ -288,7 +288,26 @@ class handler {
             });
         });
     }
-    public getDocGeneratorSettings() {
+    //根据ID获取Layer
+    public getLayersByIDs(layerIDs: number[]): Promise<any> {
+        return new Promise((resolve, reject) => {
+            const req = JSON.stringify(layerIDs)
+            this.csInterface.evalScript(`$._ext.getLayersByIDs(${req})`, (result) => {
+                try {
+                    if (result && result !== "undefined") {
+                        const layers = JSON.parse(result);
+                        console.log('getLayerInfoByID返回成功', layers)
+                        resolve(layers);
+                    } else {
+                        resolve(undefined);
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        });
+    }
+    public getDocGeneratorSettings(): Promise<any> {
         return new Promise((resolve, reject) => {
             this.csInterface.evalScript(`$._ext.getGeneratorSettings()`, (result) => {
                 console.log('getGeneratorSettings', result)
@@ -563,7 +582,7 @@ class handler {
         })
     }
     //获取文档分辨率
-    public async getDocumentResolution() : Promise<string> {
+    public async getDocumentResolution(): Promise<string> {
         return new Promise((resolve, reject) => {
             this.csInterface.evalScript(`$._ext.getDocumentResolution()`, (result) => {
                 console.log("result", result);
@@ -571,6 +590,50 @@ class handler {
                     resolve(result);
                 } else {
                     reject(-1);
+                }
+            })
+        })
+    }
+    //获取文档元数据XmpData
+    public async getXmpDataByKey(key: string): Promise<any> {
+        //key为页面+功能
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.getXmpDataByKey()`, (result) => {
+                console.log("result", result);
+                if (result && result != null) {
+                    resolve(result);
+                } else {
+                    resolve([]);
+                }
+            })
+        })
+    }
+    //设置文档元数据
+    public async setXmpDataByKey(key: string, value: any): Promise<boolean> {
+        const params = {
+            key: key,
+            value: value
+        }
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.setXmpDataByKey(${JSON.stringify(params)})`, (result) => {
+                console.log("result", result);
+                if (result) {
+                    resolve(true);
+                } else {
+                    reject(false);
+                }
+            })
+        })
+    }
+    //删除文档元数据
+    public async delXmpDataByKey(): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            this.csInterface.evalScript(`$._ext.delXmpDataByKey()`, (result) => {
+                console.log("result", result);
+                if (result) {
+                    resolve(true);
+                } else {
+                    reject(false);
                 }
             })
         })

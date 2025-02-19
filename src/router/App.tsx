@@ -13,6 +13,7 @@ import { defaultProjectHeadImage } from "@/utlis/const";
 import iService from "@/service/service";
 import { Update, UpdateRef } from "@/pages/welcome/Update";
 import path from "path";
+import { ExportDialog, ExportDialogRef } from "@/pages/cutting/component/cuttingTool/ExportDialog";
 
 interface AppRefType {
     refresh: () => void;
@@ -170,7 +171,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     }
 
     return (
-        <Provider theme={currentTheme} colorScheme={currentScheme} isQuiet>
+        <Provider theme={currentTheme} colorScheme={currentScheme} isQuiet>     
             <div className={`ps-app theme-${themeClass}`}>
                 <div style={{ width: '100%', height: '100%' }}>
                     {

@@ -1,0 +1,99 @@
+.export-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: 344px;
+    height: 191px;
+    padding: 19px 10px;
+    background: #535353;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+
+    .export-dialog-header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        width: 324px;
+        height: 33px;
+
+        select {
+            margin: 0px 10px;
+            width: 219px;
+            height: 33px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .export-dialog-header-file-chioce {
+            width: 37px;
+            height: 33px;
+        }
+    }
+
+    .export-dialog-progress-bar {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: flex-start;
+        padding: 0px;
+
+        margin: 20px 0px;
+
+        width: 324px;
+        height: 4px;
+
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 11px;
+
+        #progress-bar {
+            height: 100%;
+            background-color: #1e81d3;
+
+        }
+    }
+
+    .vector2 {
+        width: 324px;
+        height: 0px;
+
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .export-dialog-options {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 0px;
+
+        width: 324px;
+        height: 56px;
+
+        margin-top: 20px;
+
+        .export-dialog-options-item {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+
+            padding: 0px;
+            width: 157px;
+            height: 56px;
+
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 11px;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+}

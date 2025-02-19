@@ -402,6 +402,29 @@ $._ext = {
             return false;
         }
     },
+    //根据ID获取Layers
+    getLayersByIDs: function (layerIDs) {
+        try {
+            var layers = [];
+            for (var i = 0; i < layerIDs.length; i++) {
+                psconsole.log(layerIDs[i]);
+                var layer = new Layer(layerIDs[i]);
+                var iLayer = {
+                    name: layer.name(),
+                    layerKind: layer.kind(),
+                    id: layer.id,
+                    index: layer.index(),
+                    generatorSettings: layer.generatorSettings(),
+                    bounds: layer.bounds(),
+                }
+                layers.push(iLayer);
+            }
+            return JSON.stringify(layers);
+        } catch (e) {
+            psconsole.log(e);
+            return false;
+        }
+    },
     //九宫格导入
     gridGenerat: function (params) {
         for (var i = 0; i < params.length; i++) {
@@ -711,6 +734,76 @@ $._ext = {
     //获取文档分辨率
     getDocumentResolution: function () {
         return app.activeDocument.resolution;
+    },
+    //获取
+    getXmpDataByKey: function () {
+        if (ExternalObject.AdobeXMPScript == undefined) {
+            ExternalObject.AdobeXMPScript = new ExternalObject("lib:AdobeXMPScript");
+        }
+        var xmp, xmpObject;
+        try {
+            xmp = app.activeDocument.xmpMetadata.rawData;
+            xmpObject = new XMPMeta(xmp);
+        } catch (e) {
+            xmpObject = new XMPMeta();
+        }
+        var value = null;
+        try {
+            XMPMeta.registerNamespace("posidon", "cep");
+            var property = xmpObject.getProperty("posidon", "cuttingtoolmark");
+            value = property.value;
+        } catch (e) {
+            return null;
+        }
+        return JSON.stringify(value);
+    },
+    //设置元数据
+    setXmpDataByKey: function (params) {
+        var value = params.value;
+        try {
+            // 这个是它依赖的外部库，需要先判断，再引用
+            if (ExternalObject.AdobeXMPScript == undefined) {
+                ExternalObject.AdobeXMPScript = new ExternalObject("lib:AdobeXMPScript");
+            }
+            var xmpObject;
+            try {
+                var xmp = app.activeDocument.xmpMetadata.rawData;
+                xmpObject = new XMPMeta(xmp);
+            } catch (e) {
+                xmpObject = new XMPMeta();
+            }
+            XMPMeta.registerNamespace("posidon", "cep");
+            xmpObject.deleteProperty("posidon", "cuttingtoolmark");
+            xmpObject.setProperty("posidon", "cuttingtoolmark", value);
+            app.activeDocument.xmpMetadata.rawData = xmpObject.serialize();
+            return true;
+        } catch (e) {
+            psconsole.log(e);
+            return false;
+        }
+    },
+    //删除命名空间
+    delXmpDataByKey: function() {
+        try {
+            // 这个是它依赖的外部库，需要先判断，再引用
+            if (ExternalObject.AdobeXMPScript == undefined) {
+                ExternalObject.AdobeXMPScript = new ExternalObject("lib:AdobeXMPScript");
+            }
+            var xmpObject;
+            try {
+                var xmp = app.activeDocument.xmpMetadata.rawData;
+                xmpObject = new XMPMeta(xmp);
+            } catch (e) {
+                xmpObject = new XMPMeta();
+            }
+            XMPMeta.registerNamespace("posidon", "cep");
+            xmpObject.deleteProperty("posidon", "cuttingtoolmark");
+            app.activeDocument.xmpMetadata.rawData = xmpObject.serialize();
+            return true;
+        } catch (e) {
+            psconsole.log(e);
+            return false;
+        }
     }
 };
 function openImage(params) {

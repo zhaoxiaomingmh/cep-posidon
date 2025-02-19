@@ -262,10 +262,11 @@ export interface IGeneratorSettingsParams {
     layerId: string
 }
 
-export interface IFigmaUrlSettings {
-    ResourceSynchronizationURL: string,
-    resourceSynchronizationTime: string,
-    resourceSynchronizationTimeStamp: string
+export interface IGeneratorSettingsObj {
+    ResourceSynchronizationURL?: string,
+    resourceSynchronizationTime?: string,
+    resourceSynchronizationTimeStamp?: string
+    cuttingToolMarkIds?: string,
 }
 
 export interface IItem {
@@ -393,4 +394,9 @@ export type ILocation = "topLeft" | "topMid" | "topRight" | "midLeft" | "midMid"
 export interface IPoint {
     x: number,
     y: number,
+}
+
+export enum ICuttingType {
+    'fixedSize' = 'fixedSize',
+    'multipleSize' = 'multipleSize',
 }

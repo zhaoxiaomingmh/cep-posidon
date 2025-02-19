@@ -1,0 +1,204 @@
+.cutting-tool-page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 16px;
+    background: #535353;
+
+    .cutting-tool-page-list-container {
+        flex: 1;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        min-height: 285px;
+
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        .cutting-tool-page-list-header {
+            display: flex;
+            align-items: center;
+            padding: 0px 6px;
+            height: 30px;
+            min-height: 30px;
+
+            background: rgba(255, 255, 255, 0.05);
+
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 19px;
+            color: #999999;
+        }
+
+        .cutting-tool-page-list-box {
+            flex: 1;
+            display: flex;
+            padding: 0px;
+            padding: 10px;
+            min-height: 250px;
+
+            .cutting-tool-page-list-empty {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+
+                font-family: 'Inter';
+                font-style: normal;
+                font-weight: 400;
+                font-size: 16px;
+                line-height: 19px;
+                color: #999999;
+            }
+
+            .cutting-tool-page-list-table {
+                width: 100%;
+                width: 100%;
+                overflow-y: auto;
+                display: block; // 改用块级布局
+
+                .cutting-tool-page-list-item {
+                    flex-shrink: 0;
+                    height: 27px;
+                    min-height: 27px;
+                    box-sizing: border-box;
+                    background: rgba(255, 255, 255, 0.1);
+                    margin: 5px 0px;
+                    padding-left: 5px;
+
+                    font-family: 'Inter';
+                    font-style: normal;
+                    font-weight: 400;
+                    font-size: 16px;
+                    line-height: 19px;
+                    display: flex;
+                    align-items: center;
+
+                    color: #CCCCCC;
+
+                    &:hover {
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
+
+    .cutting-tool-page-list-vector {
+        width: 100%;
+        height: 0px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        margin: 10px 0px;
+    }
+
+    .cutting-tool-page-list-options {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px 0px 0px;
+
+        width: 100%;
+        height: 171px;
+
+        border-radius: 0px;
+
+        .cutting-tool-page-list-options-sliding-window {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2px;
+
+            width: 282px;
+            height: 41px;
+
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+
+            .cutting-tool-page-list-options-sliding-window-item {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                width: 139px;
+                height: 39px;
+
+                border-radius: 2px;
+
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+        }
+
+        .frame-15618 {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            width: 100%;
+            height: 98px;
+
+            .arithmetic-input-box {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+
+                .input-item1 {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 4px;
+
+                    height: 32px;
+                    width: 68px;
+
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+                    input {
+                        background: transparent;
+                        outline: none;
+                        border: none;
+
+                        padding-left: 16px;
+                        width: 64px;
+                        font-family: 'Inter';
+                        font-style: normal;
+                        font-weight: 400;
+                        font-size: 20px;
+                        line-height: 24px;
+                        display: flex;
+                        align-items: center;
+                        color: #FFFFFF;
+
+                    }
+
+                }
+
+                .symbol-item {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 40px;
+                    height: 19px;
+                    margin: 0px 5px;
+
+                    font-family: 'Inter';
+                    font-style: normal;
+                    font-weight: 400;
+                    font-size: 16px;
+                    line-height: 19px;
+
+
+                    color: #FFFFFF;
+
+                }
+            }
+        }
+    }
+}

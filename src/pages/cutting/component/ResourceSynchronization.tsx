@@ -6,7 +6,7 @@ import './rs.scss'
 import { PsInput } from "@/hooks/input/PsInput";
 import { PsAction } from "@/hooks/button/PsAction";
 import psHandler from "@/service/handler";
-import { IFigmaUrlSettings, IGeneratorAction, ILayer, IWaitIte } from "@/store/iTypes/iTypes";
+import { IGeneratorSettingsObj, IGeneratorAction, ILayer, IWaitIte } from "@/store/iTypes/iTypes";
 
 import { Button, Checkbox } from 'antd';
 import type { CheckboxProps } from 'antd';
@@ -27,7 +27,7 @@ export const ResourceSynchronizationRef = React.createRef<ResourceSynchronizatio
 export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType, ResourceSynchronizationProps>((props, ref) => {
 
     const activeLayer = useDocumentStore(state => state.getActiveLayer());
-    const [figmaSettings, setFigmaSettings] = useState<IFigmaUrlSettings>(undefined);
+    const [figmaSettings, setFigmaSettings] = useState<IGeneratorSettingsObj>(undefined);
     const [figmaId, setFigmaId] = useState<string>(undefined);
     const [groups, setGroups] = useState<ILayer[]>([]);
     const [checkedList, setCheckedList] = useState<ILayer[]>([]);
