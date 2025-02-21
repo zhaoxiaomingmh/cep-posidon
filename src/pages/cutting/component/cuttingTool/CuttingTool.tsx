@@ -390,9 +390,9 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
                 </div>
 
                 <div className="frame-15614">
-                    <button onClick={() => {
+                    {checkedList?.length > 0&&<button onClick={() => {
                         ExportDialogRef?.current?.show();
-                    }}>全部导出</button>
+                    }}>全部导出</button>}
                     {
                         checkedItem ?
                             <button
