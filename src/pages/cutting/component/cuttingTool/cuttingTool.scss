@@ -57,7 +57,6 @@
             .cutting-tool-page-list-table {
                 width: 100%;
                 width: 100%;
-                overflow-y: auto;
                 display: block; // 改用块级布局
 
                 .cutting-tool-page-list-item {
@@ -68,14 +67,28 @@
                     background: rgba(255, 255, 255, 0.1);
                     margin: 5px 0px;
                     padding-left: 5px;
-
-                    font-family: 'Inter';
-                    font-style: normal;
-                    font-weight: 400;
-                    font-size: 16px;
-                    line-height: 19px;
                     display: flex;
                     align-items: center;
+                    justify-content: space-between;
+
+
+                    span {
+                        font-family: 'Inter';
+                        font-style: normal;
+                        font-weight: 400;
+                        font-size: 16px;
+                        line-height: 19px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    .icon-fork {
+                        margin-right: 15px;
+                        z-index: 100;
+                    }
+
+
 
                     color: #CCCCCC;
 
@@ -114,7 +127,7 @@
             padding: 2px;
 
             width: 282px;
-            height: 41px;
+            height: 48px;
 
             background: rgba(0, 0, 0, 0.2);
             border-radius: 4px;
@@ -198,6 +211,33 @@
                     color: #FFFFFF;
 
                 }
+            }
+        }
+
+        .frame-15614 {
+            width: 400px;
+            height: 56px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+
+            button {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                width: 195px;
+                height: 56px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 11px;
+                background-color: transparent;
+
+                font-family: 'Inter';
+                font-style: normal;
+                font-weight: 400;
+                font-size: 20px;
+                line-height: 24px;
+                color: #FFFFFF;
             }
         }
     }

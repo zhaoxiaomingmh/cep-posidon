@@ -1,18 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useImperativeHandle, useState } from "react";
 import { forwardRef } from "react";
 import './cuttingTool.scss';
-import { ICuttingType, IGeneratorSettingsObj, ILayer, IStatus } from "@/store/iTypes/iTypes";
+import { ICuttingToolExportParams, ICuttingToolLayer, ICuttingType, IGeneratorAction, IGeneratorSettingsObj, IHorizontal, ILayer, IStatus, IVertical, IWaitIte, LayerKind } from "@/store/iTypes/iTypes";
 import psHandler from "@/service/handler";
 import useDocumentStore from "@/store/modules/documentStore";
 import { ExportDialog, ExportDialogRef } from "./ExportDialog";
+import 'react-perfect-scrollbar/dist/css/styles.css';
+import PerfectScrollbar from 'react-perfect-scrollbar'
 
 type CuttingToolPageProps = {
 }
 type CuttingToolPageRefType = {
+    refreshExportTaskStatus: (status: IStatus, layerId: number) => void
 };
 
 export const CuttingToolPageRef = React.createRef<CuttingToolPageRefType>();
 export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPageProps>((props, ref) => {
+
+    useImperativeHandle(ref, () => {
+        return {
+            refreshExportTaskStatus: refreshExportTaskStatus,
+        }
+    })
 
     //ps数据
     const doc = useDocumentStore(state => state.getActiveDocument());
@@ -57,11 +66,21 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
                 setCheckedList(layers);
             }
         }
+        setSuccessList([]);
+        setFailList([]);
+        setPercentage(0);
     }
     //新增选中资源
     const addCheckedLayer = async () => {
         if (checkedItem || !activeLayer) return;
+        if (activeLayer.layerKind === LayerKind.adjustment) {
+            alert('调整图层不可标记');
+            return;
+        }
         if (checkedList.findIndex(item => item.id === activeLayer.id) !== -1) return;
+        setSuccessList([]);
+        setFailList([]);
+        setPercentage(0);
         //需要确定的是是否要加参数
         const currentLayer = await psHandler.getActiveLayer();
         let layerGS = JSON.parse(currentLayer.generatorSettings) ?? {};
@@ -90,18 +109,19 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
         await psHandler.setDocGeneratorSettings(comPosidonPSCep);
     }
     //删除选中资源
-    const removeCheckedLayer = async () => {
-        if (!checkedItem) return;
-        const currentLayer: ILayer[] = await psHandler.getLayersByIDs([checkedItem.id]);
+    const removeCheckedLayer = async (layer: ILayer) => {
+        if (status === IStatus.loading) return;
+        console.log('removeCheckedLayer', layer)
+        const currentLayer: ILayer[] = await psHandler.getLayersByIDs([layer.id]);
         let layerGS = JSON.parse(currentLayer[0].generatorSettings) ?? {};
         let layerPosidon = layerGS.comPosidonPSCep ?? {};
         delete layerPosidon.cuttingToolCuttingType;
         if (layerPosidon.cuttingToolWidth) delete layerPosidon.cuttingToolWidth;
         if (layerPosidon.cuttingToolHeight) delete layerPosidon.cuttingToolHeight;
         if (layerPosidon.cuttingToolMultiple) delete layerPosidon.cuttingToolMultiple;
-        await psHandler.setLayerGeneratorSettings(checkedItem.id, layerPosidon);
+        await psHandler.setLayerGeneratorSettings(layer.id, layerPosidon);
 
-        const layers = checkedList.filter(item => item.id !== checkedItem.id);
+        const layers = checkedList.filter(item => item.id !== layer.id);
         setCheckedList(layers);
         setCheckedItem(undefined);
         let ids = layers.map(item => item.id);
@@ -116,10 +136,123 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
     const [width, setWidth] = useState<number>(undefined);
     const [height, setHeight] = useState<number>(undefined);
     const [multiple, setMultiple] = useState<number>(undefined);
+    // 修改任务参数
+    const updateLayerCuttingParma = async () => {
+        if (!checkedItem) { return; }
+        const layers = await psHandler.getLayersByIDs([checkedItem.id])
+        const layer = layers[0];
+        let layerGS = JSON.parse(layer.generatorSettings) ?? {};
+        let layerPosidon = layerGS.comPosidonPSCep ?? {};
+        layerPosidon.cuttingToolCuttingType = cuttingType;
+        if (cuttingType === ICuttingType.fixedSize) {
+            if (width != undefined && height != undefined && !Number.isNaN(width) && !Number.isNaN(height) && width !== 0 && height !== 0) {
+                layerPosidon.cuttingToolWidth = width;
+                layerPosidon.cuttingToolHeight = height;
+                if (layerPosidon.multiple) delete layerPosidon.multiple;
+            } else {
+                delete layerPosidon.cuttingToolCuttingType;
+                if (layerPosidon.multiple) delete layerPosidon.multiple;
+                if (layerPosidon.cuttingToolWidth) delete layerPosidon.cuttingToolWidth;
+                if (layerPosidon.cuttingToolHeight) delete layerPosidon.cuttingToolHeight;
+            }
+        } else {
+            if (multiple != undefined && !Number.isNaN(multiple) && multiple !== 0) {
+                layerPosidon.cuttingToolMultiple = multiple;
+                if (layerPosidon.cuttingToolWidth) delete layerPosidon.cuttingToolWidth;
+                if (layerPosidon.cuttingToolHeight) delete layerPosidon.cuttingToolHeight;
+            } else {
+                delete layerPosidon.cuttingToolCuttingType;
+                if (layerPosidon.multiple) delete layerPosidon.multiple;
+                if (layerPosidon.cuttingToolWidth) delete layerPosidon.cuttingToolWidth;
+                if (layerPosidon.cuttingToolHeight) delete layerPosidon.cuttingToolHeight;
+            }
+        }
+        await psHandler.setLayerGeneratorSettings(layer.id, layerPosidon);
+        alert('修改成功');
+    }
     //任务模块
-    const [status, setStatus] = useState<IStatus>(IStatus.wait);
+    const [status, setStatus] = useState<IStatus>(IStatus.success);
+    const [successList, setSuccessList] = useState<number[]>([]);
+    const [failList, setFailList] = useState<number[]>([]);
     const [percentage, setPercentage] = useState<number>(0);
 
+    //开始导出任务
+    const startExport = async (localPath: string) => {
+        if (checkedList.length === 0 || !localPath || status === IStatus.loading) return;
+        setStatus(IStatus.loading);
+        setSuccessList([]);
+        setFailList([]);
+        setPercentage(0);
+        //组装导出参数
+        const resolution = await psHandler.getDocumentResolution();
+        let exportParams: ICuttingToolExportParams = {
+            path: localPath,
+            resolution: parseFloat(resolution),
+            layers: []
+        };
+        let ids = checkedList.map((layer) => { return layer.id });
+        const layers = await psHandler.getLayersByIDs(ids)
+        layers.map((layer) => {
+            //获取图层原生参数
+            let layerGS = JSON.parse(layer.generatorSettings) ?? {};
+            let layerPosidon = layerGS.comPosidonPSCep ?? {};
+            //获取切图参数
+            let cuttingType = layerPosidon.cuttingToolCuttingType;
+            let cuttingWidth = layerPosidon.cuttingToolWidth;
+            let cuttingHeight = layerPosidon.cuttingToolHeight;
+            let cuttingMultiple = layerPosidon.cuttingToolMultiple;
+            //多种情况分别处理
+            let cuttingLayer: ICuttingToolLayer = {
+                layerId: layer.id,
+                name: layer.name,
+                isNative: cuttingType ? false : true,
+                horizontal: IHorizontal.twoWay,
+                vertical: IVertical.twoWay,
+            }
+            if (cuttingType) {
+                cuttingLayer.cuttingType = cuttingType;
+                if (cuttingType == ICuttingType.fixedSize) {
+                    cuttingLayer.width = parseFloat(cuttingWidth);
+                    cuttingLayer.height = parseFloat(cuttingHeight);
+                } else {
+                    cuttingLayer.multiple = parseFloat(cuttingMultiple);
+                }
+            }
+            exportParams.layers.push(cuttingLayer);
+        })
+
+        //开始导出 to生成器
+        psHandler.sendToGenerator({
+            from: "com.posidon.cep.panel",
+            action: IGeneratorAction.cuttingToolExport,
+            data: exportParams
+        })
+    }
+
+    //刷新任务状态
+    const refreshExportTaskStatus = (taskStatus: IStatus, layerId: number) => {
+        if (!checkedList.some(item => item.id === layerId)) return;
+        if (taskStatus === IStatus.success) {
+            if (!successList.includes(layerId)) {
+                setSuccessList([...successList, layerId]);
+            }
+        } else {
+            if (!failList.includes(layerId)) {
+                setFailList([...failList, layerId]);
+            }
+        }
+    }
+
+    useEffect(() => {
+        const count = successList.length + failList.length;
+        let per = Math.round(count / checkedList.length * 100);
+        per = per > 100 ? 100 : per;
+        setPercentage(per);
+        if (status === IStatus.loading && count === checkedList.length) {
+            setStatus(IStatus.success);
+            alert("图片导出成功");
+        }
+    }, [failList, successList])
     return (
         <div className="cutting-tool-page" >
             <div className="cutting-tool-page-list-container">
@@ -133,23 +266,47 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
                         checkedList?.length > 0
                         &&
                         <div className="cutting-tool-page-list-table">
-                            {
-                                checkedList?.map((layer, index) => {
-                                    return (
-                                        <div className="cutting-tool-page-list-item"
-                                            key={index}
-                                            onClick={() => {
-                                                checkNewLayer(layer);
-                                            }}
-                                            style={{
-                                                backgroundColor: checkedItem?.id === layer.id ? "#1472e6" : undefined,
-                                                color: checkedItem?.id === layer.id ? "#ffffff" : undefined,
-                                            }}
-                                        >
-                                            <span>{layer.name}</span>
-                                        </div>);
-                                })
-                            }
+                            <PerfectScrollbar >
+                                {
+                                    checkedList?.map((layer, index) => {
+                                        return (
+                                            <div className="cutting-tool-page-list-item"
+                                                key={index}
+                                                onClick={() => {
+                                                    checkNewLayer(layer);
+                                                }}
+                                                style={{
+                                                    backgroundColor: checkedItem?.id === layer.id ? "#1472e6" : undefined,
+                                                    color: checkedItem?.id === layer.id ? "#ffffff" : undefined,
+                                                }}
+                                            >
+                                                <div>
+                                                    <span>{layer.name}</span>
+                                                    {
+                                                        successList.includes(layer.id)
+                                                        &&
+                                                        <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/success.svg"></img>
+                                                    }
+                                                    {
+                                                        failList.includes(layer.id)
+                                                        &&
+                                                        <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/fail.svg"></img>
+                                                    }
+                                                </div>
+
+                                                <div className="icon-fork" onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    if (confirm("确定删除?")) {
+                                                        removeCheckedLayer(layer);
+                                                    }
+                                                }}>
+                                                    <img src="./dist/static/images/svg/fork.svg"></img>
+                                                </div>
+                                            </div>);
+                                    })
+                                }
+                            </PerfectScrollbar>
                         </div>
                     }
                     {
@@ -192,7 +349,9 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
                                     value={width == undefined ? '' : width}
                                     onChange={(event) => {
                                         const value = parseFloat(event.target.value);
-                                        setWidth(value);
+                                        if (value >= 0 || Number.isNaN(value)) {
+                                            setWidth(Math.round(value));
+                                        }
                                     }}></input>
                             </div>
                             <div className="symbol-item">
@@ -204,7 +363,9 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
                                     value={height == undefined ? '' : height}
                                     onChange={(event) => {
                                         const value = parseFloat(event.target.value);
-                                        setHeight(value);
+                                        if (value >= 0 || Number.isNaN(value)) {
+                                            setHeight(Math.round(value));
+                                        }
                                     }}></input>
                             </div>
                             <div className="symbol-item">
@@ -222,7 +383,9 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
                                     value={multiple == undefined ? '' : multiple}
                                     onChange={(event) => {
                                         const value = parseFloat(event.target.value);
-                                        setMultiple(value);
+                                        if (value >= 0 || Number.isNaN(value)) {
+                                            setMultiple(Math.round(value));
+                                        }
                                     }}></input>
                             </div>
                             <div className="symbol-item">
@@ -231,26 +394,41 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
                         </div>
                     }
                 </div>
-                {
-                    checkedItem ?
-                        <div className="frame-15614">
+
+                <div className="frame-15614">
+                    <button onClick={() => {
+                        ExportDialogRef?.current?.show();
+                    }}>全部导出</button>
+                    {
+                        checkedItem ?
                             <button
-                                onClick={() => { removeCheckedLayer() }}>删除标记</button>
-                            <button onClick={() => {
-                                ExportDialogRef?.current?.show();
-                            }}>全部导出</button>
-                            <button >修改标记</button>
-                        </div>
-                        :
-                        <div className="frame-15614">
-                            <button onClick={() => { addCheckedLayer() }}>标记为新增资源</button>
-                        </div>
-                }
+                                onClick={() => { updateLayerCuttingParma() }}
+                                disabled={status === IStatus.loading ? true : false}
+                                style={{
+                                    backgroundColor: "#1472e6",
+                                    border: "0px"
+                                }}
+                            >修改标记</button>
+                            :
+                            <button
+                                onClick={() => { addCheckedLayer() }}
+                                disabled={status === IStatus.loading ? true : false}
+                                style={{
+                                    backgroundColor: "#1472e6",
+                                    border: "0px"
+                                }}
+                            >标记为新增资源</button>
+                    }
+
+
+                </div>
+
             </div>
             {
                 <ExportDialog
                     ref={ExportDialogRef}
                     percentage={percentage}
+                    startExport={startExport}
                 ></ExportDialog>
             }
         </div >

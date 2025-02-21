@@ -3,6 +3,7 @@ import './exportDialog.scss';
 
 export interface ExportDialogRefProps {
     percentage: number,
+    startExport: (path: string) => void,
 }
 export interface ExportDialogRefType {
     show: () => void,
@@ -60,7 +61,7 @@ export const ExportDialog = forwardRef<ExportDialogRefType, ExportDialogRefProps
                         </div>
                     </div>
                     <div className="export-dialog-progress-bar">
-                        <div id="progress-bar" style={{ width: Math.round(props.percentage * 324) }} > </div>
+                        <div id="progress-bar" style={{ width: Math.round(props.percentage * 324 / 100) }} > </div>
                     </div>
                     <div className="vector2"> </div>
 
@@ -70,7 +71,15 @@ export const ExportDialog = forwardRef<ExportDialogRefType, ExportDialogRefProps
                             取消
                         </div>
                         <div className="export-dialog-options-item"
-                            style={{ backgroundColor: "#1471e6" }}>
+                            style={{ backgroundColor: "#1471e6" }}
+                            onClick={() => {
+                                if (!path) {
+                                    alert("请选择导出路径");
+                                    return;
+                                }
+                                props.startExport(path)
+                            }}
+                        >
                             确定
                         </div>
                     </div>

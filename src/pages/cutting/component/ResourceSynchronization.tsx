@@ -191,13 +191,15 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
         document.execCommand("Copy")
         document.body.removeChild(textarea)
     }
-    const addOrUpdateFigmaId = () => {
+    const addOrUpdateFigmaId = async () => {
         if (!activeLayer || !figmaId) return;
-        console.log('figmaId', figmaId)
-        if (activeLayer.generatorSettings?.comPosidonPSCep?.figmaNodeId) {
-            let data = activeLayer.generatorSettings?.comPosidonPSCep;
-            data.figmaNodeId = undefined;
-            psHandler.setLayerGeneratorSettings(activeLayer.id, data, () => {
+        const currentLayer = await psHandler.getActiveLayer();
+        console.log('currentLayer', currentLayer)
+        let layerGS = JSON.parse(currentLayer.generatorSettings) ?? {};
+        let layerPosidon = layerGS.comPosidonPSCep ?? {};
+        if (layerPosidon.figmaNodeId) {
+            if (layerPosidon.figmaNodeId) delete layerPosidon.figmaNodeId;
+            psHandler.setLayerGeneratorSettings(activeLayer.id, layerPosidon, () => {
                 psHandler.refreshActiveLayer();
                 setUploadList([]);
                 setFailList([])
@@ -206,10 +208,8 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                 if (checkedList.some(i => i.id === activeLayer.id)) setCheckedList(prevCheckedList => prevCheckedList.filter(i => i.id !== activeLayer.id));
             });
         } else {
-            console.log('activeLayer.generatorSettings', activeLayer.generatorSettings)
-            let data = activeLayer.generatorSettings?.comPosidonPSCep ?? {};
-            data.figmaNodeId = figmaId;
-            psHandler.setLayerGeneratorSettings(activeLayer.id, data, () => {
+            layerPosidon.figmaNodeId = figmaId;
+            psHandler.setLayerGeneratorSettings(activeLayer.id, layerPosidon, () => {
                 psHandler.refreshActiveLayer();
                 const layer: ILayer = {
                     id: activeLayer.id,
@@ -224,7 +224,6 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                 if (!groups.some(i => i.id === activeLayer.id)) {
                     setGroups(prevGroups => [...prevGroups, layer]);
                 }
-
                 if (!checkedList.some(i => i.id === activeLayer.id)) setCheckedList(prevCheckedList => [...prevCheckedList, layer]);
             });
         }
@@ -290,7 +289,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                         <span >关联ID:</span>
                     </div>
                     <PsInput disabled={activeLayer?.layerKind == 7 && (activeLayer?.generatorSettings?.comPosidonPSCep?.figmaNodeId)} callback={entryFigmaId} value={figmaId} placeholder="请输入Figma节点ID">
-                        <PsAction callback={addOrUpdateFigmaId}>
+                        <PsAction callback={() => { addOrUpdateFigmaId() }}>
                             {
                                 activeLayer?.generatorSettings?.comPosidonPSCep?.figmaNodeId ?
                                     <img src="./dist/static/images/svg/brush.svg"></img> :

@@ -293,6 +293,7 @@ export enum IGeneratorAction {
     test = "communication-test",
     fastExport = "fast-export-png-by-id",
     grid = "grid",
+    cuttingToolExport = "cutting-tool-export",
 }
 
 export interface IMessage {
@@ -399,4 +400,34 @@ export interface IPoint {
 export enum ICuttingType {
     'fixedSize' = 'fixedSize',
     'multipleSize' = 'multipleSize',
+}
+
+export interface ICuttingToolExportParams {
+    path: string,
+    resolution: number,
+    layers: ICuttingToolLayer[],
+}
+
+export interface ICuttingToolLayer {
+    layerId: number,
+    name: string,
+    isNative: boolean,
+    cuttingType?: ICuttingType,
+    width?: number,
+    height?: number,
+    multiple?: number,
+    horizontal: IHorizontal,
+    vertical: IVertical
+}
+
+export enum IHorizontal {
+    left = 'left',
+    right = 'right',
+    twoWay = 'twoWay',
+}
+
+export enum IVertical {
+    top = 'top',
+    bottom = 'bottom',
+    twoWay = 'twoWay',
 }

@@ -15,9 +15,15 @@ export const DocumentSlimming = forwardRef<DocumentSlimmingRefType, DocumentSlim
 
     return (
         <div className="document-slimming-container">
-            <div className="doc-preview"></div>
+            <div className="doc-preview">
+                <span>预览图施工中...</span>
+            </div>
             <div className="doc-slimming-footer">
-                <button onClick={() => { documentSlimming() }}>一键瘦身</button>
+                <button onClick={() => {
+                    if (confirm("开始瘦身？过程会比较慢，请耐心等待")) {
+                        documentSlimming();
+                    }
+                }}>一键瘦身</button>
             </div>
         </div>)
 })

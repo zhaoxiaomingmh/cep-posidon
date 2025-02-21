@@ -1,3 +1,4 @@
+import { CuttingToolPageRef } from "@/pages/cutting/component/cuttingTool/CuttingTool";
 import { ResourceSynchronizationRef } from "@/pages/cutting/component/ResourceSynchronization";
 import { GridRef } from "@/pages/grid/component/grid/Grid";
 import { AppRef } from "@/router/App";
@@ -171,8 +172,7 @@ class handler {
         ResourceSynchronizationRef?.current?.init();
     }
     private handleEventFromGenerator(data: IMessage) {
-        console.log('action', data.action);
-        console.log('action', data.type);
+        console.log('action', data.action, data.type);
         switch (data.action) {
             case IGeneratorAction.fastExport: {
                 if (data.type === 'success' || data.type === 'error') {
@@ -189,6 +189,11 @@ class handler {
                 } else {
                     GridRef?.current?.handleGridTask(IStatus.error);
                 }
+                break;
+            }
+            case IGeneratorAction.cuttingToolExport: {
+                CuttingToolPageRef?.current?.refreshExportTaskStatus(data.type === 'success' ? IStatus.success : IStatus.error, data.data.layerId);
+                break;
             }
         }
     }
@@ -289,7 +294,7 @@ class handler {
         });
     }
     //根据ID获取Layer
-    public getLayersByIDs(layerIDs: number[]): Promise<any> {
+    public getLayersByIDs(layerIDs: number[]): Promise<ILayer[]> {
         return new Promise((resolve, reject) => {
             const req = JSON.stringify(layerIDs)
             this.csInterface.evalScript(`$._ext.getLayersByIDs(${req})`, (result) => {
@@ -638,6 +643,7 @@ class handler {
             })
         })
     }
+
 }
 
 const psHandler = handler.getInstance();
