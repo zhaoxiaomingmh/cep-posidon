@@ -45,10 +45,16 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
             const currentLayer = layers[0];
             let generaterSettings = JSON.parse(currentLayer.generatorSettings) ?? {};
             let layerPosidon = generaterSettings.comPosidonPSCep ?? {};
-            if (layerPosidon.cuttingToolWidth) setWidth(parseFloat(layerPosidon.cuttingToolWidth));
-            if (layerPosidon.cuttingToolHeight) setHeight(parseFloat(layerPosidon.cuttingToolHeight));
-            if (layerPosidon.cuttingToolMultiple) setMultiple(parseFloat(layerPosidon.cuttingToolMultiple));
-            if (layerPosidon.cuttingToolCuttingType) setCuttingType(layerPosidon.cuttingToolCuttingType);
+            if (layerPosidon.cuttingToolCuttingType) {
+                setCuttingType(layerPosidon.cuttingToolCuttingType)
+                if (layerPosidon.cuttingToolWidth) setWidth(parseFloat(layerPosidon.cuttingToolWidth));
+                if (layerPosidon.cuttingToolHeight) setHeight(parseFloat(layerPosidon.cuttingToolHeight));
+                if (layerPosidon.cuttingToolMultiple) setMultiple(parseFloat(layerPosidon.cuttingToolMultiple));
+            } else {
+                setWidth(undefined);
+                setHeight(undefined);
+                setMultiple(undefined);
+            }
             await psHandler.selectLayer(layer.id);
         }
     }
@@ -251,6 +257,7 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
         if (status === IStatus.loading && count === checkedList.length) {
             setStatus(IStatus.success);
             alert("图片导出成功");
+            ExportDialogRef?.current?.close();
         }
     }, [failList, successList])
     return (
