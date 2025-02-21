@@ -61,7 +61,7 @@ export const ExportDialog = forwardRef<ExportDialogRefType, ExportDialogRefProps
                         </div>
                     </div>
                     <div className="export-dialog-progress-bar">
-                        <div id="progress-bar" style={{ width: Math.round(props.percentage * 324 / 100) }} > </div>
+                        <div id="progress-bar" style={{ width: `${Math.round(props.percentage)}%` }} > </div>
                     </div>
                     <div className="vector2"> </div>
 
