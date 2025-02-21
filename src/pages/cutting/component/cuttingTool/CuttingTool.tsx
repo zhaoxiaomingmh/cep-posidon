@@ -280,17 +280,17 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
                                                     color: checkedItem?.id === layer.id ? "#ffffff" : undefined,
                                                 }}
                                             >
-                                                <div>
-                                                    <span>{layer.name}</span>
+                                                <div className="item-label">
+                                                    <span title={layer.name}>{layer.name}</span>
                                                     {
                                                         successList.includes(layer.id)
                                                         &&
-                                                        <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/success.svg"></img>
+                                                        <img style={{ margin: "0px 5px", width: 14, height: 14 }} src="./dist/static/images/svg/success.svg"></img>
                                                     }
                                                     {
                                                         failList.includes(layer.id)
                                                         &&
-                                                        <img style={{ marginLeft: "5px", width: 14, height: 14 }} src="./dist/static/images/svg/fail.svg"></img>
+                                                        <img style={{ margin: "0px 5px", width: 14, height: 14 }} src="./dist/static/images/svg/fail.svg"></img>
                                                     }
                                                 </div>
 
@@ -322,18 +322,12 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
             <div className="cutting-tool-page-list-options">
                 <div className="cutting-tool-page-list-options-sliding-window">
                     <div
-                        className="cutting-tool-page-list-options-sliding-window-item"
-                        style={{
-                            backgroundColor: cuttingType === ICuttingType.fixedSize ? "rgba(255, 255, 255, 0.1)" : undefined,
-                        }}
+                        className={`cutting-tool-page-list-options-sliding-window-item ${cuttingType === ICuttingType.fixedSize?'selected':''}`}
                         onClick={() => { setCuttingType(ICuttingType.fixedSize) }}>
                         <span>固定尺寸</span>
                     </div>
                     <div
-                        className="cutting-tool-page-list-options-sliding-window-item"
-                        style={{
-                            backgroundColor: cuttingType === ICuttingType.multipleSize ? "rgba(255, 255, 255, 0.1)" : undefined,
-                        }}
+                        className={`cutting-tool-page-list-options-sliding-window-item ${cuttingType === ICuttingType.multipleSize?'selected':''}`}
                         onClick={() => { setCuttingType(ICuttingType.multipleSize) }}>
                         <span>倍数尺寸</span>
                     </div>
@@ -355,7 +349,7 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
                                     }}></input>
                             </div>
                             <div className="symbol-item">
-                                X
+                                ×
                             </div>
                             <div className="input-item1" >
                                 <input type="number"

@@ -2,7 +2,6 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 10px 16px;
     background: #535353;
 
     .cutting-tool-page-list-container {
@@ -10,7 +9,7 @@
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
-        min-height: 285px;
+        min-height: 60px;
 
         background: rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -18,26 +17,21 @@
         .cutting-tool-page-list-header {
             display: flex;
             align-items: center;
-            padding: 0px 6px;
-            height: 30px;
-            min-height: 30px;
-
+            padding: 4px 6px;
+            width: 100%;
             background: rgba(255, 255, 255, 0.05);
 
             font-family: 'Inter';
             font-style: normal;
             font-weight: 400;
-            font-size: 16px;
-            line-height: 19px;
+            font-size: 12px;
             color: #999999;
         }
 
         .cutting-tool-page-list-box {
             flex: 1;
             display: flex;
-            padding: 0px;
-            padding: 10px;
-            min-height: 250px;
+            padding: 6px;
 
             .cutting-tool-page-list-empty {
                 flex: 1;
@@ -65,26 +59,34 @@
                     min-height: 27px;
                     box-sizing: border-box;
                     background: rgba(255, 255, 255, 0.1);
-                    margin: 5px 0px;
+                    margin-bottom: 4px;
                     padding-left: 5px;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
 
-
-                    span {
-                        font-family: 'Inter';
-                        font-style: normal;
-                        font-weight: 400;
-                        font-size: 16px;
-                        line-height: 19px;
-                        white-space: nowrap;
+                    .item-label{
+                        flex: 1;
+                        display: flex;
+                        flex-shrink: 1;
                         overflow: hidden;
-                        text-overflow: ellipsis;
+                        align-items: center;
+                        span {
+                            display: inline-block;
+                            font-family: 'Inter';
+                            font-style: normal;
+                            font-weight: 400;
+                            font-size: 12px;
+                            line-height: 19px;
+                            flex: 1;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
                     }
 
                     .icon-fork {
-                        margin-right: 15px;
+                        margin-right: 10px;
                         z-index: 100;
                     }
 
@@ -112,10 +114,9 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding: 20px 0px 0px;
 
         width: 100%;
-        height: 171px;
+        // height: 171px;
 
         border-radius: 0px;
 
@@ -125,9 +126,7 @@
             justify-content: center;
             align-items: flex-start;
             padding: 2px;
-
-            width: 282px;
-            height: 48px;
+            max-width: 240px;
 
             background: rgba(0, 0, 0, 0.2);
             border-radius: 4px;
@@ -138,12 +137,20 @@
                 align-items: center;
 
                 width: 139px;
-                height: 39px;
+                height: 34px;
+                color: #999;
 
                 border-radius: 2px;
+                &.selected {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    color: #fff;
+                }
 
                 &:hover {
                     cursor: pointer;
+                }
+                span {
+                    font-size: 14px;
                 }
             }
         }
@@ -154,7 +161,7 @@
             align-items: center;
 
             width: 100%;
-            height: 98px;
+            height: 60px;
 
             .arithmetic-input-box {
                 display: flex;
@@ -215,29 +222,32 @@
         }
 
         .frame-15614 {
-            width: 400px;
-            height: 56px;
+            width: 100%;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
 
             button {
+                flex: 1;
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                margin-right: 10px;
 
-                width: 195px;
-                height: 56px;
+                height: 40px;
                 border: 1px solid rgba(255, 255, 255, 0.2);
-                border-radius: 11px;
                 background-color: transparent;
+                border-radius: 4px;
 
                 font-family: 'Inter';
                 font-style: normal;
                 font-weight: 400;
-                font-size: 20px;
+                font-size: 14px;
                 line-height: 24px;
                 color: #FFFFFF;
+                &:last-child{
+                    margin-right: 0;
+                }
             }
         }
     }
