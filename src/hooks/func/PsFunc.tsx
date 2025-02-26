@@ -20,13 +20,7 @@ export const PsFunc = forwardRef<PsFuncRef, PsFuncProps>((props, ref) => {
         <div className="ps-func">
             <div className="ps-func__toolbar">
                 {(Array.isArray(props.children) ? props.children : [props.children]).map((child: any, index) =>
-                    <div key={index} className={`ps-func__toolbar__title ${func==child.props.id?'active':''}`} onClick={() => setFunc(child.props.id)}>
-                        {/* <ActionButton
-                            isQuiet={true}
-                            onPress={() => setFunc(child.props.id)}
-                        >
-                            
-                        </ActionButton> */}
+                    <div key={index} className={`ps-func__toolbar__title ${func == child.props.id ? 'active' : ''} ${child.props.right ? 'right' : ''}`} onClick={() => setFunc(child.props.id)}>
                         <span>{child.props.title}</span>
                     </div>
                 )}

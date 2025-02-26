@@ -1,12 +1,15 @@
 import React, { useEffect, useImperativeHandle, useState } from "react";
 import { forwardRef } from "react";
 import './cuttingTool.scss';
-import { ICuttingToolExportParams, ICuttingToolLayer, ICuttingType, IGeneratorAction, IGeneratorSettingsObj, IHorizontal, ILayer, IStatus, IVertical, IWaitIte, LayerKind } from "@/store/iTypes/iTypes";
+import { ICuttingToolExportParams, ICuttingToolLayer, ICuttingType, IFunctionName, IGeneratorAction, IGeneratorSettingsObj, IHorizontal, ILayer, IStatus, IVertical, IWaitIte, LayerKind } from "@/store/iTypes/iTypes";
 import psHandler from "@/service/handler";
 import useDocumentStore from "@/store/modules/documentStore";
 import { ExportDialog, ExportDialogRef } from "./ExportDialog";
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar'
+import iService from "@/service/service";
+import useUserStore from "@/store/modules/userStore";
+import useSettingsStore from "@/store/modules/settings";
 
 type CuttingToolPageProps = {
 }
@@ -24,8 +27,11 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
     })
 
     //ps数据
+    const project = useUserStore(state => state.getProject());
+    const user = useUserStore(state => state.getUser());
     const doc = useDocumentStore(state => state.getActiveDocument());
     const activeLayer = useDocumentStore(state => state.getActiveLayer());
+    const imageExportSetting = useSettingsStore(state => state.getImageExportSetting());
     useEffect(() => {
         if (!activeLayer) return;
         if (checkedList?.findIndex(item => item.id === activeLayer.id) !== -1) {
@@ -184,6 +190,7 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
 
     //开始导出任务
     const startExport = async (localPath: string) => {
+        await iService.increaseFunctionCoutn(IFunctionName.cuttingToolExport, project.id, project.name, user.id);
         if (checkedList.length === 0 || !localPath || status === IStatus.loading) return;
         setStatus(IStatus.loading);
         setSuccessList([]);
@@ -194,7 +201,8 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
         let exportParams: ICuttingToolExportParams = {
             path: localPath,
             resolution: parseFloat(resolution),
-            layers: []
+            layers: [],
+            imageExportSetting: imageExportSetting
         };
         let ids = checkedList.map((layer) => { return layer.id });
         const layers = await psHandler.getLayersByIDs(ids)
@@ -329,12 +337,12 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
             <div className="cutting-tool-page-list-options">
                 <div className="cutting-tool-page-list-options-sliding-window">
                     <div
-                        className={`cutting-tool-page-list-options-sliding-window-item ${cuttingType === ICuttingType.fixedSize?'selected':''}`}
+                        className={`cutting-tool-page-list-options-sliding-window-item ${cuttingType === ICuttingType.fixedSize ? 'selected' : ''}`}
                         onClick={() => { setCuttingType(ICuttingType.fixedSize) }}>
                         <span>固定尺寸</span>
                     </div>
                     <div
-                        className={`cutting-tool-page-list-options-sliding-window-item ${cuttingType === ICuttingType.multipleSize?'selected':''}`}
+                        className={`cutting-tool-page-list-options-sliding-window-item ${cuttingType === ICuttingType.multipleSize ? 'selected' : ''}`}
                         onClick={() => { setCuttingType(ICuttingType.multipleSize) }}>
                         <span>倍数尺寸</span>
                     </div>
@@ -397,7 +405,7 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
                 </div>
 
                 <div className="frame-15614">
-                    {checkedList?.length > 0&&<button onClick={() => {
+                    {checkedList?.length > 0 && <button onClick={() => {
                         ExportDialogRef?.current?.show();
                     }}>全部导出</button>}
                     {

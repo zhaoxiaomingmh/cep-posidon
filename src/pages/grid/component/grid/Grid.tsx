@@ -3,11 +3,12 @@ import './grid.scss';
 import Draggable, { DraggableData } from "react-draggable";
 import useDocumentStore from "@/store/modules/documentStore";
 import psHandler from "@/service/handler";
-import { IGeneratorAction, IGridInfo, IGridParameter, IImage, ILayer, IPoint, IStatus, LayerKind } from "@/store/iTypes/iTypes";
-import { Status } from "@/hooks/status/Status";
+import { IFunctionName, IGeneratorAction, IGridInfo, IGridParameter, IImage, ILayer, IPoint, IStatus, LayerKind } from "@/store/iTypes/iTypes";
 import { psConfig } from "@/utlis/util-env";
 import path from "path";
 import { Button } from "antd";
+import iService from "@/service/service";
+import useUserStore from "@/store/modules/userStore";
 
 type GridProps = {
 }
@@ -31,6 +32,8 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         }
     })
     //原始数据
+    const project = useUserStore(state => state.getProject());
+    const user = useUserStore(state => state.getUser());
     const doc = useDocumentStore(state => state.getActiveDocument());
     const activeLayer = useDocumentStore(state => state.getActiveLayer());
     const setActiveLayer = useDocumentStore(state => state.setActiveLayer);
@@ -492,6 +495,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
             alert("当前图层不支持九宫格");
             return;
         }
+        await iService.increaseFunctionCoutn(IFunctionName.grid, project.id, project.name, user.id);
         setGridStatus(IStatus.loading);
         const resolution = await psHandler.getDocumentResolution();
         let gridParameter: IGridParameter = {

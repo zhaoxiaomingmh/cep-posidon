@@ -406,6 +406,7 @@ export interface ICuttingToolExportParams {
     path: string,
     resolution: number,
     layers: ICuttingToolLayer[],
+    imageExportSetting: IImageExportSetting,
 }
 
 export interface ICuttingToolLayer {
@@ -430,4 +431,24 @@ export enum IVertical {
     top = 'top',
     bottom = 'bottom',
     twoWay = 'twoWay',
+}
+
+export enum IFunctionName {
+    grid = 'grid',
+    cuttingToolExport = 'cuttingToolExport',
+    generateFigmaUrl = "generateFigmaUrl",
+    psdDeepClean = "psdDeepClean",
+}
+
+
+export interface ISettingsState {
+    imageExportSetting: IImageExportSetting,
+    getImageExportSetting: () => IImageExportSetting,
+    setImageExportSetting: (imageExportSetting: IImageExportSetting) => void,
+}
+
+
+export interface IImageExportSetting {
+    compress: boolean,
+    rename: boolean,
 }

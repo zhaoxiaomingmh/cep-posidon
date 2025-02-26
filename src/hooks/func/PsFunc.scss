@@ -26,6 +26,9 @@
                 font-size: large;
                 color: var(--primary-font-color);
             }
+            &.right {
+                margin-left: auto;
+            }
         }
     }
     .ps-func__item {

@@ -248,6 +248,9 @@ class psSerive {
     public async increaseDownloadCount(url: string, projectId: number, projectName: string, type: string) {
         const response: any = await utilHttps.httpPost(psConfig.increaseDownloadCount, { projectId: projectId, projectName: projectName, downloadUrl: url, type: type })
     }
+    public async increaseFunctionCoutn(func: string, projectId: number, projectName: string, userId: number) {
+        const response: any = await utilHttps.httpPost(psConfig.functionUsageStatistics, { FunctionName: func, ProjectID: projectId, ProjectName: projectName, UserID: userId, PluginType: "posidon-cep" })
+    }
 }
 
 const iService = psSerive.getInstance();

@@ -5,6 +5,7 @@ export interface PsFuncItemProps {
     id: string;
     title: string;
     children: React.ReactNode;
+    right?: boolean;
 }
 
 export const PsFuncItem = forwardRef<PsFuncItemRef, PsFuncItemProps>((props, ref) => {

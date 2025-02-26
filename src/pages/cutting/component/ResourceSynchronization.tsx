@@ -6,7 +6,7 @@ import './rs.scss'
 import { PsInput } from "@/hooks/input/PsInput";
 import { PsAction } from "@/hooks/button/PsAction";
 import psHandler from "@/service/handler";
-import { IGeneratorSettingsObj, IGeneratorAction, ILayer, IWaitIte } from "@/store/iTypes/iTypes";
+import { IGeneratorSettingsObj, IGeneratorAction, ILayer, IWaitIte, IFunctionName } from "@/store/iTypes/iTypes";
 
 import { Button, Checkbox } from 'antd';
 import type { CheckboxProps } from 'antd';
@@ -14,6 +14,9 @@ import { psConfig } from "@/utlis/util-env";
 import nas from "@/service/nas";
 import path from "path";
 import PerfectScrollbar from 'react-perfect-scrollbar'
+import iService from "@/service/service";
+import useUserStore from "@/store/modules/userStore";
+import useSettingsStore from "@/store/modules/settings";
 
 type ResourceSynchronizationProps = {
 }
@@ -26,7 +29,10 @@ type ResourceSynchronizationRefType = {
 export const ResourceSynchronizationRef = React.createRef<ResourceSynchronizationRefType>();
 export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType, ResourceSynchronizationProps>((props, ref) => {
 
+    const project = useUserStore(state => state.getProject());
+    const user = useUserStore(state => state.getUser());
     const activeLayer = useDocumentStore(state => state.getActiveLayer());
+    const imageExportSetting = useSettingsStore(state => state.getImageExportSetting());
     const [figmaSettings, setFigmaSettings] = useState<IGeneratorSettingsObj>(undefined);
     const [figmaId, setFigmaId] = useState<string>(undefined);
     const [groups, setGroups] = useState<ILayer[]>([]);
@@ -239,6 +245,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
         }
     };
     const generateFigmaUrl = () => {
+        iService.increaseFunctionCoutn(IFunctionName.generateFigmaUrl, project.id, project.name, user.id);
         if (checkedList?.length === 0) {
             alert('请选择要同步的编组');
             return;
@@ -261,6 +268,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                         filename: filename.toString(),
                         path: psConfig.figmaImageDir(),
                         format: "png",
+                        imageExportSetting: imageExportSetting,
                     }
                 })
             })

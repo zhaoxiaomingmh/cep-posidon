@@ -5,7 +5,7 @@ import path from "path";
 import psHandler from "@/service/handler";
 const env = IEnv.prod;
 export const psConfig = {
-    version: "1.3.0",
+    version: "1.3.5",
     generatorVersion: "0.0.3",
     env: env,
     publicKey: config[env].posidon.publicKey,
@@ -172,6 +172,7 @@ export const psConfig = {
     getSVNAccountById: config.path["get-svn-account-by-id"],
     downloadfromserver: config.path["download-from-server"],
     increaseDownloadCount: config.path["increaseDownloadCount"],
+    functionUsageStatistics: config.path["functionUsageStatistics"],
     nas: config.nas
 }
 

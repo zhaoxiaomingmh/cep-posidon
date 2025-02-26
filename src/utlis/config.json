@@ -50,6 +50,7 @@
         "get-svn-account-by-id": "/ImageSeach/GetSVNAccountById",
         "generate-element": "/ImageSeach/UploadImageToAnalyze",
         "download-from-server": "/Download/downloadfromserver",
-        "increaseDownloadCount": "/ImageSeach/IncreaseDownloadCount"
+        "increaseDownloadCount": "/ImageSeach/IncreaseDownloadCount",
+        "functionUsageStatistics":"/api/log/functionUsageStatistics"
     }
 }
