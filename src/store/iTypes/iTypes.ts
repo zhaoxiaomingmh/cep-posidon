@@ -265,7 +265,8 @@ export interface IGeneratorSettingsParams {
 export interface IGeneratorSettingsObj {
     ResourceSynchronizationURL?: string,
     resourceSynchronizationTime?: string,
-    resourceSynchronizationTimeStamp?: string
+    resourceSynchronizationTimeStamp?: string,
+    resourceSynchronizationMarkIds?: string,
     cuttingToolMarkIds?: string,
 }
 

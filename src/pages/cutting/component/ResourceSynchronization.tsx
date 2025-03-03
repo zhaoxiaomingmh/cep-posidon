@@ -43,7 +43,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
     const [generateList, setGenerateList] = useState<IWaitIte[]>([]);
     const [uploadList, setUploadList] = useState<IWaitIte[]>([]);
     const [failList, setFailList] = useState<IWaitIte[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         init();
@@ -90,13 +90,25 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
             }
         }
     }, [uploadList])
-    const init = () => {
+    const init = async () => {
         setStatus('idle');
         setGenerateList([]);
         setUploadList([]);
         setFailList([]);
         refreshFigmaSettings();
-        getGroups();
+        // getGroups();
+
+        const docGeneratorSettings = await psHandler.getDocGeneratorSettings();
+        console.log("docGeneratorSettings", docGeneratorSettings)
+        if (docGeneratorSettings.comPosidonPSCep) {
+            const docSetting = docGeneratorSettings.comPosidonPSCep as IGeneratorSettingsObj;
+            if (docSetting.resourceSynchronizationMarkIds) {
+                const ids = JSON.parse(docSetting.resourceSynchronizationMarkIds) as number[] || [];
+                if(ids.length > 0) {
+                    setGroups(await psHandler.getLayersByIDs(ids));
+                }
+            }
+        }
     }
     useImperativeHandle(ref, () => {
         return {
@@ -179,13 +191,6 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
 
         })
     }
-    const getGroups = () => {
-        psHandler.getAllLayerList(7).then((layers: ILayer[]) => {
-            const figmaLinkGroups = layers.filter((l) => l.generatorSettings?.comPosidonPSCep?.figmaNodeId);
-            setGroups(figmaLinkGroups);
-            setLoading(false);
-        })
-    }
     const entryFigmaId = (value) => {
         setFigmaId(value)
     }
@@ -200,6 +205,8 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
     const addOrUpdateFigmaId = async () => {
         if (!activeLayer || !figmaId) return;
         const currentLayer = await psHandler.getActiveLayer();
+        const docGeneratorSettings = await psHandler.getDocGeneratorSettings();
+        let comPosidonPSCep: IGeneratorSettingsObj = docGeneratorSettings.comPosidonPSCep ?? {};
         console.log('currentLayer', currentLayer)
         let layerGS = JSON.parse(currentLayer.generatorSettings) ?? {};
         let layerPosidon = layerGS.comPosidonPSCep ?? {};
@@ -212,6 +219,10 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                 setGenerateList([]);
                 setGroups(prevGroups => prevGroups.filter(i => i.id !== activeLayer.id));
                 if (checkedList.some(i => i.id === activeLayer.id)) setCheckedList(prevCheckedList => prevCheckedList.filter(i => i.id !== activeLayer.id));
+                const ids = groups.map(i => i.id !== activeLayer.id);
+                comPosidonPSCep.resourceSynchronizationMarkIds = JSON.stringify(ids);
+                psHandler.setDocGeneratorSettings(comPosidonPSCep);
+
             });
         } else {
             layerPosidon.figmaNodeId = figmaId;
@@ -227,12 +238,19 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
                         }
                     }
                 }
+                let ids = groups.map(i => i.id);
                 if (!groups.some(i => i.id === activeLayer.id)) {
+                    ids.push(activeLayer.id);
                     setGroups(prevGroups => [...prevGroups, layer]);
                 }
                 if (!checkedList.some(i => i.id === activeLayer.id)) setCheckedList(prevCheckedList => [...prevCheckedList, layer]);
+                comPosidonPSCep.resourceSynchronizationMarkIds = JSON.stringify(ids);
+                psHandler.setDocGeneratorSettings(comPosidonPSCep);
             });
         }
+
+      
+
     }
     const onCheckAllChange: CheckboxProps['onChange'] = (e) => {
         setCheckedList(e.target.checked ? groups : []);
