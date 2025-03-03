@@ -439,6 +439,7 @@ export enum IFunctionName {
     cuttingToolExport = 'cuttingToolExport',
     generateFigmaUrl = "generateFigmaUrl",
     psdDeepClean = "psdDeepClean",
+    psdLevel = "psdLevel",
 }
 
 

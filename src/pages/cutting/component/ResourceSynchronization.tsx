@@ -96,8 +96,6 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
         setUploadList([]);
         setFailList([]);
         refreshFigmaSettings();
-        // getGroups();
-
         const docGeneratorSettings = await psHandler.getDocGeneratorSettings();
         console.log("docGeneratorSettings", docGeneratorSettings)
         if (docGeneratorSettings.comPosidonPSCep) {

@@ -1,7 +1,7 @@
 import { NoSVNLibrary } from "@/hooks/gallery/NoSVNLibrary";
 import levService from "@/service/levelService";
 import iService from "@/service/service";
-import { IDownloader, IGalleryItem, ImageFormat, IPath, ISvnPsdGroup, ISvnPsdGroupItem } from "@/store/iTypes/iTypes";
+import { IDownloader, IFunctionName, IGalleryItem, ImageFormat, IPath, ISvnPsdGroup, ISvnPsdGroupItem } from "@/store/iTypes/iTypes";
 import useUserStore from "@/store/modules/userStore";
 import { psConfig } from "@/utlis/util-env";
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
@@ -19,9 +19,11 @@ type PsdLevelRefType = {
 export const PsdLevelRef = React.createRef<PsdLevelRefType>();
 export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) => {
     const size: number = 20;
-    const project = useUserStore(state => state.project);
+    const project = useUserStore(state => state.getProject());
+    const user = useUserStore(state => state.getUser());
     const myServeice = levService;
 
+    
     const [levelGroup, setLevelGroup] = useState<ISvnPsdGroup[]>(undefined);
     const [isCreate, setIsCreate] = useState<boolean>(false);
     const [level, setLevel] = useState<number>(1);
@@ -128,6 +130,9 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
                 setGItems(gItems);
             }
             setIsSearch(false);
+            if( data.children.length > 0) {
+                iService.increaseFunctionCoutn(IFunctionName.psdLevel, project.id, project.name, user.id);
+            }
         } catch (error) {
             console.error('Error fetching data:', error);
         }
