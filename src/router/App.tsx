@@ -1,6 +1,6 @@
 import { Login, LoginRef } from "@/pages/welcome/Login";
 import psHandler from "@/service/handler";
-import { ILayer, IPosidonResponse, IProject, IProjectStorehouse, IUser, IVersion } from "@/store/iTypes/iTypes";
+import { IFunctionName, ILayer, IPosidonResponse, IProject, IProjectStorehouse, IUser, IVersion } from "@/store/iTypes/iTypes";
 import useDocumentStore from "@/store/modules/documentStore";
 import useUserStore from "@/store/modules/userStore";
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
@@ -159,6 +159,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
                     const project = user.projects.find(p => p.id === user.last);
                     setProject(project)
                 }
+                iService.increaseFunctionCoutn(IFunctionName.activePlugin, projects[0]?.id, projects[0]?.name, user.id);
             } else {
                 localStorage.removeItem('cep-user');
             }
@@ -171,7 +172,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     }
 
     return (
-        <Provider theme={currentTheme} colorScheme={currentScheme} isQuiet>     
+        <Provider theme={currentTheme} colorScheme={currentScheme} isQuiet>
             <div className={`ps-app theme-${themeClass}`}>
                 <div style={{ width: '100%', height: '100%' }}>
                     {

@@ -83,6 +83,9 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
                     filename: filename,
                     path: psConfig.previewImageDir(),
                     format: "png",
+                    imageExportSetting: {
+                        compress: false,
+                    } 
                 }
             })
             setImage({

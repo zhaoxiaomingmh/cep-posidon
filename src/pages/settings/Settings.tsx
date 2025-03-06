@@ -103,6 +103,31 @@ export const Settings = forwardRef<SettingsRefType, SettingsProps>((props, ref) 
         }
     }
     const test = async () => {
+        // const generatorZip = "C:\\Users\\wb.zhaominghui01\\AppData\\Roaming\\Adobe\\CEP\\Temp_Dir\\Generator\\com.posidon.generator";
+        // const batPath = path.join(psConfig.pluginDir(), "dist", "static", "bat", "updateGen1.bat");
+        // try {
+        //     const stat = window.cep.fs.stat(batPath);
+        //     if (stat.err !== 0) throw new Error("系统文件丢失:更新文件，请联系管理员处理");
+
+        //     // 增加超时机制
+        //     const timeoutPromise = new Promise((_, reject) =>
+        //         setTimeout(() => reject(new Error("操作超时 (60秒)")), 60000));
+        //     await Promise.race([
+        //         new Promise((resolve, reject) => {
+        //             //@ts-ignore
+        //             runBat(batPath, [generatorZip], (error) => {
+        //                 error ? reject(error) : resolve(null);
+        //             });
+        //         }),
+        //         timeoutPromise
+        //     ]);
+
+        //     alert("更新完成，请重启Photoshop");
+        // } catch (error) {
+        //     alert(`更新失败: ${error.message}`);
+        //     // 记录错误日志
+        //     console.error(`[${new Date().toISOString()}] 更新错误:`, error);
+        // }
     }
 
     return (

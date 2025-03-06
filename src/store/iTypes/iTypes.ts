@@ -440,6 +440,7 @@ export enum IFunctionName {
     generateFigmaUrl = "generateFigmaUrl",
     psdDeepClean = "psdDeepClean",
     psdLevel = "psdLevel",
+    activePlugin= "activePlugin",
 }
 
 

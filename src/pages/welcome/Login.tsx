@@ -2,13 +2,14 @@ import React, { useContext } from "react";
 import { forwardRef } from "react";
 import './login.scss'
 import useUserStore from "@/store/modules/userStore";
-import { IPosidonResponse, IProject, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
+import { IFunctionName, IPosidonResponse, IProject, IProjectStorehouse, IUser } from "@/store/iTypes/iTypes";
 import * as signalR from "@microsoft/signalr";
 import { psConfig } from "@/utlis/util-env";
 import { util } from "@/utlis/util";
 import utilHttps from "@/utlis/util-https";
 import { defaultProjectHeadImage } from "@/utlis/const";
 import { useProvider } from "@adobe/react-spectrum";
+import iService from "@/service/service";
 
 
 interface LoginRefType { };
@@ -98,6 +99,7 @@ export const Login = forwardRef<LoginRefType, LoginProps>((props, ref) => {
         }
         setUser(user);
         localStorage.setItem('cep-user', JSON.stringify(user));
+        iService.increaseFunctionCoutn(IFunctionName.activePlugin, projects[0]?.id, projects[0]?.name, user.id);
     };
 
     return (

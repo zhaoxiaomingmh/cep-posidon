@@ -102,7 +102,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
             const docSetting = docGeneratorSettings.comPosidonPSCep as IGeneratorSettingsObj;
             if (docSetting.resourceSynchronizationMarkIds) {
                 const ids = JSON.parse(docSetting.resourceSynchronizationMarkIds) as number[] || [];
-                if(ids.length > 0) {
+                if (ids.length > 0) {
                     setGroups(await psHandler.getLayersByIDs(ids));
                 }
             }
@@ -115,7 +115,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
             init: init
         }
     })
-    const updateFigmaDownline = (url?: string) => {
+    const updateFigmaDownline = async (url?: string) => {
         toNative();
         if (!url) {
 
@@ -128,12 +128,15 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
             const formattedDate = `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
-            const settings = {
-                ResourceSynchronizationURL: url,
-                resourceSynchronizationTime: formattedDate,
-                resourceSynchronizationTimeStamp: new Date().getTime(),
+            const docGeneratorSettings = await psHandler.getDocGeneratorSettings();
+            console.log("docGeneratorSettings", docGeneratorSettings)
+            if (docGeneratorSettings.comPosidonPSCep) {
+                const docSetting = docGeneratorSettings.comPosidonPSCep as IGeneratorSettingsObj;
+                docSetting.ResourceSynchronizationURL = url;
+                docSetting.resourceSynchronizationTime = formattedDate;
+                docSetting.resourceSynchronizationTimeStamp = new Date().getTime().toString();
+                await psHandler.setDocGeneratorSettings(docSetting, refreshFigmaSettings)
             }
-            psHandler.setDocGeneratorSettings(settings, refreshFigmaSettings)
             const images = window.cep.fs.readdir(psConfig.figmaImageDir());
             if (images.err === 0) {
                 images.data.forEach(i => {
@@ -247,7 +250,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
             });
         }
 
-      
+
 
     }
     const onCheckAllChange: CheckboxProps['onChange'] = (e) => {
