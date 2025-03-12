@@ -99,7 +99,7 @@ export const Login = forwardRef<LoginRefType, LoginProps>((props, ref) => {
         }
         setUser(user);
         localStorage.setItem('cep-user', JSON.stringify(user));
-        iService.increaseFunctionCoutn(IFunctionName.activePlugin, projects[0]?.id, projects[0]?.name, user.id);
+        iService.increaseFunctionCount(IFunctionName.activePlugin, projects[0]?.id, projects[0]?.name, user.id);
     };
 
     return (

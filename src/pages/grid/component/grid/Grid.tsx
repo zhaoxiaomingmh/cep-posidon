@@ -17,7 +17,7 @@ type GridRefType = {
     handleGridTask: (status: IStatus) => void,
     refreshStatus: IStatus,
     gridStatus: IStatus,
-    handleResize: () => void,
+    setRefreshStatus: (status: IStatus) => void,
 
 };
 export const GridRef = React.createRef<GridRefType>();
@@ -28,7 +28,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
             handleGridTask: handleGridTask,
             refreshStatus: refreshStatus,
             gridStatus: gridStatus,
-            handleResize: handleResize,
+            setRefreshStatus: setRefreshStatus,
         }
     })
     //原始数据
@@ -85,7 +85,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
                     format: "png",
                     imageExportSetting: {
                         compress: false,
-                    } 
+                    }
                 }
             })
             setImage({
@@ -498,7 +498,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
             alert("当前图层不支持九宫格");
             return;
         }
-        await iService.increaseFunctionCoutn(IFunctionName.grid, project.id, project.name, user.id);
+        await iService.increaseFunctionCount(IFunctionName.grid, project.id, project.name, user.id);
         setGridStatus(IStatus.loading);
         const resolution = await psHandler.getDocumentResolution();
         let gridParameter: IGridParameter = {
@@ -583,11 +583,6 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
             const imgDir = path.join(psConfig.gridDir(), `${iGrid.location}.png`);
             //先算出位移再移动
             if (iGrid.validImageInfo.width > 0 && iGrid.validImageInfo.height > 0) {
-                // const result = await psHandler.importImage(imgDir, imageOffset.x, imageOffset.y);
-                // const layer = await psHandler.getActiveLayer();
-                // let layers: number[] = [id];
-                // layers.push(layer.id);
-                // await psHandler.moveLayersToGroup(layers, groupId);
                 let imgPart = {
                     imgDir: imgDir,
                     offsetX: imageOffset.x,
@@ -615,6 +610,11 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         setActiveLayer(gridLayer);
         alert("生成成功");
     }
+    useEffect(() => {
+        if (refreshStatus === IStatus.loading) {
+            handleResize();
+        }
+    }, [refreshStatus])
     //尺寸整理
     const handleResize = async () => {
         if (!(activeLayer.layerKind === LayerKind.group && activeLayer.generatorSettings?.comPosidonPSCep?.isGrid)) {
@@ -627,6 +627,7 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         const topRightLayer = layers.find(x => x.name == 'topRight');
         const bottomRightLayer = layers.find(x => x.name == 'bottomRight');
         if (!topleftLayer && !bottomLeftLayer && !topRightLayer && !bottomRightLayer) {
+            setRefreshStatus(IStatus.success)
             return;
         }
         //GridInfo 
@@ -634,24 +635,28 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
         if (topleftLayer) {
             const topleftRect = gridInfo.grid.find(x => x.location == 'topLeft')!.validImageInfo;
             if (topleftRect && (Math.abs(topleftLayer.bounds.width - topleftRect.width) < 1 && Math.abs(topleftLayer.bounds.height - topleftRect.height) < 1)) {
+                setRefreshStatus(IStatus.success)
                 return;
             }
         }
         if (bottomLeftLayer) {
             const bottomLeftRect = gridInfo.grid.find(x => x.location == 'bottomLeft')!.validImageInfo;
             if (bottomLeftRect && (Math.abs(bottomLeftLayer.bounds.width - bottomLeftRect.width) < 1 && Math.abs(bottomLeftLayer.bounds.height - bottomLeftRect.height) < 1)) {
+                setRefreshStatus(IStatus.success)
                 return;
             }
         }
         if (topRightLayer) {
             const topRightRect = gridInfo.grid.find(x => x.location == 'topRight')!.validImageInfo;
             if (topRightRect && (Math.abs(topRightLayer.bounds.width - topRightRect.width) < 1 && Math.abs(topRightLayer.bounds.height - topRightRect.height) < 1)) {
+                setRefreshStatus(IStatus.success)
                 return;
             }
         }
         if (bottomRightLayer) {
             const bottomRightRect = gridInfo.grid.find(x => x.location == 'bottomRight').validImageInfo;
             if (bottomRightRect && (Math.abs(bottomRightLayer.bounds.width - bottomRightRect.width) < 1 && Math.abs(bottomRightLayer.bounds.height - bottomRightRect.height) < 1)) {
+                setRefreshStatus(IStatus.success)
                 return;
             }
         }
@@ -662,199 +667,6 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
             await psHandler.setPhotoshopPreferencesInterpolation("ResampleMethod.NEARESTNEIGHBOR");
         }
         await psHandler.suspendHistory('九宫格形变', 'gridDeformation', activeLayer.id);
-        // //计算缩放倍率
-
-        // const gridLayer = await psHandler.getActiveLayer();
-        // if (gridLayer.bounds.width == gridInfo.width && gridLayer.bounds.height == gridInfo.height) {
-        //     return;
-        // }
-        // const id = activeLayer.id;
-        // const bounds = gridLayer.bounds;
-        // const layers = await psHandler.getLayersInGroup(id);
-        // console.log("layers", layers);
-        // //咱们先来计算中间的实际宽高
-        // const topleftRect = gridInfo.grid.find(x => x.location == 'topLeft')!.rect;
-        // const bottomLeftRect = gridInfo.grid.find(x => x.location == 'bottomLeft')!.rect;
-        // const topRightRect = gridInfo.grid.find(x => x.location == 'topRight')!.rect;
-        // //实际宽高
-        // const theoryHeight = (bounds.height - topleftRect.height - bottomLeftRect.height);
-        // const theoryWidth = (bounds.width - topleftRect.width - topRightRect.width);
-
-        // for (let index = 0; index < layers.length; index++) {
-        //     let layer = layers[index];
-        //     const grid = gridInfo.grid.find(x => x.location == layer.name);
-        //     if (!grid) {
-        //         continue;
-        //     }
-        //     await psHandler.selectLayer(layer.id);
-        //     await psHandler.setLayerVisible(layer.id, true);
-        //     layer = await psHandler.getActiveLayer();
-        //     //每一步移动都要去除透明像素层的影响
-        //     switch (grid.location) {
-        //         case "topLeft":
-        //             {
-        //                 const scaleX = grid.validImageInfo.width / layer.bounds.width;
-        //                 const scaleY = grid.validImageInfo.height / layer.bounds.height;
-        //                 //缩放offset
-        //                 let offsetX = (layer.bounds.width - grid.validImageInfo.width) / 2;
-        //                 let offsetY = (layer.bounds.height - grid.validImageInfo.height) / 2;
-        //                 //当前原点
-        //                 let org: IPoint = {
-        //                     x: layer.bounds.x + offsetX,
-        //                     y: layer.bounds.y + offsetY,
-        //                 }
-        //                 //理论位置
-        //                 let theoryOrg: IPoint = {
-        //                     x: bounds.x + grid.validImageInfo.left,
-        //                     y: bounds.y + grid.validImageInfo.top,
-        //                 }
-        //                 await psHandler.transformLayer(theoryOrg.x - org.x, theoryOrg.y - org.y, scaleX * 100, scaleY * 100);
-        //                 break;
-        //             }
-        //         case "topMid":
-        //             {
-        //                 if (theoryWidth <= 0) {
-        //                     await psHandler.setLayerVisible(layer.id, false);
-        //                     break;
-        //                 }
-        //                 const actualScaleX = grid.validImageInfo.width / grid.rect.width;
-        //                 const actualWidth = layer.bounds.width / actualScaleX;
-        //                 const scaleX = theoryWidth / actualWidth * 100;
-        //                 const scaleY = grid.validImageInfo.height / layer.bounds.height * 100;
-        //                 await psHandler.transformLayer(0, 0, scaleX, scaleY);
-        //                 const deformLayer = await psHandler.getActiveLayer();
-        //                 let theoryOrg: IPoint = {
-        //                     x: bounds.x + topleftRect.width + (grid.validImageInfo.left * (theoryWidth / grid.rect.width)),
-        //                     y: bounds.y + grid.validImageInfo.top,
-        //                 }
-        //                 await psHandler.transformLayer(theoryOrg.x - deformLayer.bounds.x, theoryOrg.y - deformLayer.bounds.y, 100, 100);
-        //                 break;
-        //             }
-        //         case "topRight":
-        //             {
-        //                 const scaleX = grid.validImageInfo.width / layer.bounds.width * 100;
-        //                 const scaleY = grid.validImageInfo.height / layer.bounds.height * 100;
-        //                 await psHandler.transformLayer(0, 0, scaleX, scaleY);
-        //                 const deformLayer = await psHandler.getActiveLayer();
-        //                 let theoryOrg: IPoint = {
-        //                     x: bounds.x + grid.validImageInfo.left + bounds.width - grid.rect.width,
-        //                     y: bounds.y + grid.validImageInfo.top,
-        //                 }
-        //                 await psHandler.transformLayer(theoryOrg.x - deformLayer.bounds.x, theoryOrg.y - deformLayer.bounds.y, 100, 100);
-        //                 break;
-        //             }
-        //         case "midLeft":
-        //             {
-        //                 //先宽高
-        //                 //宽
-        //                 const scaleX = grid.validImageInfo.width / layer.bounds.width * 100;
-        //                 //高
-        //                 if (theoryHeight <= 0) {
-        //                     await psHandler.setLayerVisible(layer.id, false);
-        //                     break;
-        //                 }
-        //                 const actualScaleY = grid.validImageInfo.height / grid.rect.height;
-        //                 const actualHeight = layer.bounds.height / actualScaleY;
-        //                 const scaleY = theoryHeight / actualHeight * 100;
-        //                 await psHandler.transformLayer(0, 0, scaleX, scaleY);
-        //                 const newLayer = await psHandler.getActiveLayer();
-        //                 let theoryOrg: IPoint = {
-        //                     x: bounds.x + grid.validImageInfo.left,
-        //                     y: bounds.y + topleftRect.height + (grid.validImageInfo.top * (theoryHeight / grid.rect.height)),
-        //                 }
-        //                 await psHandler.transformLayer(theoryOrg.x - newLayer.bounds.x, theoryOrg.y - newLayer.bounds.y, 100, 100);
-        //                 break;
-        //             }
-        //         case "midMid":
-        //             {
-        //                 if (theoryHeight <= 0 || theoryWidth <= 0) {
-        //                     await psHandler.setLayerVisible(layer.id, false);
-        //                     break;
-        //                 }
-        //                 const actualScaleX = grid.validImageInfo.width / grid.rect.width;
-        //                 const actualWidth = layer.bounds.width / actualScaleX;
-        //                 const scaleX = theoryWidth / actualWidth * 100;
-        //                 const actualScaleY = grid.validImageInfo.height / grid.rect.height;
-        //                 const actualHeight = layer.bounds.height / actualScaleY;
-        //                 const scaleY = theoryHeight / actualHeight * 100;
-        //                 await psHandler.transformLayer(0, 0, scaleX, scaleY);
-        //                 const deformLayer = await psHandler.getActiveLayer();
-        //                 let theoryOrg: IPoint = {
-        //                     x: bounds.x + topleftRect.width + (grid.validImageInfo.left * (theoryWidth / grid.rect.width)),
-        //                     y: bounds.y + topleftRect.height + (grid.validImageInfo.top * (theoryHeight / grid.rect.height)),
-        //                 }
-        //                 await psHandler.transformLayer(theoryOrg.x - deformLayer.bounds.x, theoryOrg.y - deformLayer.bounds.y, 100, 100);
-        //                 break;
-        //             }
-        //         case "midRight":
-        //             {
-        //                 if (theoryHeight <= 0) {
-        //                     await psHandler.setLayerVisible(layer.id, false);
-        //                     break;
-        //                 }
-        //                 const scaleX = grid.validImageInfo.width / layer.bounds.width * 100;
-        //                 const actualScaleY = grid.validImageInfo.height / grid.rect.height;
-        //                 const actualHeight = layer.bounds.height / actualScaleY;
-        //                 const scaleY = theoryHeight / actualHeight * 100;
-        //                 await psHandler.transformLayer(0, 0, scaleX, scaleY);
-        //                 const deformLayer = await psHandler.getActiveLayer();
-        //                 let theoryOrg: IPoint = {
-        //                     x: bounds.x + bounds.width - grid.rect.width + grid.validImageInfo.left,
-        //                     y: bounds.y + topleftRect.height + (grid.validImageInfo.top * (theoryHeight / grid.rect.height)),
-        //                 }
-        //                 await psHandler.transformLayer(theoryOrg.x - deformLayer.bounds.x, theoryOrg.y - deformLayer.bounds.y, 100, 100);
-        //                 break;
-        //             }
-        //         case "bottomLeft":
-        //             {
-        //                 const scaleX = grid.validImageInfo.width / layer.bounds.width * 100;
-        //                 const scaleY = grid.validImageInfo.height / layer.bounds.height * 100;
-        //                 await psHandler.transformLayer(0, 0, scaleX, scaleY);
-        //                 const deformLayer = await psHandler.getActiveLayer();
-        //                 let theoryOrg: IPoint = {
-        //                     x: bounds.x + grid.validImageInfo.left,
-        //                     y: bounds.y + bounds.height - bottomLeftRect.height + grid.validImageInfo.top,
-        //                 }
-        //                 await psHandler.transformLayer(theoryOrg.x - deformLayer.bounds.x, theoryOrg.y - deformLayer.bounds.y, 100, 100);
-        //                 break;
-        //             }
-        //         case "bottomMid":
-        //             {
-        //                 if (theoryWidth <= 0) {
-        //                     await psHandler.setLayerVisible(layer.id, false);
-        //                     break;
-        //                 }
-        //                 const actualScaleX = grid.validImageInfo.width / grid.rect.width;
-        //                 const actualWidth = layer.bounds.width / actualScaleX;
-        //                 const scaleX = theoryWidth / actualWidth * 100;
-        //                 const scaleY = grid.validImageInfo.height / layer.bounds.height * 100;
-        //                 await psHandler.transformLayer(0, 0, scaleX, scaleY);
-        //                 const deformLayer = await psHandler.getActiveLayer();
-        //                 let theoryOrg: IPoint = {
-        //                     x: bounds.x + topleftRect.width + (grid.validImageInfo.left * (theoryWidth / grid.rect.width)),
-        //                     y: bounds.y + bounds.height - bottomLeftRect.height + grid.validImageInfo.top,
-        //                 }
-        //                 await psHandler.transformLayer(theoryOrg.x - deformLayer.bounds.x, theoryOrg.y - deformLayer.bounds.y, 100, 100);
-        //                 break;
-        //             }
-        //         case "bottomRight":
-        //             {
-        //                 const scaleX = grid.validImageInfo.width / layer.bounds.width * 100;
-        //                 const scaleY = grid.validImageInfo.height / layer.bounds.height * 100;
-        //                 await psHandler.transformLayer(0, 0, scaleX, scaleY);
-        //                 const deformLayer = await psHandler.getActiveLayer();
-        //                 let theoryOrg: IPoint = {
-        //                     x: bounds.x + grid.validImageInfo.left + bounds.width - grid.rect.width,
-        //                     y: bounds.y + bounds.height - grid.rect.height + grid.validImageInfo.top,
-        //                 }
-        //                 await psHandler.transformLayer(theoryOrg.x - deformLayer.bounds.x, theoryOrg.y - deformLayer.bounds.y, 100, 100);
-        //                 break;
-        //             }
-
-        //     }
-
-        // }
-        // await psHandler.selectLayer(id);
         if (interpolation != "ResampleMethod.NEARESTNEIGHBOR") {
             var meth = interpolation as string;
             await psHandler.setPhotoshopPreferencesInterpolation(meth);
@@ -1122,7 +934,9 @@ export const Grid = forwardRef<GridRefType, GridProps>((props, ref) => {
                 {
                     (activeLayer.layerKind == LayerKind.group && activeLayer.generatorSettings?.comPosidonPSCep?.gridInfo)
                     &&
-                    <Button className="grid-gen" type="primary" loading={refreshStatus === IStatus.loading} onClick={handleResize}>
+                    <Button className="grid-gen" type="primary" loading={refreshStatus === IStatus.loading} onClick={() => {
+                        setRefreshStatus(IStatus.loading)
+                    }}>
                         尺寸整理
                     </Button>
                 }

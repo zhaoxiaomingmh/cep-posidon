@@ -13,6 +13,8 @@ class handler {
     public csInterface: CSInterface;
     public extId: string;
     public appId: string;
+    public isWindowVisible: string;
+    public cumulativeTime: number = 0;
 
     private selectEventId: string;
     private closeEventId: string;
@@ -24,6 +26,8 @@ class handler {
     private makeEventId: string;
     private transformEventId: string;
     private placeEventId: string;
+    private closeDocumentEventId: string;
+
 
     constructor() {
         console.log("中央处理器注册成功");
@@ -37,7 +41,10 @@ class handler {
         this.makeEventId = "1298866208";
         this.transformEventId = "1416785510";
         this.placeEventId = "1349280544";
+        this.closeDocumentEventId = "1131180832";
         this.init();
+        this.pluginPersistence();
+        this.timingTasks();
     }
     public static getInstance(): handler {
         handler.instance = new handler();
@@ -86,6 +93,7 @@ class handler {
         this.registerEvent('make');
         this.registerEvent('transform');
         this.registerEventByTypeID("1349280544");
+        this.registerEventByTypeID("1131180832");
         this.getCurrentTheme();
 
         this.csInterface.addEventListener('com.posidon.generator.plugin', (data: IEventResult) => {
@@ -124,6 +132,9 @@ class handler {
                 this.refreshActiveLayer();
                 this.refreshGroup()
             }
+            if (parseInt(obj.eventID) === parseInt(this.closeDocumentEventId)) {
+                console.log('CloseDocument事件', obj);
+            }
             if (parseInt(obj.eventID) === parseInt(this.openEventId)) {
                 this.refreshActiveLayer();
                 this.refreshGroup()
@@ -150,7 +161,7 @@ class handler {
             }
             if (parseInt(obj.eventID) === parseInt(this.transformEventId)) {
                 console.log('Transform事件', obj);
-                GridRef?.current?.handleResize();
+                GridRef?.current?.setRefreshStatus(IStatus.loading);
             }
             if (parseInt(obj.eventID) === parseInt(this.placeEventId)) {
                 console.log('Place事件', obj);
@@ -167,7 +178,34 @@ class handler {
         this.csInterface.addEventListener(`console_log_event`, (result) => {
             console.log('console_log_event', result);
         }, undefined)
+
     }
+    //插件持久化
+    private pluginPersistence() {
+        const event = new CSEvent("com.adobe.PhotoshopPersistent", "APPLICATION", this.appId, this.extId);
+        this.csInterface.dispatchEvent(event);
+    }
+    //计时任务 
+    private timingTasks() {
+        //执行代码
+        const isWindowVisible = this.csInterface.isWindowVisible();
+        if (isWindowVisible !== this.isWindowVisible) {
+            if (isWindowVisible === 'false') {
+                AppRef?.current?.scheduledTaskForUpdateTimestamp(true);
+                this.cumulativeTime = 0;
+            } 
+            this.isWindowVisible = isWindowVisible;
+        } else {
+            if (isWindowVisible && this.cumulativeTime + 10 < 300) {
+                this.cumulativeTime += 10;
+            } else {
+                AppRef?.current?.scheduledTaskForUpdateTimestamp(false);
+                this.cumulativeTime = 0;
+            }
+        }
+        setTimeout(() => { this.timingTasks(); }, 10000)
+    }
+    //刷新编组
     private refreshGroup() {
         ResourceSynchronizationRef?.current?.init();
     }
@@ -387,31 +425,6 @@ class handler {
             callback && callback();
         });
     }
-    public async fastExport(layer: ILayer) {
-        console.log('fastExport', layer)
-        const suffix = new Date().getTime();
-        // const floderPath = psConfig.downloadDir();
-        const floderPath = "C:\\Users\\wb.zhaominghui01\\Desktop\\新建文件夹";
-        const param = {
-            layer: true,
-            path: floderPath,
-            suffix: suffix
-        }
-        const fileName = suffix + '.png';
-        this.csInterface.evalScript(`$._ext.quick_export_png(${JSON.stringify(param)})`, (result) => {
-            setTimeout(() => {
-                console.log('fileName', fileName, result)
-                const oldPath = path.join(floderPath, "组 4" + ".png");
-                console.log('oldPath', oldPath)
-                const newPath = path.join(floderPath, fileName);
-                console.log('newPath', newPath)
-                console.log('newPath', window.cep.fs.stat(oldPath))
-                if (window.cep.fs.stat(oldPath).err === 0) {
-                    window.cep.fs.rename(oldPath, newPath);
-                }
-            }, 100)
-        });
-    }
     public async sendToGenerator(params: IGeneratorParams) {
         console.log("sendToGenerator", params)
         this.csInterface.evalScript(`$._ext.sendToGenerator(${JSON.stringify(params)})`, (result) => {
@@ -599,51 +612,6 @@ class handler {
             })
         })
     }
-    //获取文档元数据XmpData
-    public async getXmpDataByKey(key: string): Promise<any> {
-        //key为页面+功能
-        return new Promise((resolve, reject) => {
-            this.csInterface.evalScript(`$._ext.getXmpDataByKey()`, (result) => {
-                console.log("result", result);
-                if (result && result != null) {
-                    resolve(result);
-                } else {
-                    resolve([]);
-                }
-            })
-        })
-    }
-    //设置文档元数据
-    public async setXmpDataByKey(key: string, value: any): Promise<boolean> {
-        const params = {
-            key: key,
-            value: value
-        }
-        return new Promise((resolve, reject) => {
-            this.csInterface.evalScript(`$._ext.setXmpDataByKey(${JSON.stringify(params)})`, (result) => {
-                console.log("result", result);
-                if (result) {
-                    resolve(true);
-                } else {
-                    reject(false);
-                }
-            })
-        })
-    }
-    //删除文档元数据
-    public async delXmpDataByKey(): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            this.csInterface.evalScript(`$._ext.delXmpDataByKey()`, (result) => {
-                console.log("result", result);
-                if (result) {
-                    resolve(true);
-                } else {
-                    reject(false);
-                }
-            })
-        })
-    }
-
 }
 
 const psHandler = handler.getInstance();

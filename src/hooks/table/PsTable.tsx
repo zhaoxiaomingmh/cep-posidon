@@ -4,6 +4,7 @@ import { SideIcon } from "./SideIcon";
 import { PsTableItemProps } from "./PsTableItem";
 import './PsTable.scss'
 import React from 'react';
+import { AppRef } from "@/router/App";
 
 interface PsTableRef { }
 interface PsTableProps {

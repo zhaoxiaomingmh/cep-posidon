@@ -15,7 +15,7 @@ export const DocumentSlimming = forwardRef<DocumentSlimmingRefType, DocumentSlim
     const user = useUserStore(state => state.getUser());
     
     const documentSlimming = async () => {
-        await iService.increaseFunctionCoutn(IFunctionName.psdDeepClean, project.id, project.name, user.id);
+        await iService.increaseFunctionCount(IFunctionName.psdDeepClean, project.id, project.name, user.id);
         await psHandler.documentSlimming();
     }
 

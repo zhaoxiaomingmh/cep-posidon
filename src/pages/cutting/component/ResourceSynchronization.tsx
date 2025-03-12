@@ -264,7 +264,7 @@ export const ResourceSynchronization = forwardRef<ResourceSynchronizationRefType
         }
     };
     const generateFigmaUrl = () => {
-        iService.increaseFunctionCoutn(IFunctionName.generateFigmaUrl, project.id, project.name, user.id);
+        iService.increaseFunctionCount(IFunctionName.generateFigmaUrl, project.id, project.name, user.id);
         if (checkedList?.length === 0) {
             alert('请选择要同步的编组');
             return;

@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import './PsFunc.scss'
 import useAppStore from "@/store/modules/appStore";
 import { PsFuncItemProps } from "./PsFuncItem";
@@ -9,9 +9,8 @@ interface PsFuncProps {
 }
 export const PsFunc = forwardRef<PsFuncRef, PsFuncProps>((props, ref) => {
 
-    const func = useAppStore(state => state.func);
+    const func = useAppStore(state => state.getFunc());
     const setFunc = useAppStore(state => state.setFunc);
-
     useEffect(() => {
         Array.isArray(props.children) ? setFunc(props.children[0].props.id) : setFunc(props.children.props.id);
     }, [])

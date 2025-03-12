@@ -1,6 +1,6 @@
 import { Login, LoginRef } from "@/pages/welcome/Login";
 import psHandler from "@/service/handler";
-import { IFunctionName, ILayer, IPosidonResponse, IProject, IProjectStorehouse, IUser, IVersion } from "@/store/iTypes/iTypes";
+import { IFunctionName, ILayer, ILogTaskItem, IPosidonResponse, IProject, IProjectStorehouse, ITable, ITimestampItem, IUser, IVersion } from "@/store/iTypes/iTypes";
 import useDocumentStore from "@/store/modules/documentStore";
 import useUserStore from "@/store/modules/userStore";
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
@@ -13,39 +13,89 @@ import { defaultProjectHeadImage } from "@/utlis/const";
 import iService from "@/service/service";
 import { Update, UpdateRef } from "@/pages/welcome/Update";
 import path from "path";
-import { ExportDialog, ExportDialogRef } from "@/pages/cutting/component/cuttingTool/ExportDialog";
+import useAppStore from "@/store/modules/appStore";
 
 interface AppRefType {
     refresh: () => void;
     user: IUser;
     selectLayer: (layer: ILayer) => void
+    updateTimestamp: (table: string) => void,
+    scheduledTaskForUpdateTimestamp: (needToZero: boolean) => void
 };
 interface AppProps { }
 export const AppRef = React.createRef<AppRefType>();
 export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
     const handler = psHandler;
     const user = useUserStore(state => state.getUser());
+    const project = useUserStore(state => state.getProject());
     const setUser = useUserStore(state => state.setUser);
     const setProject = useUserStore(state => state.setProject);
     const activeDocument = useDocumentStore(state => state.getActiveDocument());
     const setActiveDocument = useDocumentStore(state => state.setActiveDocument);
-    const activeLayer = useDocumentStore(state => state.getActiveLayer());
     const setActiveLayer = useDocumentStore(state => state.setActiveLayer);
     const [currentTheme, setCurrentTheme] = useState(defaultTheme)
     const [currentScheme, setCurrentScheme] = useState<'dark' | 'light'>('dark')
     const [themeClass, setThemeClass] = useState('dark')
     const [version, setVersion] = useState<string>(psConfig.version);
     const [desc, setDesc] = useState<string>("");
-    const [generate, setGenerate] = useState<string>(undefined);
     const [update, setUpdate] = useState<'latest' | 'plugin' | 'generator'>('latest');
+    //用于统计功能/模块使用时间
+    const [tableTimeItem, setTableTimeItem] = useState<ITimestampItem>(undefined);
+    const table = useAppStore(state => state.getTable());
+    const updateTimestamp = (newTable: string) => {
+        console.log("更新时间戳:源功能", table);
+        console.log("更新时间戳:新功能", newTable);
+        const now = new Date().getTime();
+        if (tableTimeItem) {
+            const time = Math.ceil((now - tableTimeItem.timestamp) / 1000);
+            console.log("更新时间戳：时间", time);
+            const value = ITable[table];
+            console.log("更新时间戳:功能名", value);
+            iService.increaseFunctionCount(IFunctionName.logTask, project.id, project.name, user.id, {
+                name: value,
+                time: time
+            });
+        }
+        setTableTimeItem({
+            name: newTable,
+            type: "table",
+            timestamp: now,
+        })
+    }
 
+    const scheduledTaskForUpdateTimestamp = (needToZero: boolean) => {
+        const now = new Date().getTime();
+        if (tableTimeItem) {
+            const time = Math.ceil((now - tableTimeItem.timestamp) / 1000);
+            console.log("更新时间戳：时间", time);
+            const value = ITable[table];
+            console.log("更新时间戳:功能名", value);
+            iService.increaseFunctionCount(IFunctionName.logTask, project.id, project.name, user.id, {
+                name: value,
+                time: time
+            });
+        }
+        if (needToZero) {
+            setTableTimeItem(undefined)
+        } else {
+            setTableTimeItem({
+                name: table,
+                type: "table",
+                timestamp: now,
+            })
+        }
+
+    }
     useImperativeHandle(ref, () => {
         return {
             refresh: checkActiveDocument,
             user: user,
-            selectLayer: setActiveLayer
+            selectLayer: setActiveLayer,
+            updateTimestamp: updateTimestamp,
+            scheduledTaskForUpdateTimestamp: scheduledTaskForUpdateTimestamp
         }
     })
+
     useEffect(() => {
         const exid = handler.extId;
         if (psConfig.env == "prod" && exid == "posidon-ps-cep-main") {
@@ -159,7 +209,7 @@ export const App = forwardRef<AppRefType, AppProps>((props, ref) => {
                     const project = user.projects.find(p => p.id === user.last);
                     setProject(project)
                 }
-                iService.increaseFunctionCoutn(IFunctionName.activePlugin, projects[0]?.id, projects[0]?.name, user.id);
+                iService.increaseFunctionCount(IFunctionName.activePlugin, projects[0]?.id, projects[0]?.name, user.id);
             } else {
                 localStorage.removeItem('cep-user');
             }

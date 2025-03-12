@@ -190,7 +190,7 @@ export const CuttingToolPage = forwardRef<CuttingToolPageRefType, CuttingToolPag
 
     //开始导出任务
     const startExport = async (localPath: string) => {
-        await iService.increaseFunctionCoutn(IFunctionName.cuttingToolExport, project.id, project.name, user.id);
+        await iService.increaseFunctionCount(IFunctionName.cuttingToolExport, project.id, project.name, user.id);
         if (checkedList.length === 0 || !localPath || status === IStatus.loading) return;
         setStatus(IStatus.loading);
         setSuccessList([]);

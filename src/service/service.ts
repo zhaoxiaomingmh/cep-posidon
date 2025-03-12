@@ -1,7 +1,7 @@
 import { ImageSearchImageRef } from '@/pages/search/component/ImageSearchImage';
 import { TextSearchImageRef } from '@/pages/search/component/TextSearchImage';
 import { AppRef } from '@/router/App';
-import { IAccountResponse, IPosidonPageResponse, IPosidonResponse, ISearchItem, ISearchResult, ISvnPsdDirTreeNode, ISvnPsdGroup } from '@/store/iTypes/iTypes';
+import { IAccountResponse, IFunctionName, IPosidonPageResponse, IPosidonResponse, ISearchItem, ISearchResult, ISvnPsdDirTreeNode, ISvnPsdGroup } from '@/store/iTypes/iTypes';
 import { psConfig } from '@/utlis/util-env';
 import utilHttps from '@/utlis/util-https';
 import axios from 'axios';
@@ -248,8 +248,20 @@ class psSerive {
     public async increaseDownloadCount(url: string, projectId: number, projectName: string, type: string) {
         const response: any = await utilHttps.httpPost(psConfig.increaseDownloadCount, { projectId: projectId, projectName: projectName, downloadUrl: url, type: type })
     }
-    public async increaseFunctionCoutn(func: string, projectId: number, projectName: string, userId: number) {
-        const response: any = await utilHttps.httpPost(psConfig.functionUsageStatistics, { FunctionName: func, ProjectID: projectId, ProjectName: projectName, UserID: userId, PluginType: "posidon-cep" })
+    public async increaseFunctionCount(func: IFunctionName, projectId: number, projectName: string, userId: number, extraData?: Record<string, unknown>) {
+        const payload = {
+            FunctionName: func,
+            ProjectID: projectId,
+            ProjectName: projectName,
+            UserID: userId,
+            PluginType: "posidon-cep" as const,
+            ...(extraData ? { data: extraData } : {})
+        };
+
+        const response = await utilHttps.httpPost(
+            psConfig.functionUsageStatistics,
+            payload
+        );
     }
 }
 

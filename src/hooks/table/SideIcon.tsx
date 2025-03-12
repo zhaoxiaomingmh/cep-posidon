@@ -16,11 +16,11 @@ export const SideIcon = forwardRef<SideIconRef, SideIconProps>((props, ref) => {
     const setTable = useAppStore(state => state.setTable);
 
     return (
-        <div className={props.isGap?'side-gap':'side-icon'} onClick={() => {
-                if(props.active || props.isGap) return;
-                setTable(props.id);
+        <div className={props.isGap ? 'side-gap' : 'side-icon'} onClick={() => {
+            if (props.active || props.isGap) return;
+            setTable(props.id);
         }}>
-            {!props.isGap&&<div className={`side-icon__main ${props.active ? "selected" : ""}`}>
+            {!props.isGap && <div className={`side-icon__main ${props.active ? "selected" : ""}`}>
                 {props.children}
             </div>}
         </div>);

@@ -6,8 +6,9 @@ $.level = 0;
 try {
     var xLib = new ExternalObject("lib:\PlugPlugExternalObject");
 } catch (e) {
-    alert(e.toString());
+    alert("PhotoShop外部库PlugPlugExternalObject加载中，请点击重试（可能需要重复多次哦）");
 }
+
 const classProperty = charIDToTypeID("Prpr");
 const propNull = charIDToTypeID("null");
 const classNull = charIDToTypeID("null");
@@ -149,41 +150,6 @@ $._ext = {
             }
         })
         return JSON.stringify(layers);
-    },
-    quick_export_png: function (params) {
-        //暂时不用
-        try {
-            if (params.layer == undefined) layer = false;
-
-            var d = new ActionDescriptor();
-
-            var r = new ActionReference();
-
-            r.putEnumerated(stringIDToTypeID("layer"), stringIDToTypeID("ordinal"), stringIDToTypeID("targetEnum"));
-
-            d.putReference(stringIDToTypeID("null"), r);
-
-            d.putString(stringIDToTypeID("fileType"), "png");
-
-            d.putInteger(stringIDToTypeID("quality"), 32);
-
-            d.putInteger(stringIDToTypeID("metadata"), 0);
-
-            d.putString(stringIDToTypeID("destFolder"), params.path);
-
-            d.putBoolean(stringIDToTypeID("sRGB"), true);
-
-            d.putBoolean(stringIDToTypeID("openWindow"), false);
-
-            d.putString(stringIDToTypeID("Suffix"), params.suffix);
-
-            executeAction(stringIDToTypeID(params.layer ? "exportSelectionAsFileTypePressed" : "exportDocumentAsFileTypePressed"), d, DialogModes.NO);
-
-            return true;
-        } catch (e) {
-            psconsole.log(e);
-            return false;
-        }
     },
     sendToGenerator: function (params) {
         try {
@@ -735,76 +701,6 @@ $._ext = {
     getDocumentResolution: function () {
         return app.activeDocument.resolution;
     },
-    //获取
-    getXmpDataByKey: function () {
-        if (ExternalObject.AdobeXMPScript == undefined) {
-            ExternalObject.AdobeXMPScript = new ExternalObject("lib:AdobeXMPScript");
-        }
-        var xmp, xmpObject;
-        try {
-            xmp = app.activeDocument.xmpMetadata.rawData;
-            xmpObject = new XMPMeta(xmp);
-        } catch (e) {
-            xmpObject = new XMPMeta();
-        }
-        var value = null;
-        try {
-            XMPMeta.registerNamespace("posidon", "cep");
-            var property = xmpObject.getProperty("posidon", "cuttingtoolmark");
-            value = property.value;
-        } catch (e) {
-            return null;
-        }
-        return JSON.stringify(value);
-    },
-    //设置元数据
-    setXmpDataByKey: function (params) {
-        var value = params.value;
-        try {
-            // 这个是它依赖的外部库，需要先判断，再引用
-            if (ExternalObject.AdobeXMPScript == undefined) {
-                ExternalObject.AdobeXMPScript = new ExternalObject("lib:AdobeXMPScript");
-            }
-            var xmpObject;
-            try {
-                var xmp = app.activeDocument.xmpMetadata.rawData;
-                xmpObject = new XMPMeta(xmp);
-            } catch (e) {
-                xmpObject = new XMPMeta();
-            }
-            XMPMeta.registerNamespace("posidon", "cep");
-            xmpObject.deleteProperty("posidon", "cuttingtoolmark");
-            xmpObject.setProperty("posidon", "cuttingtoolmark", value);
-            app.activeDocument.xmpMetadata.rawData = xmpObject.serialize();
-            return true;
-        } catch (e) {
-            psconsole.log(e);
-            return false;
-        }
-    },
-    //删除命名空间
-    delXmpDataByKey: function() {
-        try {
-            // 这个是它依赖的外部库，需要先判断，再引用
-            if (ExternalObject.AdobeXMPScript == undefined) {
-                ExternalObject.AdobeXMPScript = new ExternalObject("lib:AdobeXMPScript");
-            }
-            var xmpObject;
-            try {
-                var xmp = app.activeDocument.xmpMetadata.rawData;
-                xmpObject = new XMPMeta(xmp);
-            } catch (e) {
-                xmpObject = new XMPMeta();
-            }
-            XMPMeta.registerNamespace("posidon", "cep");
-            xmpObject.deleteProperty("posidon", "cuttingtoolmark");
-            app.activeDocument.xmpMetadata.rawData = xmpObject.serialize();
-            return true;
-        } catch (e) {
-            psconsole.log(e);
-            return false;
-        }
-    }
 };
 function openImage(params) {
     var path = params.path;
@@ -924,10 +820,10 @@ Layer.prototype.kind = function () {
 */
 Layer.prototype.bounds = function () {
     var layerReference = new ActionReference();
-    layerReference.putProperty(charIDToTypeID("Prpr"), stringIDToTypeID("bounds"));
+    layerReference.putProperty(charIDToTypeID("Prpr"), stringIDToTypeID("boundsNoEffects"));
     layerReference.putIdentifier(charIDToTypeID("Lyr "), this.id);
     var layerDescriptor = executeActionGet(layerReference);
-    var rectangle = layerDescriptor.getObjectValue(stringIDToTypeID("bounds"));
+    var rectangle = layerDescriptor.getObjectValue(stringIDToTypeID("boundsNoEffects"));
     var left = rectangle.getUnitDoubleValue(charIDToTypeID("Left"));
     var top = rectangle.getUnitDoubleValue(charIDToTypeID("Top "));
     var right = rectangle.getUnitDoubleValue(charIDToTypeID("Rght"));

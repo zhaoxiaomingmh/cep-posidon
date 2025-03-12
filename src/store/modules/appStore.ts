@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { IAppState } from '../iTypes/iTypes';
+import { AppRef } from '@/router/App';
 
 const useAppStore = create<IAppState>((set, get) => ({
     table: undefined,
@@ -11,6 +12,7 @@ const useAppStore = create<IAppState>((set, get) => ({
             ...state,
             table: table
         }))
+        AppRef?.current?.updateTimestamp(table)
     },
     getTable() {
         return get().table;

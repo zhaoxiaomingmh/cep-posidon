@@ -131,7 +131,7 @@ export const PsdLevel = forwardRef<PsdLevelRefType, PsdLevelProps>((props, ref) 
             }
             setIsSearch(false);
             if( data.children.length > 0) {
-                iService.increaseFunctionCoutn(IFunctionName.psdLevel, project.id, project.name, user.id);
+                iService.increaseFunctionCount(IFunctionName.psdLevel, project.id, project.name, user.id);
             }
         } catch (error) {
             console.error('Error fetching data:', error);

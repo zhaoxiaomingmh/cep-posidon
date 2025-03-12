@@ -440,9 +440,14 @@ export enum IFunctionName {
     generateFigmaUrl = "generateFigmaUrl",
     psdDeepClean = "psdDeepClean",
     psdLevel = "psdLevel",
-    activePlugin= "activePlugin",
+    activePlugin = "activePlugin",
+    logTask = "logTask",
 }
 
+export interface ILogTaskItem {
+    name: string,
+    time: number,
+}
 
 export interface ISettingsState {
     imageExportSetting: IImageExportSetting,
@@ -455,3 +460,19 @@ export interface IImageExportSetting {
     compress: boolean,
     rename: boolean,
 }
+
+
+export interface ITimestampItem {
+    name: string,
+    type: 'func' | 'table',
+    timestamp: number,
+}
+
+export enum ITable {
+    "asset-search-page" = "图片搜索",
+    "psd-level-page" = "PSD文件分类浏览",
+    "cutting-page" = "PSD资源切图",
+    "grid-page" = " PS九宫应用",
+    "clean-page" = "PSD瘦身",
+    "settings" = "设置",
+} 
